@@ -5,24 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mote — Today, in a Word</title>
 <meta property="og:title" content="Mote — Today, in a Word" />
-<meta property="og:description" content="A daily almanac of the world's words. One word per person, every day." />
+<meta property="og:description" content="One word a day. The world's words, set big. Resets at midnight UTC." />
 <meta property="og:url" content="https://mote.day" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper:        #f1e7d0;
-    --paper-deep:   #e9dcc0;
-    --ink:          #16223a;
-    --ink-soft:     #4a546b;
-    --ink-faint:    #8a8676;
-    --rule:         #c4b89a;
-    --rule-soft:    #d8cdaf;
-    --vermillion:   #b62a1c;
-    --vermillion-d: #8e1d12;
+    --paper:        #efe6d2;
+    --paper-warm:   #f4ecd9;
+    --ink:          #0e1115;
+    --ink-soft:     #3d4148;
+    --ink-faint:    #7d7666;
+    --rule:         #cdc1a1;
+    --rule-soft:    #ddd2b1;
+    --vermillion:   #d2381c;
+    --vermillion-d: #a81e0a;
 
     --display: "Fraunces", "Times New Roman", serif;
     --body:    "Newsreader", Georgia, serif;
@@ -43,278 +43,279 @@
 
   body {
     background-image:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,250,232,0.6), transparent 60%),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.13  0 0 0 0 0.22  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      radial-gradient(ellipse 90% 50% at 50% -10%, rgba(255,250,232,0.7), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 90% 100%, rgba(210,56,28,0.04), transparent 70%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.07  0 0 0 0 0.10  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 56px 28px 80px;
     position: relative;
     overflow-x: hidden;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse 100% 60% at 50% 100%, rgba(20,20,20,0.06), transparent 70%);
-    z-index: 0;
-  }
-
   .page {
     width: 100%;
-    max-width: 840px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 18px 32px 48px;
     position: relative;
-    z-index: 1;
-  }
-
-  /* — Masthead — */
-  .masthead {
-    text-align: center;
-    padding-bottom: 28px;
-  }
-  .masthead .kicker {
-    font-family: var(--body);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 13px;
-    color: var(--ink-soft);
-    letter-spacing: 0.02em;
-    margin: 0 0 22px;
-    opacity: 0;
-    animation: rise 700ms ease-out 80ms forwards;
-  }
-  .nameplate {
-    font-family: var(--display);
-    font-variation-settings: "opsz" 144, "SOFT" 30;
-    font-weight: 350;
-    font-style: italic;
-    font-size: clamp(72px, 14vw, 132px);
-    line-height: 0.85;
-    margin: 0;
-    letter-spacing: -0.025em;
-    color: var(--ink);
-    opacity: 0;
-    animation: rise 900ms ease-out 180ms forwards;
-  }
-  .nameplate .dot {
-    color: var(--vermillion);
-    font-style: normal;
-  }
-
-  .ornament {
+    min-height: 100vh;
     display: flex;
-    align-items: center;
-    gap: 18px;
-    margin: 28px auto 0;
-    max-width: 520px;
-    opacity: 0;
-    animation: rise 700ms ease-out 360ms forwards;
-  }
-  .ornament .line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--rule) 20%, var(--rule) 80%, transparent);
-  }
-  .ornament .fleur {
-    font-family: var(--body);
-    color: var(--vermillion);
-    font-size: 16px;
-    line-height: 1;
-    transform: translateY(-1px);
+    flex-direction: column;
   }
 
-  .colophon {
-    margin: 18px auto 0;
+  /* — Masthead bar (single line) — */
+  .bar {
     display: flex;
-    justify-content: space-between;
     align-items: baseline;
+    justify-content: space-between;
     gap: 24px;
-    max-width: 520px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    opacity: 0;
+    animation: rise 500ms ease-out 50ms forwards;
+  }
+  .bar .brand {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 30, "wght" 400;
+    font-style: italic;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .bar .brand .dot { color: var(--vermillion); font-style: normal; }
+  .bar .meta {
+    display: flex;
+    gap: 22px;
     font-family: var(--body);
     font-size: 11px;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--ink-faint);
-    opacity: 0;
-    animation: rise 700ms ease-out 480ms forwards;
+    font-variant-numeric: tabular-nums;
   }
-  .colophon .dateline { text-align: left; }
-  .colophon .issue { text-align: right; font-variant-numeric: tabular-nums; }
+  .bar .meta .sep { color: var(--rule); }
 
-  /* — Section title — */
-  .lede {
-    margin: 56px 0 0;
-    text-align: center;
-    opacity: 0;
-    animation: rise 800ms ease-out 600ms forwards;
+  /* — Hero (above the fold) — */
+  .hero {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: start;
   }
-  .lede h2 {
-    font-family: var(--display);
-    font-variation-settings: "opsz" 144, "SOFT" 50;
-    font-weight: 300;
-    font-style: italic;
-    font-size: clamp(40px, 6.5vw, 64px);
-    line-height: 1.02;
-    letter-spacing: -0.02em;
-    margin: 0;
-    color: var(--ink);
-  }
-  .lede p {
-    margin: 22px auto 0;
-    max-width: 460px;
+  .hero-eyebrow {
     font-family: var(--body);
-    font-size: 16.5px;
-    line-height: 1.55;
-    color: var(--ink-soft);
     font-style: italic;
+    font-size: 15px;
+    color: var(--vermillion);
+    letter-spacing: 0.01em;
+    margin: 0;
+    opacity: 0;
+    animation: rise 500ms ease-out 120ms forwards;
+  }
+  .hero-eyebrow .count {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "wght" 500;
+    font-style: normal;
+    font-size: 17px;
+    color: var(--vermillion);
+    margin-right: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-eyebrow .pulse {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--vermillion);
+    margin-right: 10px;
+    transform: translateY(-2px);
+    animation: pulse 1800ms ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.35; transform: translateY(-2px) scale(0.85); }
+    50%      { opacity: 1;    transform: translateY(-2px) scale(1.15); }
+  }
+
+  h1.hero-title {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 350;
+    font-style: italic;
+    font-size: clamp(56px, 9vw, 116px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin: 6px 0 0;
+    color: var(--ink);
+    opacity: 0;
+    animation: rise 700ms ease-out 180ms forwards;
+  }
+  h1.hero-title .stamp {
+    color: var(--vermillion);
+    font-style: italic;
+    position: relative;
+    display: inline-block;
+  }
+  h1.hero-title .stamp::after {
+    content: "";
+    position: absolute;
+    left: -2%;
+    right: -2%;
+    bottom: 8%;
+    height: 14%;
+    background: var(--vermillion);
+    opacity: 0.14;
+    z-index: -1;
+    transform: skewX(-3deg);
   }
 
   /* — Composer — */
   #composer {
-    margin: 56px auto 0;
-    width: 100%;
+    margin-top: 18px;
     opacity: 0;
-    animation: rise 800ms ease-out 720ms forwards;
+    animation: rise 700ms ease-out 280ms forwards;
   }
+
   .compose {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0;
+    align-items: stretch;
+    border-bottom: 2px solid var(--ink);
+    max-width: 760px;
   }
-  .compose .label {
-    font-family: var(--body);
-    font-size: 11px;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .compose .label .arrow {
-    color: var(--vermillion);
-    font-size: 14px;
-    transform: translateY(-1px);
-  }
-
-  .input-frame {
-    position: relative;
-    width: 100%;
-    max-width: 520px;
-    padding: 0 24px;
-  }
-  .input-frame::before, .input-frame::after {
-    content: "·";
-    position: absolute;
-    bottom: 6px;
-    color: var(--ink-faint);
-    font-size: 24px;
-    line-height: 1;
-  }
-  .input-frame::before { left: 8px; }
-  .input-frame::after  { right: 8px; }
-
-  input[type="text"] {
-    width: 100%;
+  .compose input[type="text"] {
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--ink-soft);
     font-family: var(--display);
-    font-variation-settings: "opsz" 144, "SOFT" 40;
-    font-weight: 350;
+    font-variation-settings: "opsz" 144, "SOFT" 40, "wght" 350;
     font-style: italic;
-    font-size: clamp(40px, 6vw, 56px);
-    line-height: 1.1;
-    text-align: center;
+    font-size: clamp(36px, 5.5vw, 64px);
+    line-height: 1.05;
     color: var(--ink);
-    padding: 6px 0 14px;
+    padding: 6px 14px 14px 0;
     outline: none;
     caret-color: var(--vermillion);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    width: 100%;
   }
-  input[type="text"]:focus { border-bottom-color: var(--vermillion); }
-  input[type="text"]::placeholder {
+  .compose input::placeholder {
     color: var(--ink-faint);
+    opacity: 0.6;
     font-style: italic;
-    opacity: 0.55;
   }
 
-  .hint {
+  .cta {
     font-family: var(--body);
     font-size: 13px;
-    line-height: 1.4;
-    color: var(--ink-faint);
-    font-style: italic;
-    min-height: 18px;
-    text-align: center;
-    max-width: 360px;
-  }
-  .hint.error { color: var(--vermillion); }
-
-  button {
-    font-family: var(--body);
-    font-size: 11px;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     background: var(--ink);
     color: var(--paper);
     border: none;
-    padding: 14px 26px 13px;
+    padding: 0 28px;
+    margin-bottom: 6px;
     cursor: pointer;
-    transition: background 180ms ease, letter-spacing 240ms ease, color 180ms ease;
     font-weight: 500;
+    align-self: stretch;
+    transition: background 180ms ease, letter-spacing 240ms ease, transform 180ms ease;
+    white-space: nowrap;
   }
-  button:hover {
+  .cta:hover {
     background: var(--vermillion);
     letter-spacing: 0.32em;
   }
-  button:disabled { opacity: 0.55; cursor: wait; }
-  button.ghost {
-    background: transparent;
-    color: var(--ink-faint);
-    padding: 14px 14px 13px;
-    border-bottom: 1px solid transparent;
-    transition: color 180ms ease, border-color 180ms ease;
+  .cta:active { transform: translateY(1px); }
+  .cta:disabled { opacity: 0.55; cursor: wait; }
+
+  .compose-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 12px;
+    max-width: 760px;
   }
-  button.ghost:hover {
-    background: transparent;
-    color: var(--vermillion);
-    letter-spacing: 0.28em;
-    border-bottom-color: var(--vermillion);
+  .hint {
+    font-family: var(--body);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    font-style: italic;
+    min-height: 18px;
+  }
+  .hint.error { color: var(--vermillion); font-style: italic; }
+  .rules {
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: right;
+    flex-shrink: 0;
   }
 
-  /* — Confirm — */
-  .confirm { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+  /* — Confirm state — */
+  .confirm {
+    max-width: 760px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    padding: 22px 0 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
   .confirm-text {
     font-family: var(--display);
     font-style: italic;
-    font-size: clamp(20px, 2.6vw, 26px);
+    font-size: clamp(20px, 2.6vw, 24px);
     color: var(--ink-soft);
     font-weight: 350;
-    letter-spacing: -0.005em;
+    line-height: 1.3;
   }
   .confirm-text .pick {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 60, "wght" 400;
     color: var(--vermillion);
-    font-size: clamp(40px, 6vw, 56px);
+    font-size: clamp(40px, 6vw, 60px);
     display: block;
-    margin: 8px 0;
+    margin: 4px 0;
     line-height: 1;
+    letter-spacing: -0.02em;
   }
-  .actions { display: flex; gap: 18px; align-items: center; }
+  .actions { display: flex; gap: 14px; align-items: stretch; }
+  .ghost {
+    background: transparent;
+    color: var(--ink-faint);
+    padding: 0 14px;
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    transition: color 180ms ease, border-color 180ms ease;
+    height: 56px;
+  }
+  .ghost:hover { color: var(--vermillion); border-color: var(--vermillion); }
 
-  /* — You said — */
+  /* — You said state — */
   .you {
-    margin: 0 auto;
-    text-align: center;
-    padding: 14px 0 6px;
+    max-width: 760px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0 22px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .you .you-l {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
   }
   .you .label {
     font-family: var(--body);
@@ -322,69 +323,58 @@
     letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--ink-faint);
+    flex-shrink: 0;
   }
   .you .word {
     font-family: var(--display);
-    font-variation-settings: "opsz" 144, "SOFT" 60;
+    font-variation-settings: "opsz" 144, "SOFT" 60, "wght" 400;
     font-style: italic;
-    font-weight: 350;
-    font-size: clamp(48px, 7vw, 72px);
+    font-size: clamp(48px, 7vw, 76px);
     color: var(--vermillion);
     line-height: 1;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
   .you .badge {
     font-family: var(--body);
     font-size: 10px;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--ink-faint);
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
+    border: 1px solid var(--rule);
     padding: 4px 10px;
+    align-self: center;
   }
 
   /* — Cloud section — */
   .gallery {
-    margin-top: 80px;
-    position: relative;
+    margin-top: 56px;
+    flex: 1;
   }
-  .gallery::before {
-    content: "";
-    display: block;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--rule) 12%, var(--rule) 88%, transparent);
-    margin-bottom: 8px;
-  }
-  .gallery .center-mark {
-    text-align: center;
-    margin-top: -16px;
-    color: var(--vermillion);
-    font-size: 18px;
-    line-height: 1;
-  }
-  .gallery .center-mark span {
-    background: var(--paper);
-    padding: 0 14px;
-  }
-
   .gallery-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin: 28px 0 36px;
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .gallery-head .label {
     font-family: var(--body);
     font-size: 11px;
     letter-spacing: 0.26em;
     text-transform: uppercase;
     color: var(--ink-faint);
   }
-  .gallery-head .label-l, .gallery-head .label-r {
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
+  .gallery-head .label .ornament {
+    color: var(--vermillion);
+    margin-right: 8px;
+    font-size: 13px;
   }
   .gallery-head a {
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
     color: var(--ink-soft);
     text-decoration: none;
     border-bottom: 1px dotted var(--ink-faint);
@@ -397,36 +387,28 @@
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    justify-content: center;
-    gap: 4px 22px;
-    line-height: 1.05;
-    min-height: 160px;
-    padding: 12px 0 24px;
+    justify-content: flex-start;
+    gap: 6px 26px;
+    line-height: 1;
+    min-height: 200px;
+    padding: 6px 0 24px;
   }
   .cloud .w {
     font-family: var(--display);
-    font-variation-settings: "opsz" 144, "SOFT" 40;
-    font-weight: 350;
+    font-variation-settings: "opsz" 144, "SOFT" 40, "wght" 350;
     color: var(--ink);
     transition: color 180ms ease, transform 180ms ease;
     cursor: default;
     display: inline-block;
     opacity: 0;
     animation: ink 520ms ease-out forwards;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
   .cloud .w.italic { font-style: italic; }
-  .cloud .w:hover { color: var(--vermillion); }
+  .cloud .w:hover { color: var(--vermillion); transform: translateY(-1px); }
   .cloud .w.mine {
     color: var(--vermillion);
     font-style: italic;
-  }
-  .cloud .w.mine::after {
-    content: "·";
-    color: var(--vermillion);
-    margin-left: 6px;
-    font-style: normal;
-    opacity: 0.6;
   }
   .cloud .w.pop {
     animation: ink-bleed 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
@@ -438,7 +420,7 @@
   }
   @keyframes ink-bleed {
     0%   { opacity: 0; transform: scale(0.7); filter: blur(8px); }
-    50%  { opacity: 1; transform: scale(1.05); filter: blur(0.5px); }
+    50%  { opacity: 1; transform: scale(1.06); filter: blur(0.5px); }
     100% { opacity: 1; transform: scale(1); filter: blur(0); }
   }
   @keyframes rise {
@@ -448,20 +430,20 @@
 
   .empty {
     width: 100%;
-    text-align: center;
+    text-align: left;
     font-family: var(--display);
     font-style: italic;
-    font-size: 22px;
+    font-size: 26px;
     color: var(--ink-faint);
-    padding: 32px 0;
+    padding: 12px 0;
   }
 
   /* — Modal — */
   .modal-bg {
     position: fixed;
     inset: 0;
-    background: rgba(22,34,58,0.55);
-    backdrop-filter: blur(2px);
+    background: rgba(14,17,21,0.65);
+    backdrop-filter: blur(3px);
     display: none;
     align-items: center;
     justify-content: center;
@@ -474,118 +456,127 @@
   .modal {
     background: var(--paper);
     background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.13  0 0 0 0 0.22  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    max-width: 760px;
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.07  0 0 0 0 0.10  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    max-width: 880px;
     width: 100%;
     max-height: 84vh;
     overflow: auto;
-    padding: 36px 36px 32px;
+    padding: 32px 36px;
     border: 1px solid var(--rule);
-    box-shadow: 0 30px 60px -20px rgba(22,34,58,0.4);
+    box-shadow: 0 30px 60px -20px rgba(14,17,21,0.5);
   }
   .modal-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     border-bottom: 1px solid var(--rule);
-    padding-bottom: 18px;
+    padding-bottom: 14px;
     gap: 16px;
   }
   .modal-head h3 {
     font-family: var(--display);
-    font-variation-settings: "opsz" 144, "SOFT" 40;
+    font-variation-settings: "opsz" 144, "SOFT" 40, "wght" 350;
     font-style: italic;
-    font-weight: 350;
-    font-size: 32px;
+    font-size: 36px;
     margin: 0;
     line-height: 1;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
   .modal-head .meta {
     font-family: var(--body);
-    font-size: 10px;
-    letter-spacing: 0.26em;
+    font-size: 11px;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--ink-faint);
+    flex: 1;
+    text-align: right;
+    margin-right: 12px;
   }
   .modal-head .close {
     background: transparent;
     color: var(--ink-faint);
     padding: 6px 0;
-    letter-spacing: 0.2em;
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: color 180ms ease;
   }
-  .modal-head .close:hover { color: var(--vermillion); letter-spacing: 0.22em; }
+  .modal-head .close:hover { color: var(--vermillion); }
 
   /* — Footer — */
   footer {
-    margin-top: 96px;
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
+    margin-top: 64px;
+    padding-top: 18px;
     border-top: 1px solid var(--rule-soft);
-    padding-top: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     font-family: var(--body);
-    font-style: italic;
-    font-size: 12px;
-    line-height: 1.7;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     color: var(--ink-faint);
-    opacity: 0;
-    animation: rise 800ms ease-out 900ms forwards;
+    gap: 16px;
   }
-  footer .mark {
-    color: var(--vermillion);
-    font-style: normal;
-    margin: 0 6px;
+  footer em {
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 13px;
+    color: var(--ink-soft);
   }
+  footer .mark { color: var(--vermillion); margin: 0 6px; font-style: normal; }
 
-  @media (max-width: 600px) {
-    body { padding: 36px 18px 64px; }
-    .colophon { flex-direction: column; align-items: center; gap: 6px; }
-    .colophon .dateline, .colophon .issue { text-align: center; }
-    .gallery-head { flex-direction: column; gap: 8px; align-items: center; }
-    .lede { margin-top: 40px; }
-    #composer { margin-top: 40px; }
+  @media (max-width: 720px) {
+    .page { padding: 14px 18px 32px; }
+    .bar .meta { gap: 10px; font-size: 10px; }
+    .bar .meta .hide-sm { display: none; }
+    .compose { grid-template-columns: 1fr; border-bottom: none; }
+    .compose input[type="text"] { border-bottom: 2px solid var(--ink); padding-right: 0; }
+    .cta { padding: 16px; margin-top: 14px; margin-bottom: 0; }
+    .compose-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .rules { text-align: left; }
+    .confirm { grid-template-columns: 1fr; }
+    .actions { width: 100%; }
+    .ghost { flex: 1; }
+    footer { flex-direction: column; align-items: flex-start; gap: 10px; }
   }
 </style>
 </head>
 <body>
   <div class="page">
-    <header class="masthead">
-      <p class="kicker">A daily almanac of the world's words</p>
-      <h1 class="nameplate">Mote<span class="dot">.</span></h1>
-      <div class="ornament" aria-hidden="true">
-        <span class="line"></span>
-        <span class="fleur">❦</span>
-        <span class="line"></span>
+    <div class="bar">
+      <div class="brand">Mote<span class="dot">.</span></div>
+      <div class="meta">
+        <span id="dateline">—</span>
+        <span class="sep">/</span>
+        <span id="issue">No. —</span>
+        <span class="sep hide-sm">/</span>
+        <span class="hide-sm" id="reset">Resets 00:00 UTC</span>
       </div>
-      <div class="colophon">
-        <span class="dateline" id="dateline">—</span>
-        <span class="issue" id="issue">No. —</span>
-      </div>
-    </header>
+    </div>
 
-    <section class="lede">
-      <h2>Today, in a Word</h2>
-      <p>What is the world thinking today? Each soul shares one word — the more often it is spoken, the larger it stands. The page is unset and reprinted at midnight, in Greenwich.</p>
+    <section class="hero">
+      <p class="hero-eyebrow" id="live"><span class="pulse"></span><span class="count" id="live-count">—</span>voices, today</p>
+      <h1 class="hero-title">Today, in <span class="stamp">a word.</span></h1>
+      <section id="composer"></section>
     </section>
 
-    <section id="composer"></section>
-
     <section class="gallery">
-      <div class="center-mark" aria-hidden="true"><span>❧</span></div>
       <div class="gallery-head">
-        <div class="label-l"><span id="cloud-label">Today's setting</span></div>
-        <div class="label-r"><a href="#" id="open-yesterday">Yesterday's page →</a></div>
+        <div class="label"><span class="ornament">❦</span><span id="cloud-label">The world's words, today</span></div>
+        <a href="#" id="open-yesterday">Yesterday's page →</a>
       </div>
       <div class="cloud" id="cloud"></div>
     </section>
 
     <footer>
-      Set in <em>Fraunces</em> &amp; <em>Newsreader</em>.
-      <span class="mark">❦</span>
-      Pressed daily at midnight, Greenwich Mean Time.<br/>
-      mote.day · anonymous, by design.
+      <span>One word a day. <em>Anonymous, by design.</em></span>
+      <span>mote.day <span class="mark">·</span> set in <em>Fraunces</em></span>
     </footer>
   </div>
 
@@ -609,17 +600,20 @@
     "slut","whore","fag","nigger","retard"
   ]);
 
-  const composer = document.getElementById("composer");
-  const cloud = document.getElementById("cloud");
+  const composer  = document.getElementById("composer");
+  const cloud     = document.getElementById("cloud");
   const cloudLabel = document.getElementById("cloud-label");
-  const modal = document.getElementById("modal");
+  const modal     = document.getElementById("modal");
   const modalCloud = document.getElementById("modal-cloud");
   const modalTitle = document.getElementById("modal-title");
   const modalMeta  = document.getElementById("modal-meta");
+  const liveCount  = document.getElementById("live-count");
 
   /* — Date helpers — */
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const WEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const FULLMONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const WEEKDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const FULLWEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
   function ordinal(n) {
     const s = ["th","st","nd","rd"], v = n % 100;
@@ -636,16 +630,13 @@
     const diff = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - start;
     return Math.floor(diff / 86400000);
   }
-  function formatDateline(d) {
-    return `${WEEKDAYS[d.getUTCDay()]} · the ${ordinal(d.getUTCDate())} of ${MONTHS[d.getUTCMonth()]}`;
-  }
-
-  function setMasthead() {
+  function setBar() {
     const now = new Date();
-    document.getElementById("dateline").textContent = formatDateline(now);
-    document.getElementById("issue").textContent = `No. ${toRoman(dayOfYear(now))} · ${toRoman(now.getUTCFullYear())}`;
+    document.getElementById("dateline").textContent =
+      `${WEEKDAYS[now.getUTCDay()]} · ${MONTHS[now.getUTCMonth()]} ${now.getUTCDate()}`;
+    document.getElementById("issue").textContent = `No. ${toRoman(dayOfYear(now))}`;
   }
-  setMasthead();
+  setBar();
 
   /* — Identity — */
   const deviceId = (() => {
@@ -666,7 +657,7 @@
   function prettyDate(iso) {
     const [y, m, day] = iso.split("-").map(Number);
     const d = new Date(Date.UTC(y, m - 1, day));
-    return formatDateline(d);
+    return `${FULLWEEKDAYS[d.getUTCDay()]} · ${ordinal(d.getUTCDate())} ${FULLMONTHS[d.getUTCMonth()]}`;
   }
 
   function loadMine() {
@@ -705,7 +696,8 @@
     const rows = await res.json();
     const counts = new Map();
     for (const r of rows) counts.set(r.word, (counts.get(r.word) || 0) + 1);
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const total = rows.length;
+    return { entries: [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])), total };
   }
 
   async function submitWord(word) {
@@ -720,28 +712,44 @@
     return { ok: true, row };
   }
 
+  /* — Live count animation — */
+  function animateCount(target) {
+    const el = liveCount;
+    const start = parseInt(el.dataset.cur || "0", 10);
+    const dur = 700;
+    const t0 = performance.now();
+    function tick(t) {
+      const p = Math.min((t - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const v = Math.round(start + (target - start) * eased);
+      el.textContent = v.toLocaleString();
+      el.dataset.cur = v;
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
   /* — Render — */
   function renderCloud(target, entries, mine, popWord) {
     target.innerHTML = "";
     if (!entries.length) {
       const p = document.createElement("div");
       p.className = "empty";
-      p.textContent = "The page is empty. Be the first to set a word.";
+      p.textContent = "Be the first to set a word.";
       target.appendChild(p);
       return;
     }
     const max = entries[0][1];
     const min = entries[entries.length - 1][1];
-    const total = entries.length;
     entries.forEach(([word, count], i) => {
       const t = max === min ? 0.5 : (count - min) / (max - min);
-      const size = 18 + Math.round(Math.pow(t, 0.85) * 64);
+      const size = 22 + Math.round(Math.pow(t, 0.8) * 78);
       const el = document.createElement("span");
       el.className = "w";
       if (count === 1 && max > 1) el.classList.add("italic");
       el.textContent = word;
       el.style.fontSize = size + "px";
-      el.style.animationDelay = Math.min(i * 18, 700) + "ms";
+      el.style.animationDelay = Math.min(i * 14, 600) + "ms";
       el.title = `${count} ${count === 1 ? "voice" : "voices"}`;
       if (mine && word === mine.word) el.classList.add("mine");
       if (popWord && word === popWord) {
@@ -756,7 +764,7 @@
     const word = raw.trim().toLowerCase();
     if (!word) return { ok: false, msg: "Type a word — anything." };
     if (!/^[a-z]+$/.test(word)) return { ok: false, msg: "Letters only. No spaces, numbers, or punctuation." };
-    if (word.length > 20) return { ok: false, msg: "Twenty letters or fewer, please." };
+    if (word.length > 20) return { ok: false, msg: "Twenty letters or fewer." };
     if (PROFANITY.has(word)) return { ok: false, msg: "Try another word." };
     return { ok: true, word };
   }
@@ -764,18 +772,18 @@
   function renderInput() {
     composer.innerHTML = `
       <div class="compose">
-        <div class="label"><span class="arrow">☞</span><span>Your word, today</span></div>
-        <div class="input-frame">
-          <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="…" />
-        </div>
-        <div class="hint" id="hint">One word, lowercase letters. Once set, it cannot be unset.</div>
-        <button id="next">Continue →</button>
+        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="type your word…" />
+        <button class="cta" id="next">Press it →</button>
+      </div>
+      <div class="compose-foot">
+        <div class="hint" id="hint">One word, lowercase. Once set, it cannot be unset.</div>
+        <div class="rules">A–Z · max 20</div>
       </div>
     `;
     const input = document.getElementById("word");
     const hint = document.getElementById("hint");
     const next = document.getElementById("next");
-    input.focus();
+    setTimeout(() => input.focus(), 60);
 
     function go() {
       const v = validate(input.value);
@@ -788,7 +796,7 @@
     }
     input.addEventListener("input", () => {
       hint.classList.remove("error");
-      hint.textContent = "One word, lowercase letters. Once set, it cannot be unset.";
+      hint.textContent = "One word, lowercase. Once set, it cannot be unset.";
     });
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
     next.addEventListener("click", go);
@@ -800,12 +808,11 @@
         <div class="confirm-text">
           You set the word —
           <span class="pick">${word}</span>
-          for today's page.
+          for today's page. Press to commit.
         </div>
-        <div class="hint">Once pressed, this cannot be edited or unsent.</div>
         <div class="actions">
-          <button class="ghost" id="back">← Reconsider</button>
-          <button id="send">Press it</button>
+          <button class="ghost" id="back">← Back</button>
+          <button class="cta" id="send">Press it</button>
         </div>
       </div>
     `;
@@ -822,7 +829,7 @@
         return;
       }
       if (!r.ok) {
-        composer.innerHTML = `<div class="hint error" style="text-align:center; margin: 0 auto; max-width: 360px">The press jammed. Try again in a moment.</div>`;
+        composer.innerHTML = `<div class="hint error" style="padding: 16px 0">The press jammed. Try again in a moment.</div>`;
         setTimeout(renderInput, 1800);
         return;
       }
@@ -837,9 +844,11 @@
     const isYesterday = mine.utc_date && mine.utc_date !== today;
     composer.innerHTML = `
       <div class="you">
-        <div class="label">${isYesterday ? "Yesterday, you offered" : "Today, you offered"}</div>
-        <div class="word">${mine.word}</div>
-        ${isYesterday ? `<div class="badge">From yesterday's page</div>` : ""}
+        <div class="you-l">
+          <span class="label">${isYesterday ? "Yesterday, you said" : "Today, you said"}</span>
+          <span class="word">${mine.word}</span>
+        </div>
+        ${isYesterday ? `<span class="badge">From yesterday's page</span>` : `<span class="badge">Locked until midnight UTC</span>`}
       </div>
     `;
   }
@@ -850,8 +859,9 @@
     const showingTodayMine = mine && mine.utc_date === today;
     if (mine) renderYou(mine);
     else renderInput();
-    cloudLabel.textContent = showingTodayMine || !mine ? "Today's setting" : "Today's setting · your word is from yesterday";
-    const entries = await fetchCloud(today);
+    cloudLabel.textContent = "The world's words, today";
+    const { entries, total } = await fetchCloud(today);
+    animateCount(total);
     const highlightMine = showingTodayMine ? mine : null;
     renderCloud(cloud, entries, highlightMine, popWord);
   }
@@ -862,9 +872,9 @@
     modal.classList.add("open");
     modalCloud.innerHTML = `<div class="empty">Loading…</div>`;
     const y = yesterdayUTC();
-    modalTitle.textContent = "Yesterday's page";
+    modalTitle.textContent = "Yesterday";
     modalMeta.textContent = prettyDate(y);
-    const entries = await fetchCloud(y);
+    const { entries } = await fetchCloud(y);
     renderCloud(modalCloud, entries, null, null);
   });
   document.getElementById("modal-close").addEventListener("click", () => modal.classList.remove("open"));
