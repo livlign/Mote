@@ -1233,13 +1233,7 @@
     tooltipEl.innerHTML = `
       <div class="word">${word}</div>
       <div class="count"><strong>${count.toLocaleString()}</strong>${count === 1 ? " voice" : " voices"} today</div>
-      ${alreadySaid
-        ? `<div class="note">You already said “${mine.word}” today.</div>`
-        : `<div class="row">
-             <button data-action="me">I feel the same</button>
-             <button data-action="copy">Copy</button>
-           </div>`
-      }
+      ${alreadySaid ? "" : `<div class="row"><button data-action="me">I feel the same</button></div>`}
     `;
     const r = el.getBoundingClientRect();
     const tw = 200, th = 130;
@@ -1422,7 +1416,7 @@
   let pollTimer = null;
   function startPolling() {
     if (pollTimer) return;
-    pollTimer = setInterval(() => { if (!document.hidden) refresh(); }, 8000);
+    pollTimer = setInterval(() => { if (!document.hidden) refresh(); }, 3000);
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
@@ -1605,7 +1599,10 @@
   }
 
   /* — Dev panel — */
-  const devOn = new URLSearchParams(location.search).has("dev");
+  const devParam = new URLSearchParams(location.search).get("dev");
+  if (devParam === "1") localStorage.setItem("mote.dev", "1");
+  if (devParam === "0") localStorage.removeItem("mote.dev");
+  const devOn = localStorage.getItem("mote.dev") === "1";
   if (devOn) {
     document.getElementById("dev-panel").classList.add("show");
     document.getElementById("dev-reset").addEventListener("click", async () => {
