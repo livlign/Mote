@@ -1143,6 +1143,9 @@
     isPacking = true;
     const stageW = stageEl.clientWidth;
     const stageH = stageEl.clientHeight;
+    // cap visible words so the cloud isn't so dense that new words can't be placed
+    const VISIBLE_CAP = 80;
+    entries = entries.slice(0, VISIBLE_CAP);
     const max = entries[0][1], min = entries[entries.length - 1][1];
     const targetWords = new Set(entries.map(([w]) => w));
 
@@ -1610,12 +1613,6 @@
       localStorage.setItem("mote.device", crypto.randomUUID());
       location.reload();
     });
-    const DEV_WORDS = [
-      "hope","tired","busy","sun","calm","ok","lost","ready","quiet","alive","new","gold",
-      "rain","spring","ink","leaf","river","stone","cloud","light","still","bright","late",
-      "rested","grateful","curious","empty","full","focused","scared","blue","green","grey",
-      "pause","drift","return","bloom","linger","wonder","seek","listen","breathe","mend"
-    ];
     async function devInsert(word) {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/words`, {
         method: "POST",
@@ -1630,9 +1627,18 @@
       if (!res.ok) console.warn("dev insert failed", res.status, await res.text());
       return res.ok;
     }
+    function freshWord() {
+      // generate a unique pseudo-word so it appears as a new entry in the cloud
+      const cons = "bcdfghjklmnpqrstvwxyz";
+      const vow = "aeiou";
+      const len = 4 + Math.floor(Math.random() * 3); // 4–6 letters
+      let s = "";
+      for (let i = 0; i < len; i++) s += (i % 2 === 0 ? cons : vow)[Math.floor(Math.random() * (i % 2 === 0 ? cons.length : vow.length))];
+      return s;
+    }
     document.getElementById("dev-drop").addEventListener("click", async () => {
-      const w = DEV_WORDS[Math.floor(Math.random() * DEV_WORDS.length)];
-      const n = 3 + Math.floor(Math.random() * 5); // 3–7 voices at once
+      const w = freshWord();
+      const n = 3 + Math.floor(Math.random() * 6); // 3–8 voices for visible size
       console.log(`dev: dropping ${n}× "${w}"`);
       await Promise.all(Array.from({ length: n }, () => devInsert(w)));
       await refresh(w);
