@@ -46,8 +46,9 @@
       radial-gradient(ellipse 90% 50% at 50% -10%, rgba(255,250,232,0.7), transparent 70%),
       radial-gradient(ellipse 60% 40% at 90% 100%, rgba(210,56,28,0.04), transparent 70%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.07  0 0 0 0 0.10  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -58,11 +59,12 @@
     align-items: baseline;
     justify-content: space-between;
     gap: 24px;
-    padding: 18px 32px 12px;
+    padding: 12px 28px 10px;
     border-bottom: 1px solid var(--rule);
     margin-bottom: 0;
     position: relative;
     z-index: 5;
+    flex-shrink: 0;
   }
   .topbar .brand {
     font-family: var(--display);
@@ -130,14 +132,15 @@
   /* — Header (top) — */
   .header {
     text-align: center;
-    padding: 36px 24px 22px;
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
   }
   .header .eyebrow {
     font-family: var(--body);
     font-style: italic;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--vermillion);
-    margin: 0 0 6px;
+    margin: 0 0 4px;
     letter-spacing: 0.01em;
     opacity: 0;
     animation: rise 600ms ease-out 80ms forwards;
@@ -146,10 +149,10 @@
     font-family: var(--display);
     font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 350;
     font-style: italic;
-    font-size: clamp(40px, 5.6vw, 72px);
+    font-size: clamp(32px, 4.4vw, 56px);
     line-height: 1;
     letter-spacing: -0.03em;
-    margin: 4px 0 14px;
+    margin: 2px 0 8px;
     opacity: 0;
     animation: rise 700ms ease-out 160ms forwards;
   }
@@ -173,21 +176,21 @@
     font-family: var(--display);
     font-style: italic;
     font-weight: 350;
-    font-size: clamp(16px, 1.6vw, 19px);
-    line-height: 1.45;
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.4;
     color: var(--ink-soft);
-    margin: 0 auto 4px;
+    margin: 0 auto 2px;
     max-width: 520px;
     opacity: 0;
     animation: rise 700ms ease-out 240ms forwards;
   }
   .header .subtext {
     font-family: var(--body);
-    font-size: 13px;
-    line-height: 1.55;
+    font-size: 12.5px;
+    line-height: 1.5;
     color: var(--ink-faint);
     margin: 0 auto;
-    max-width: 460px;
+    max-width: 520px;
     opacity: 0;
     animation: rise 700ms ease-out 320ms forwards;
   }
@@ -196,8 +199,8 @@
   .stage {
     position: relative;
     width: 100%;
-    flex: 1;
-    min-height: 360px;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -246,12 +249,13 @@
 
   /* — Composer dock (below cloud) — */
   .dock {
-    padding: 18px 24px 14px;
+    padding: 14px 24px 16px;
     border-top: 1px solid var(--rule-soft);
     background: var(--paper);
     text-align: center;
     opacity: 0;
     animation: rise 700ms ease-out 420ms forwards;
+    flex-shrink: 0;
   }
 
   #composer { opacity: 1; }
@@ -857,11 +861,6 @@
   <div class="dock">
     <section id="composer"></section>
   </div>
-
-  <footer>
-    <span>One word a day. <em>Anonymous, by design.</em></span>
-    <span>mote.day <span style="color: var(--vermillion);">·</span> set in <em>Fraunces</em></span>
-  </footer>
 
   <div class="tooltip" id="tooltip" role="tooltip"></div>
 
