@@ -1610,10 +1610,14 @@
       localStorage.setItem("mote.device", crypto.randomUUID());
       location.reload();
     });
-    document.getElementById("dev-drop").addEventListener("click", async () => {
-      const sample = ["hope","tired","busy","sun","calm","ok","lost","ready","quiet","alive","new","gold"];
-      const w = sample[Math.floor(Math.random() * sample.length)];
-      const fakeRes = await fetch(`${SUPABASE_URL}/rest/v1/words`, {
+    const DEV_WORDS = [
+      "hope","tired","busy","sun","calm","ok","lost","ready","quiet","alive","new","gold",
+      "rain","spring","ink","leaf","river","stone","cloud","light","still","bright","late",
+      "rested","grateful","curious","empty","full","focused","scared","blue","green","grey",
+      "pause","drift","return","bloom","linger","wonder","seek","listen","breathe","mend"
+    ];
+    async function devInsert(word) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/words`, {
         method: "POST",
         headers: {
           "apikey": SUPABASE_ANON_KEY,
@@ -1621,9 +1625,17 @@
           "Content-Type": "application/json",
           "Prefer": "return=minimal"
         },
-        body: JSON.stringify({ word: w, device_id: "seed-" + crypto.randomUUID() })
+        body: JSON.stringify({ word, device_id: "seed-" + crypto.randomUUID() })
       });
-      if (fakeRes.ok) refresh();
+      if (!res.ok) console.warn("dev insert failed", res.status, await res.text());
+      return res.ok;
+    }
+    document.getElementById("dev-drop").addEventListener("click", async () => {
+      const w = DEV_WORDS[Math.floor(Math.random() * DEV_WORDS.length)];
+      const n = 3 + Math.floor(Math.random() * 5); // 3–7 voices at once
+      console.log(`dev: dropping ${n}× "${w}"`);
+      await Promise.all(Array.from({ length: n }, () => devInsert(w)));
+      await refresh(w);
     });
     let dripT = null;
     const dripBtn = document.getElementById("dev-drip");
