@@ -1349,10 +1349,34 @@
     const input = document.getElementById("word");
     const hint = document.getElementById("hint");
     const next = document.getElementById("next");
-    function go() {
+    let submitting = false;
+
+    async function go() {
+      if (submitting) return;
       const v = validate(input.value);
       if (!v.ok) { hint.textContent = v.msg; hint.classList.add("error"); return; }
-      renderConfirm(v.word);
+      submitting = true;
+      next.disabled = true;
+      const original = next.textContent;
+      next.textContent = "Pressing…";
+      const r = await submitWord(v.word);
+      if (!r.ok && r.reason === "duplicate") {
+        const mine = { word: v.word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
+        saveMine(mine);
+        await refresh(v.word);
+        return;
+      }
+      if (!r.ok) {
+        hint.textContent = "The press jammed. Try again.";
+        hint.classList.add("error");
+        next.disabled = false;
+        next.textContent = original;
+        submitting = false;
+        return;
+      }
+      const mine = { word: r.row.word, submitted_at: r.row.submitted_at, utc_date: r.row.utc_date };
+      saveMine(mine);
+      await refresh(r.row.word);
     }
     input.addEventListener("input", () => {
       hint.classList.remove("error");
@@ -1362,41 +1386,6 @@
     next.addEventListener("click", go);
   }
 
-  function renderConfirm(word) {
-    composer.innerHTML = `
-      <div class="confirm">
-        <div class="confirm-text">
-          You're about to commit —
-          <span class="pick">${word}</span>
-        </div>
-        <div class="actions">
-          <button class="ghost" id="back">← Back</button>
-          <button class="cta" id="send">Press it</button>
-        </div>
-      </div>
-    `;
-    document.getElementById("back").addEventListener("click", renderInput);
-    const send = document.getElementById("send");
-    send.addEventListener("click", async () => {
-      send.disabled = true;
-      send.textContent = "Pressing…";
-      const r = await submitWord(word);
-      if (!r.ok && r.reason === "duplicate") {
-        const mine = { word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
-        saveMine(mine);
-        await refresh(word);
-        return;
-      }
-      if (!r.ok) {
-        composer.innerHTML = `<div class="hint error" style="text-align:center; padding: 16px 0">The press jammed. Try again.</div>`;
-        setTimeout(renderInput, 1800);
-        return;
-      }
-      const mine = { word: r.row.word, submitted_at: r.row.submitted_at, utc_date: r.row.utc_date };
-      saveMine(mine);
-      await refresh(r.row.word);
-    });
-  }
 
   function renderYou(mine, total) {
     const today = todayUTC();
