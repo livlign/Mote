@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mote — Today, in a Word</title>
+<meta property="og:title" content="Mote — Today, in a Word" />
+<meta property="og:description" content="A daily almanac of the world's words. One word per person, every day." />
+<meta property="og:url" content="https://mote.day" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #f1e7d0;
+    --paper-deep:   #e9dcc0;
+    --ink:          #16223a;
+    --ink-soft:     #4a546b;
+    --ink-faint:    #8a8676;
+    --rule:         #c4b89a;
+    --rule-soft:    #d8cdaf;
+    --vermillion:   #b62a1c;
+    --vermillion-d: #8e1d12;
+
+    --display: "Fraunces", "Times New Roman", serif;
+    --body:    "Newsreader", Georgia, serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,250,232,0.6), transparent 60%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.13  0 0 0 0 0.22  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 56px 28px 80px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 100% 60% at 50% 100%, rgba(20,20,20,0.06), transparent 70%);
+    z-index: 0;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 840px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* — Masthead — */
+  .masthead {
+    text-align: center;
+    padding-bottom: 28px;
+  }
+  .masthead .kicker {
+    font-family: var(--body);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+    margin: 0 0 22px;
+    opacity: 0;
+    animation: rise 700ms ease-out 80ms forwards;
+  }
+  .nameplate {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 30;
+    font-weight: 350;
+    font-style: italic;
+    font-size: clamp(72px, 14vw, 132px);
+    line-height: 0.85;
+    margin: 0;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    opacity: 0;
+    animation: rise 900ms ease-out 180ms forwards;
+  }
+  .nameplate .dot {
+    color: var(--vermillion);
+    font-style: normal;
+  }
+
+  .ornament {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 28px auto 0;
+    max-width: 520px;
+    opacity: 0;
+    animation: rise 700ms ease-out 360ms forwards;
+  }
+  .ornament .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--rule) 20%, var(--rule) 80%, transparent);
+  }
+  .ornament .fleur {
+    font-family: var(--body);
+    color: var(--vermillion);
+    font-size: 16px;
+    line-height: 1;
+    transform: translateY(-1px);
+  }
+
+  .colophon {
+    margin: 18px auto 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    max-width: 520px;
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    opacity: 0;
+    animation: rise 700ms ease-out 480ms forwards;
+  }
+  .colophon .dateline { text-align: left; }
+  .colophon .issue { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* — Section title — */
+  .lede {
+    margin: 56px 0 0;
+    text-align: center;
+    opacity: 0;
+    animation: rise 800ms ease-out 600ms forwards;
+  }
+  .lede h2 {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(40px, 6.5vw, 64px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--ink);
+  }
+  .lede p {
+    margin: 22px auto 0;
+    max-width: 460px;
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  /* — Composer — */
+  #composer {
+    margin: 56px auto 0;
+    width: 100%;
+    opacity: 0;
+    animation: rise 800ms ease-out 720ms forwards;
+  }
+  .compose {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .compose .label {
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .compose .label .arrow {
+    color: var(--vermillion);
+    font-size: 14px;
+    transform: translateY(-1px);
+  }
+
+  .input-frame {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    padding: 0 24px;
+  }
+  .input-frame::before, .input-frame::after {
+    content: "·";
+    position: absolute;
+    bottom: 6px;
+    color: var(--ink-faint);
+    font-size: 24px;
+    line-height: 1;
+  }
+  .input-frame::before { left: 8px; }
+  .input-frame::after  { right: 8px; }
+
+  input[type="text"] {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink-soft);
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+    font-weight: 350;
+    font-style: italic;
+    font-size: clamp(40px, 6vw, 56px);
+    line-height: 1.1;
+    text-align: center;
+    color: var(--ink);
+    padding: 6px 0 14px;
+    outline: none;
+    caret-color: var(--vermillion);
+    letter-spacing: -0.01em;
+  }
+  input[type="text"]:focus { border-bottom-color: var(--vermillion); }
+  input[type="text"]::placeholder {
+    color: var(--ink-faint);
+    font-style: italic;
+    opacity: 0.55;
+  }
+
+  .hint {
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ink-faint);
+    font-style: italic;
+    min-height: 18px;
+    text-align: center;
+    max-width: 360px;
+  }
+  .hint.error { color: var(--vermillion); }
+
+  button {
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 14px 26px 13px;
+    cursor: pointer;
+    transition: background 180ms ease, letter-spacing 240ms ease, color 180ms ease;
+    font-weight: 500;
+  }
+  button:hover {
+    background: var(--vermillion);
+    letter-spacing: 0.32em;
+  }
+  button:disabled { opacity: 0.55; cursor: wait; }
+  button.ghost {
+    background: transparent;
+    color: var(--ink-faint);
+    padding: 14px 14px 13px;
+    border-bottom: 1px solid transparent;
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  button.ghost:hover {
+    background: transparent;
+    color: var(--vermillion);
+    letter-spacing: 0.28em;
+    border-bottom-color: var(--vermillion);
+  }
+
+  /* — Confirm — */
+  .confirm { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+  .confirm-text {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: clamp(20px, 2.6vw, 26px);
+    color: var(--ink-soft);
+    font-weight: 350;
+    letter-spacing: -0.005em;
+  }
+  .confirm-text .pick {
+    color: var(--vermillion);
+    font-size: clamp(40px, 6vw, 56px);
+    display: block;
+    margin: 8px 0;
+    line-height: 1;
+  }
+  .actions { display: flex; gap: 18px; align-items: center; }
+
+  /* — You said — */
+  .you {
+    margin: 0 auto;
+    text-align: center;
+    padding: 14px 0 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .you .label {
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .you .word {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 60;
+    font-style: italic;
+    font-weight: 350;
+    font-size: clamp(48px, 7vw, 72px);
+    color: var(--vermillion);
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+  .you .badge {
+    font-family: var(--body);
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 4px 10px;
+  }
+
+  /* — Cloud section — */
+  .gallery {
+    margin-top: 80px;
+    position: relative;
+  }
+  .gallery::before {
+    content: "";
+    display: block;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--rule) 12%, var(--rule) 88%, transparent);
+    margin-bottom: 8px;
+  }
+  .gallery .center-mark {
+    text-align: center;
+    margin-top: -16px;
+    color: var(--vermillion);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .gallery .center-mark span {
+    background: var(--paper);
+    padding: 0 14px;
+  }
+
+  .gallery-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 28px 0 36px;
+    font-family: var(--body);
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .gallery-head .label-l, .gallery-head .label-r {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .gallery-head a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-faint);
+    padding-bottom: 1px;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+  .gallery-head a:hover { color: var(--vermillion); border-bottom-color: var(--vermillion); }
+
+  .cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px 22px;
+    line-height: 1.05;
+    min-height: 160px;
+    padding: 12px 0 24px;
+  }
+  .cloud .w {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+    font-weight: 350;
+    color: var(--ink);
+    transition: color 180ms ease, transform 180ms ease;
+    cursor: default;
+    display: inline-block;
+    opacity: 0;
+    animation: ink 520ms ease-out forwards;
+    letter-spacing: -0.01em;
+  }
+  .cloud .w.italic { font-style: italic; }
+  .cloud .w:hover { color: var(--vermillion); }
+  .cloud .w.mine {
+    color: var(--vermillion);
+    font-style: italic;
+  }
+  .cloud .w.mine::after {
+    content: "·";
+    color: var(--vermillion);
+    margin-left: 6px;
+    font-style: normal;
+    opacity: 0.6;
+  }
+  .cloud .w.pop {
+    animation: ink-bleed 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+
+  @keyframes ink {
+    from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+    to   { opacity: 1; transform: translateY(0);   filter: blur(0); }
+  }
+  @keyframes ink-bleed {
+    0%   { opacity: 0; transform: scale(0.7); filter: blur(8px); }
+    50%  { opacity: 1; transform: scale(1.05); filter: blur(0.5px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .empty {
+    width: 100%;
+    text-align: center;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-faint);
+    padding: 32px 0;
+  }
+
+  /* — Modal — */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(22,34,58,0.55);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+    animation: fade 220ms ease-out;
+  }
+  .modal-bg.open { display: flex; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--paper);
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.13  0 0 0 0 0.22  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    max-width: 760px;
+    width: 100%;
+    max-height: 84vh;
+    overflow: auto;
+    padding: 36px 36px 32px;
+    border: 1px solid var(--rule);
+    box-shadow: 0 30px 60px -20px rgba(22,34,58,0.4);
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 18px;
+    gap: 16px;
+  }
+  .modal-head h3 {
+    font-family: var(--display);
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+    font-style: italic;
+    font-weight: 350;
+    font-size: 32px;
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .modal-head .meta {
+    font-family: var(--body);
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .modal-head .close {
+    background: transparent;
+    color: var(--ink-faint);
+    padding: 6px 0;
+    letter-spacing: 0.2em;
+  }
+  .modal-head .close:hover { color: var(--vermillion); letter-spacing: 0.22em; }
+
+  /* — Footer — */
+  footer {
+    margin-top: 96px;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 22px;
+    font-family: var(--body);
+    font-style: italic;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-faint);
+    opacity: 0;
+    animation: rise 800ms ease-out 900ms forwards;
+  }
+  footer .mark {
+    color: var(--vermillion);
+    font-style: normal;
+    margin: 0 6px;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 36px 18px 64px; }
+    .colophon { flex-direction: column; align-items: center; gap: 6px; }
+    .colophon .dateline, .colophon .issue { text-align: center; }
+    .gallery-head { flex-direction: column; gap: 8px; align-items: center; }
+    .lede { margin-top: 40px; }
+    #composer { margin-top: 40px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <p class="kicker">A daily almanac of the world's words</p>
+      <h1 class="nameplate">Mote<span class="dot">.</span></h1>
+      <div class="ornament" aria-hidden="true">
+        <span class="line"></span>
+        <span class="fleur">❦</span>
+        <span class="line"></span>
+      </div>
+      <div class="colophon">
+        <span class="dateline" id="dateline">—</span>
+        <span class="issue" id="issue">No. —</span>
+      </div>
+    </header>
+
+    <section class="lede">
+      <h2>Today, in a Word</h2>
+      <p>What is the world thinking today? Each soul shares one word — the more often it is spoken, the larger it stands. The page is unset and reprinted at midnight, in Greenwich.</p>
+    </section>
+
+    <section id="composer"></section>
+
+    <section class="gallery">
+      <div class="center-mark" aria-hidden="true"><span>❧</span></div>
+      <div class="gallery-head">
+        <div class="label-l"><span id="cloud-label">Today's setting</span></div>
+        <div class="label-r"><a href="#" id="open-yesterday">Yesterday's page →</a></div>
+      </div>
+      <div class="cloud" id="cloud"></div>
+    </section>
+
+    <footer>
+      Set in <em>Fraunces</em> &amp; <em>Newsreader</em>.
+      <span class="mark">❦</span>
+      Pressed daily at midnight, Greenwich Mean Time.<br/>
+      mote.day · anonymous, by design.
+    </footer>
+  </div>
+
+  <div class="modal-bg" id="modal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="modal-title">Yesterday</h3>
+        <span class="meta" id="modal-meta"></span>
+        <button class="close" id="modal-close">Close ✕</button>
+      </div>
+      <div class="cloud" id="modal-cloud"></div>
+    </div>
+  </div>
+
+<script type="module">
+  const SUPABASE_URL = "https://mhtutulyduovxubzpnvd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_uP6fxaX0sr5Msc3a507uwA_2rtT_E1J";
+
+  const PROFANITY = new Set([
+    "fuck","shit","bitch","cunt","dick","cock","pussy","asshole","bastard",
+    "slut","whore","fag","nigger","retard"
+  ]);
+
+  const composer = document.getElementById("composer");
+  const cloud = document.getElementById("cloud");
+  const cloudLabel = document.getElementById("cloud-label");
+  const modal = document.getElementById("modal");
+  const modalCloud = document.getElementById("modal-cloud");
+  const modalTitle = document.getElementById("modal-title");
+  const modalMeta  = document.getElementById("modal-meta");
+
+  /* — Date helpers — */
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const WEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  function ordinal(n) {
+    const s = ["th","st","nd","rd"], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+  function toRoman(n) {
+    const map = [["M",1000],["CM",900],["D",500],["CD",400],["C",100],["XC",90],["L",50],["XL",40],["X",10],["IX",9],["V",5],["IV",4],["I",1]];
+    let r = "";
+    for (const [s, v] of map) while (n >= v) { r += s; n -= v; }
+    return r;
+  }
+  function dayOfYear(d) {
+    const start = Date.UTC(d.getUTCFullYear(), 0, 0);
+    const diff = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - start;
+    return Math.floor(diff / 86400000);
+  }
+  function formatDateline(d) {
+    return `${WEEKDAYS[d.getUTCDay()]} · the ${ordinal(d.getUTCDate())} of ${MONTHS[d.getUTCMonth()]}`;
+  }
+
+  function setMasthead() {
+    const now = new Date();
+    document.getElementById("dateline").textContent = formatDateline(now);
+    document.getElementById("issue").textContent = `No. ${toRoman(dayOfYear(now))} · ${toRoman(now.getUTCFullYear())}`;
+  }
+  setMasthead();
+
+  /* — Identity — */
+  const deviceId = (() => {
+    let id = localStorage.getItem("mote.device");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("mote.device", id);
+    }
+    return id;
+  })();
+
+  function todayUTC() { return new Date().toISOString().slice(0, 10); }
+  function yesterdayUTC() {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - 1);
+    return d.toISOString().slice(0, 10);
+  }
+  function prettyDate(iso) {
+    const [y, m, day] = iso.split("-").map(Number);
+    const d = new Date(Date.UTC(y, m - 1, day));
+    return formatDateline(d);
+  }
+
+  function loadMine() {
+    const raw = localStorage.getItem("mote.mine");
+    if (!raw) return null;
+    try {
+      const m = JSON.parse(raw);
+      const ageMs = Date.now() - new Date(m.submitted_at).getTime();
+      if (ageMs > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem("mote.mine");
+        return null;
+      }
+      return m;
+    } catch { return null; }
+  }
+  function saveMine(m) { localStorage.setItem("mote.mine", JSON.stringify(m)); }
+
+  /* — API — */
+  async function api(path, opts = {}) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      ...opts,
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+        ...(opts.headers || {})
+      }
+    });
+    return res;
+  }
+
+  async function fetchCloud(date) {
+    const res = await api(`words?utc_date=eq.${date}&select=word`);
+    if (!res.ok) return [];
+    const rows = await res.json();
+    const counts = new Map();
+    for (const r of rows) counts.set(r.word, (counts.get(r.word) || 0) + 1);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  }
+
+  async function submitWord(word) {
+    const res = await api("words", { method: "POST", body: JSON.stringify({ word, device_id: deviceId }) });
+    if (res.status === 409) return { ok: false, reason: "duplicate" };
+    if (!res.ok) {
+      const txt = await res.text();
+      if (txt.includes("words_device_date_uidx") || txt.includes("duplicate")) return { ok: false, reason: "duplicate" };
+      return { ok: false, reason: "error", detail: txt };
+    }
+    const [row] = await res.json();
+    return { ok: true, row };
+  }
+
+  /* — Render — */
+  function renderCloud(target, entries, mine, popWord) {
+    target.innerHTML = "";
+    if (!entries.length) {
+      const p = document.createElement("div");
+      p.className = "empty";
+      p.textContent = "The page is empty. Be the first to set a word.";
+      target.appendChild(p);
+      return;
+    }
+    const max = entries[0][1];
+    const min = entries[entries.length - 1][1];
+    const total = entries.length;
+    entries.forEach(([word, count], i) => {
+      const t = max === min ? 0.5 : (count - min) / (max - min);
+      const size = 18 + Math.round(Math.pow(t, 0.85) * 64);
+      const el = document.createElement("span");
+      el.className = "w";
+      if (count === 1 && max > 1) el.classList.add("italic");
+      el.textContent = word;
+      el.style.fontSize = size + "px";
+      el.style.animationDelay = Math.min(i * 18, 700) + "ms";
+      el.title = `${count} ${count === 1 ? "voice" : "voices"}`;
+      if (mine && word === mine.word) el.classList.add("mine");
+      if (popWord && word === popWord) {
+        el.classList.add("pop");
+        el.style.animationDelay = "0ms";
+      }
+      target.appendChild(el);
+    });
+  }
+
+  function validate(raw) {
+    const word = raw.trim().toLowerCase();
+    if (!word) return { ok: false, msg: "Type a word — anything." };
+    if (!/^[a-z]+$/.test(word)) return { ok: false, msg: "Letters only. No spaces, numbers, or punctuation." };
+    if (word.length > 20) return { ok: false, msg: "Twenty letters or fewer, please." };
+    if (PROFANITY.has(word)) return { ok: false, msg: "Try another word." };
+    return { ok: true, word };
+  }
+
+  function renderInput() {
+    composer.innerHTML = `
+      <div class="compose">
+        <div class="label"><span class="arrow">☞</span><span>Your word, today</span></div>
+        <div class="input-frame">
+          <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="…" />
+        </div>
+        <div class="hint" id="hint">One word, lowercase letters. Once set, it cannot be unset.</div>
+        <button id="next">Continue →</button>
+      </div>
+    `;
+    const input = document.getElementById("word");
+    const hint = document.getElementById("hint");
+    const next = document.getElementById("next");
+    input.focus();
+
+    function go() {
+      const v = validate(input.value);
+      if (!v.ok) {
+        hint.textContent = v.msg;
+        hint.classList.add("error");
+        return;
+      }
+      renderConfirm(v.word);
+    }
+    input.addEventListener("input", () => {
+      hint.classList.remove("error");
+      hint.textContent = "One word, lowercase letters. Once set, it cannot be unset.";
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+    next.addEventListener("click", go);
+  }
+
+  function renderConfirm(word) {
+    composer.innerHTML = `
+      <div class="confirm">
+        <div class="confirm-text">
+          You set the word —
+          <span class="pick">${word}</span>
+          for today's page.
+        </div>
+        <div class="hint">Once pressed, this cannot be edited or unsent.</div>
+        <div class="actions">
+          <button class="ghost" id="back">← Reconsider</button>
+          <button id="send">Press it</button>
+        </div>
+      </div>
+    `;
+    document.getElementById("back").addEventListener("click", renderInput);
+    const send = document.getElementById("send");
+    send.addEventListener("click", async () => {
+      send.disabled = true;
+      send.textContent = "Pressing…";
+      const r = await submitWord(word);
+      if (!r.ok && r.reason === "duplicate") {
+        const mine = { word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
+        saveMine(mine);
+        await refresh(word);
+        return;
+      }
+      if (!r.ok) {
+        composer.innerHTML = `<div class="hint error" style="text-align:center; margin: 0 auto; max-width: 360px">The press jammed. Try again in a moment.</div>`;
+        setTimeout(renderInput, 1800);
+        return;
+      }
+      const mine = { word: r.row.word, submitted_at: r.row.submitted_at, utc_date: r.row.utc_date };
+      saveMine(mine);
+      await refresh(r.row.word);
+    });
+  }
+
+  function renderYou(mine) {
+    const today = todayUTC();
+    const isYesterday = mine.utc_date && mine.utc_date !== today;
+    composer.innerHTML = `
+      <div class="you">
+        <div class="label">${isYesterday ? "Yesterday, you offered" : "Today, you offered"}</div>
+        <div class="word">${mine.word}</div>
+        ${isYesterday ? `<div class="badge">From yesterday's page</div>` : ""}
+      </div>
+    `;
+  }
+
+  async function refresh(popWord) {
+    const mine = loadMine();
+    const today = todayUTC();
+    const showingTodayMine = mine && mine.utc_date === today;
+    if (mine) renderYou(mine);
+    else renderInput();
+    cloudLabel.textContent = showingTodayMine || !mine ? "Today's setting" : "Today's setting · your word is from yesterday";
+    const entries = await fetchCloud(today);
+    const highlightMine = showingTodayMine ? mine : null;
+    renderCloud(cloud, entries, highlightMine, popWord);
+  }
+
+  /* — Yesterday modal — */
+  document.getElementById("open-yesterday").addEventListener("click", async (e) => {
+    e.preventDefault();
+    modal.classList.add("open");
+    modalCloud.innerHTML = `<div class="empty">Loading…</div>`;
+    const y = yesterdayUTC();
+    modalTitle.textContent = "Yesterday's page";
+    modalMeta.textContent = prettyDate(y);
+    const entries = await fetchCloud(y);
+    renderCloud(modalCloud, entries, null, null);
+  });
+  document.getElementById("modal-close").addEventListener("click", () => modal.classList.remove("open"));
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") modal.classList.remove("open"); });
+
+  refresh();
+</script>
+</body>
+</html>
