@@ -233,7 +233,10 @@
     color: var(--vermillion);
     font-style: italic;
   }
-  .stage-words .w.pop { animation: ink-bleed 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+  .stage-words .w.pop {
+    animation: ink-bleed 1400ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    z-index: 5;
+  }
   .stage-words .w.fresh { animation: ink 800ms ease-out forwards; }
   .stage-words .w.faded { color: var(--ink-faint); opacity: 0.55; }
 
@@ -242,9 +245,10 @@
     to   { opacity: 1; transform: translateY(0);   filter: blur(0); }
   }
   @keyframes ink-bleed {
-    0%   { opacity: 0; transform: scale(0.7); filter: blur(8px); }
-    50%  { opacity: 1; transform: scale(1.06); filter: blur(0.5px); }
-    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+    0%   { opacity: 0; transform: scale(0.5); filter: blur(10px); color: var(--vermillion); }
+    40%  { opacity: 1; transform: scale(1.25); filter: blur(0.5px); color: var(--vermillion); }
+    70%  { transform: scale(1); color: var(--vermillion); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); color: var(--ink); }
   }
 
   /* — Composer dock (below cloud) — */
@@ -1144,8 +1148,17 @@
     const stageW = stageEl.clientWidth;
     const stageH = stageEl.clientHeight;
     // cap visible words so the cloud isn't so dense that new words can't be placed
-    const VISIBLE_CAP = 80;
-    entries = entries.slice(0, VISIBLE_CAP);
+    const VISIBLE_CAP = 60;
+    let visible = entries.slice(0, VISIBLE_CAP);
+    // ensure popWord is always rendered, even if outside the cap
+    if (popWord && !visible.find(([w]) => w === popWord)) {
+      const popEntry = entries.find(([w]) => w === popWord);
+      if (popEntry) {
+        visible = visible.slice(0, VISIBLE_CAP - 1);
+        visible.push(popEntry);
+      }
+    }
+    entries = visible;
     const max = entries[0][1], min = entries[entries.length - 1][1];
     const targetWords = new Set(entries.map(([w]) => w));
 
@@ -1638,7 +1651,7 @@
     }
     document.getElementById("dev-drop").addEventListener("click", async () => {
       const w = freshWord();
-      const n = 3 + Math.floor(Math.random() * 6); // 3–8 voices for visible size
+      const n = 30 + Math.floor(Math.random() * 30); // 30–60 voices: definitely visible
       console.log(`dev: dropping ${n}× "${w}"`);
       await Promise.all(Array.from({ length: n }, () => devInsert(w)));
       await refresh(w);
