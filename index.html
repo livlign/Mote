@@ -997,28 +997,25 @@
   }
 
   async function fetchDay(date) {
-    const res = await api(`words?utc_date=eq.${date}&select=word`);
+    const res = await api(`word_counts?utc_date=eq.${date}&select=word,count&order=count.desc`);
     if (!res.ok) return { entries: [], total: 0 };
     const rows = await res.json();
-    const counts = new Map();
-    for (const r of rows) counts.set(r.word, (counts.get(r.word) || 0) + 1);
-    return {
-      entries: [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
-      total: rows.length
-    };
+    const entries = rows.map(r => [r.word, r.count]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const total = rows.reduce((s, r) => s + r.count, 0);
+    return { entries, total };
   }
 
   async function fetchLastDays(n) {
     const start = isoDayBack(n - 1);
-    const res = await api(`words?utc_date=gte.${start}&select=word,utc_date`);
+    const res = await api(`word_counts?utc_date=gte.${start}&select=word,utc_date,count`);
     if (!res.ok) return { byDay: new Map() };
     const rows = await res.json();
     const byDay = new Map();
     for (const r of rows) {
       if (!byDay.has(r.utc_date)) byDay.set(r.utc_date, { total: 0, counts: new Map() });
       const d = byDay.get(r.utc_date);
-      d.total++;
-      d.counts.set(r.word, (d.counts.get(r.word) || 0) + 1);
+      d.total += r.count;
+      d.counts.set(r.word, (d.counts.get(r.word) || 0) + r.count);
     }
     return { byDay };
   }

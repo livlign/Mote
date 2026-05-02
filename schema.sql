@@ -25,3 +25,26 @@ create policy words_insert_anon on words
     word ~ '^[a-z]{1,20}$'
     and length(device_id) between 8 and 64
   );
+
+-- Aggregated view: one row per (word, utc_date) with the count of voices.
+-- This avoids hitting the PostgREST max-rows cap on the raw words table.
+drop view if exists word_counts;
+create view word_counts
+with (security_invoker = true)
+as
+  select word, utc_date, count(*)::int as count
+  from words
+  group by word, utc_date;
+
+grant select on word_counts to anon, authenticated;
+
+-- Daily totals for archive views (last N days, etc).
+drop view if exists day_totals;
+create view day_totals
+with (security_invoker = true)
+as
+  select utc_date, count(*)::int as total, count(distinct word)::int as unique_words
+  from words
+  group by utc_date;
+
+grant select on day_totals to anon, authenticated;
