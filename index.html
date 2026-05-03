@@ -3,12 +3,24 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mote — Today, in a Word</title>
-<meta property="og:title" content="Mote — Today, in a Word" />
-<meta property="og:description" content="What's the world thinking today? One word per person, per day." />
-<meta property="og:url" content="https://mote.day" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary" />
+<title>Mote — Today, in a Word. What's the world thinking?</title>
+<meta name="description" content="One word per person, per day. The world's words gather into a live cloud — bigger when more people say the same thing. Resets at 00:00 UTC.">
+<link rel="canonical" href="https://mote.day">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mote.day">
+<meta property="og:title" content="Mote — Today, in a Word. What's the world thinking?">
+<meta property="og:description" content="One word per person, per day. The world's words gather into a live cloud — bigger when more people say the same thing. Resets at 00:00 UTC.">
+<meta property="og:image" content="https://mote.day/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Mote">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://mote.day">
+<meta name="twitter:title" content="Mote — Today, in a Word. What's the world thinking?">
+<meta name="twitter:description" content="One word per person, per day. The world's words gather into a live cloud — bigger when more people say the same thing. Resets at 00:00 UTC.">
+<meta name="twitter:image" content="https://mote.day/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -619,6 +631,38 @@
     padding: 0 32px 40px;
   }
 
+  .about-body {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 40px;
+  }
+  .about-body p {
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0 0 18px;
+  }
+  .about-body .about-lede {
+    font-size: 26px;
+    line-height: 1.35;
+    font-weight: 500;
+    margin-bottom: 28px;
+  }
+  .about-body .about-meta {
+    margin-top: 32px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .about-body .about-meta a {
+    color: var(--cobalt);
+    text-decoration: none;
+  }
+  .about-body .about-meta a:hover { text-decoration: underline; }
+
   .date-nav {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -889,7 +933,7 @@
     </div>
     <nav class="nav">
       <button id="open-history">History</button>
-      <button>About</button>
+      <button id="open-about">About</button>
     </nav>
   </header>
 
@@ -898,9 +942,9 @@
   </section>
 
   <section class="stats" id="stats">
-    <span class="item"><span class="num" id="s-voices">—</span> voices</span>
+    <span class="item"><span class="num" id="s-voices">—</span> <span id="s-voices-label">voices</span></span>
     <span class="sep">·</span>
-    <span class="item"><span class="num" id="s-words">—</span> words</span>
+    <span class="item"><span class="num" id="s-words">—</span> <span id="s-words-label">words</span></span>
     <span class="sep">·</span>
     <span class="typer" id="typer"></span>
   </section>
@@ -919,6 +963,19 @@
       <button class="tab" data-tab="week">Last 7 Days</button>
     </div>
     <div class="history-body" id="history-body"></div>
+  </div>
+
+  <div class="history about" id="about" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="history-bar">
+      <h2>About</h2>
+      <button class="close" id="about-close" aria-label="Close">×</button>
+    </div>
+    <div class="history-body about-body">
+      <p class="about-lede">One word per person, per day. The world's words, set big.</p>
+      <p>Each day at 00:00 UTC, the canvas resets. Everyone gets one word — whatever's on your mind, in your language of feeling. The more people who say a word, the larger it lands.</p>
+      <p>It's a quiet snapshot of a planet's mood, drawn one mote at a time.</p>
+      <p class="about-meta">Made with care · <a href="https://github.com/livlign/Mote" target="_blank" rel="noopener">source</a></p>
+    </div>
   </div>
 
 <script type="module">
@@ -1173,7 +1230,7 @@
     wrap.innerHTML = `
       <div class="narrative">Today is just beginning. The first words are arriving.</div>
       <div class="big">${voices}</div>
-      <div class="label">Voices so far</div>
+      <div class="label">${voices === 1 ? "voice" : "voices"} so far</div>
       <div class="divider"></div>
       <div class="words"></div>
     `;
@@ -1415,8 +1472,8 @@
   }
 
 
-  function renderYouSaid(mine, voices) {
-    const others = Math.max(0, voices - 1);
+  function renderYouSaid(mine, sameWordCount) {
+    const others = Math.max(0, sameWordCount - 1);
     submitEl.innerHTML = `
       <div class="you-said">
         <div class="label">You said</div>
@@ -1472,7 +1529,7 @@
 
     // If we couldn't compute a landing, just bail to refresh
     if (!landing) {
-      renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1);
+      renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, ((lastEntries.find(([w]) => w === apiRes.row.word)?.[1]) ?? 0) + 1);
       submitEl.style.visibility = "";
       await refresh(word);
       return;
@@ -1625,10 +1682,15 @@
 
     sVoices.textContent = data.voices.toLocaleString();
     sWords.textContent = data.unique.toLocaleString();
+    document.getElementById("s-voices-label").textContent = data.voices === 1 ? "voice" : "voices";
+    document.getElementById("s-words-label").textContent = data.unique === 1 ? "word" : "words";
 
     const mine = loadMine();
     if (mine && mine.utc_date === todayUTC()) {
-      if (!submitEl.querySelector(".you-said")) renderYouSaid(mine, data.voices);
+      if (!submitEl.querySelector(".you-said")) {
+        const sameWord = (data.entries.find(([w]) => w === mine.word)?.[1]) ?? 1;
+        renderYouSaid(mine, sameWord);
+      }
     } else {
       // show input if not currently in confirm state
       if (!submitEl.querySelector(".submit-row")) renderSubmitInput();
@@ -1657,7 +1719,7 @@
       lines.push(`last: ${lastWordInfo.word}, ${timeAgo(lastWordInfo.at)}`);
     }
     if (lastVoiceCount > 0) {
-      lines.push(`${lastVoiceCount.toLocaleString()} voices today, climbing`);
+      lines.push(`${lastVoiceCount.toLocaleString()} ${lastVoiceCount === 1 ? "voice" : "voices"} today, climbing`);
     }
     if (submitted) {
       const match = lastEntries.find(([w]) => w === mine.word);
@@ -1699,7 +1761,23 @@
 
   document.getElementById("open-history").addEventListener("click", () => openHistory());
   document.getElementById("history-close").addEventListener("click", () => closeHistory());
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && historyEl.classList.contains("open")) closeHistory(); });
+  const aboutEl = document.getElementById("about");
+  document.getElementById("open-about").addEventListener("click", () => {
+    aboutEl.classList.add("open");
+    aboutEl.setAttribute("aria-hidden", "false");
+  });
+  document.getElementById("about-close").addEventListener("click", () => {
+    aboutEl.classList.remove("open");
+    aboutEl.setAttribute("aria-hidden", "true");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (historyEl.classList.contains("open")) closeHistory();
+    if (aboutEl.classList.contains("open")) {
+      aboutEl.classList.remove("open");
+      aboutEl.setAttribute("aria-hidden", "true");
+    }
+  });
   document.querySelectorAll(".tabs .tab").forEach(b => {
     b.addEventListener("click", () => {
       historyTab = b.dataset.tab;
@@ -1758,7 +1836,7 @@
         insightHTML = `
           <div class="insight">
             <div class="text">${dir} <span class="v">${Math.abs(pct)}%</span> from last ${FULLDAYS[dt.getUTCDay()]}.</div>
-            <div class="meta">${data.voices.toLocaleString()} voices ${isToday ? "today" : "this day"} · ${prev.voices.toLocaleString()} last ${SHORTDAYS[dt.getUTCDay()]}</div>
+            <div class="meta">${data.voices.toLocaleString()} ${data.voices === 1 ? "voice" : "voices"} ${isToday ? "today" : "this day"} · ${prev.voices.toLocaleString()} last ${SHORTDAYS[dt.getUTCDay()]}</div>
           </div>
         `;
       }
