@@ -157,7 +157,10 @@
     z-index: 4;
   }
   .canvas .w.mine { color: var(--cobalt); }
-  .canvas .w.pulse { animation: pulse-once 600ms cubic-bezier(0.65,0,0.35,1); }
+  .canvas .w.pulse {
+    animation: pulse-once 700ms cubic-bezier(0.65,0,0.35,1) forwards;
+    z-index: 5;
+  }
   .canvas .see-all {
     position: absolute;
     bottom: 6px;
@@ -180,9 +183,9 @@
     to   { opacity: 1; }
   }
   @keyframes pulse-once {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.15); }
-    100% { transform: scale(1); }
+    0%   { transform: scale(1);    opacity: 1; }
+    50%  { transform: scale(1.18); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
   }
 
   /* — Word tooltip — */
@@ -463,6 +466,13 @@
     padding: 0;
   }
   .confirm-back:hover { color: var(--cobalt); }
+
+  /* — Fade-in on submit panel swap — */
+  .submit.fade-in { animation: panel-fade 480ms cubic-bezier(0.65, 0, 0.35, 1); }
+  @keyframes panel-fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
   /* — You said panel — */
   .you-said {
@@ -1470,6 +1480,8 @@
     if (!apiRes.ok && apiRes.reason === "duplicate") {
       saveMine({ word, submitted_at: new Date().toISOString(), utc_date: todayUTC() });
       submitEl.style.visibility = "";
+      submitEl.classList.add("fade-in");
+      setTimeout(() => submitEl.classList.remove("fade-in"), 500);
       await refresh(word);
       return;
     }
@@ -1528,9 +1540,11 @@
 
     renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1);
     submitEl.style.visibility = "";
+    submitEl.classList.add("fade-in");
+    setTimeout(() => submitEl.classList.remove("fade-in"), 500);
 
-    // Refresh in background (resize tween catches up)
-    refresh();
+    // Refresh in background — pass word as popWord so the visible-cap doesn't evict it
+    refresh(word);
   }
 
   // Plan where the word will land in the current cloud, before the API returns.
