@@ -1122,18 +1122,18 @@
   /* — Cloud sizing — */
   // size = minSize + (maxSize - minSize) * pow(count/maxCount, 0.55)
   // per-word variation: 0.92 + (hash(word) % 16)/100  (±8%)
-  const MIN_SIZE = 14;
-  const MAX_SIZE = 56;
+  const MIN_SIZE = 12;
+  const MAX_SIZE = 84;
   const MIN_SIZE_M = 11;
-  const MAX_SIZE_M = 44;
+  const MAX_SIZE_M = 56;
   function sizeFor(count, maxCount, word) {
     const isMobile = window.innerWidth <= 768;
     const min = isMobile ? MIN_SIZE_M : MIN_SIZE;
     const max = isMobile ? MAX_SIZE_M : MAX_SIZE;
-    // Linear: size strictly proportional to count. Truthful.
-    const t = maxCount === 0 ? 0 : count / maxCount;
+    // Truthful + amplified: small power > 1 expands differences so low counts
+    // don't crowd into the bottom tier.
+    const t = maxCount === 0 ? 0 : Math.pow(count / maxCount, 1.45);
     const base = min + (max - min) * t;
-    // Small ±2.5% jitter so equal-count words aren't pixel-identical.
     const variation = 0.975 + ((hash(word) % 6) / 100);
     return Math.round(base * variation);
   }
