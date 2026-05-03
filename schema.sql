@@ -55,3 +55,26 @@ as
   from words
   group by utc_date;
 grant select on day_totals to anon, authenticated;
+
+-- Telemetry: failed input attempts (e.g., user tried to enter a multi-word phrase).
+-- Insert-only from anon. Read via service key in the dashboard.
+create table if not exists attempts (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null check (kind in ('multi_word','non_letters','too_long','profanity')),
+  input_text text not null check (length(input_text) between 1 and 200),
+  device_id text not null check (length(device_id) between 8 and 64),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists attempts_by_kind_at on attempts (kind, created_at desc);
+
+alter table attempts enable row level security;
+
+drop policy if exists "anyone can insert attempt" on attempts;
+create policy "anyone can insert attempt"
+  on attempts for insert
+  with check (
+    kind in ('multi_word','non_letters','too_long','profanity')
+    and length(input_text) between 1 and 200
+    and length(device_id) between 8 and 64
+  );

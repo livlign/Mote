@@ -447,11 +447,25 @@
     color: var(--ink-soft);
     line-height: 1.5;
   }
-  .rules-text.error { color: var(--cobalt); }
+  .rules-text.error { color: #d00; }
   .rules-text .match {
     color: var(--cobalt);
     margin-left: 8px;
   }
+  @keyframes mote-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+  }
+  .submit-row.shake { animation: mote-shake 280ms ease; }
+  @keyframes mote-pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+  .rules-text.pulse { animation: mote-pulse 260ms ease; }
 
   .confirm-text {
     font-family: var(--sans);
@@ -943,8 +957,8 @@
 
   <section class="stats" id="stats">
     <span class="item"><span class="num" id="s-voices">—</span> <span id="s-voices-label">voices</span></span>
-    <span class="sep">·</span>
-    <span class="item"><span class="num" id="s-words">—</span> <span id="s-words-label">words</span></span>
+    <span class="sep" id="s-words-sep">·</span>
+    <span class="item" id="s-words-item"><span class="num" id="s-words">—</span> <span id="s-words-label">words</span></span>
     <span class="sep">·</span>
     <span class="typer" id="typer"></span>
   </section>
@@ -1328,6 +1342,12 @@
   }
 
   function renderCloudArea(entries, voices, mine, popWord) {
+    // Clear any stale error message left over from a previous failed refresh.
+    const staleMsg = canvasEl.querySelector(".canvas-msg");
+    if (staleMsg) {
+      console.warn("[mote] clearing stale canvas-msg before re-render");
+      staleMsg.remove();
+    }
     const useEarly = voices < EARLY_THRESHOLD;
     if (useEarly) {
       renderEarly(entries, voices, mine);
@@ -1411,15 +1431,40 @@
 
   /* — Validation — */
   function validate(raw) {
-    const word = raw.trim().toLowerCase();
-    if (!word) return { ok: false, msg: "Type one word." };
-    if (!/^[a-z]+$/.test(word)) return { ok: false, msg: "Letters only." };
-    if (word.length > 20) return { ok: false, msg: "Twenty letters or fewer." };
-    if (PROFANITY.has(word)) return { ok: false, msg: "Try a different word." };
+    const trimmed = raw.trim();
+    if (!trimmed) return { ok: false, kind: "empty", msg: "Type one word." };
+    if (/\s/.test(trimmed)) return { ok: false, kind: "multi_word", msg: "Just one word for now — multi-word coming soon." };
+    const word = trimmed.toLowerCase();
+    if (!/^[a-z]+$/.test(word)) return { ok: false, kind: "non_letters", msg: "Letters only." };
+    if (word.length > 20) return { ok: false, kind: "too_long", msg: "Twenty letters or fewer." };
+    if (PROFANITY.has(word)) return { ok: false, kind: "profanity", msg: "Try a different word." };
     return { ok: true, word };
   }
+  // Lightly clean as the user types: lowercase + drop control chars,
+  // but PRESERVE spaces so multi-word intent stays visible.
   function sanitize(raw) {
-    return raw.toLowerCase().replace(/[^a-z]/g, "").slice(0, 20);
+    return raw.toLowerCase().replace(/[^a-z ]/g, "").slice(0, 120);
+  }
+
+  const lastLoggedByKind = new Map();
+  async function logAttempt(kind, inputText) {
+    if (lastLoggedByKind.get(kind) === inputText) return;
+    lastLoggedByKind.set(kind, inputText);
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/attempts`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ kind, input_text: inputText.slice(0, 200), device_id: deviceId })
+      });
+    } catch (e) {
+      // fire-and-forget; never break the user flow
+      console.warn("[mote] attempt log failed:", e);
+    }
   }
 
   /* — Submit region: input / confirm / you-said — */
@@ -1430,7 +1475,7 @@
     submitEl.innerHTML = `
       <div class="submit-row">
         <span class="arrow">→</span>
-        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="type one word…" />
+        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="120" placeholder="type one word…" />
         <button class="send" id="send" disabled>Send</button>
       </div>
       <div class="submit-foot">
@@ -1445,11 +1490,18 @@
     input.addEventListener("input", () => {
       const cleaned = sanitize(input.value);
       if (cleaned !== input.value) input.value = cleaned;
-      send.disabled = cleaned.length < 1;
+      const trimmed = cleaned.trim();
+      const hasSpace = /\s/.test(trimmed);
+      send.disabled = trimmed.length < 1;
       rules.classList.remove("error");
-      // match note
-      const match = lastEntries.find(([w]) => w === cleaned);
-      if (cleaned && match) {
+      if (hasSpace) {
+        rules.textContent = "Just one word for now — multi-word coming soon.";
+        rules.classList.add("error");
+        return;
+      }
+      // match note (single-word path)
+      const match = lastEntries.find(([w]) => w === trimmed);
+      if (trimmed && match) {
         rules.innerHTML = `One word per person, per day. <span class="match">${match[1]} other${match[1] === 1 ? "" : "s"} said this.</span>`;
       } else {
         rules.textContent = "One word per person, per day. The more times a word is mentioned, the bigger it is. Reset 00:00 UTC.";
@@ -1461,6 +1513,12 @@
       if (!v.ok) {
         rules.textContent = v.msg;
         rules.classList.add("error");
+        // Re-acknowledge the rejection visually (the message itself may already be on screen).
+        const row = submitEl.querySelector(".submit-row");
+        if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); }
+        rules.classList.remove("pulse"); void rules.offsetWidth; rules.classList.add("pulse");
+        // Log every meaningful invalid attempt (skip empty — no signal).
+        if (v.kind && v.kind !== "empty") logAttempt(v.kind, input.value.trim());
         return;
       }
       send.disabled = true;
@@ -1474,11 +1532,14 @@
 
   function renderYouSaid(mine, sameWordCount) {
     const others = Math.max(0, sameWordCount - 1);
+    const context = others === 0
+      ? "You're the only one who said this today."
+      : `${others.toLocaleString()} other ${others === 1 ? "person" : "people"} said this today`;
     submitEl.innerHTML = `
       <div class="you-said">
         <div class="label">You said</div>
         <div class="word">${mine.word}</div>
-        <div class="context">${others.toLocaleString()} other ${others === 1 ? "person" : "people"} said this today</div>
+        <div class="context">${context}</div>
       </div>
     `;
   }
@@ -1668,6 +1729,7 @@
       data = await fetchToday();
     } catch (e) {
       // error state
+      console.error("[mote] fetchToday failed:", e);
       canvasEl.innerHTML = `<div class="canvas-msg">Couldn't reach today's words. <button id="retry-cloud">Try again</button></div>`;
       const r = document.getElementById("retry-cloud");
       if (r) r.addEventListener("click", () => refresh());
@@ -1681,9 +1743,14 @@
     lastWordInfo = data.last;
 
     sVoices.textContent = data.voices.toLocaleString();
-    sWords.textContent = data.unique.toLocaleString();
     document.getElementById("s-voices-label").textContent = data.voices === 1 ? "voice" : "voices";
-    document.getElementById("s-words-label").textContent = data.unique === 1 ? "word" : "words";
+    const showWords = data.unique && data.unique > 0;
+    document.getElementById("s-words-item").style.display = showWords ? "" : "none";
+    document.getElementById("s-words-sep").style.display = showWords ? "" : "none";
+    if (showWords) {
+      sWords.textContent = data.unique.toLocaleString();
+      document.getElementById("s-words-label").textContent = data.unique === 1 ? "word" : "words";
+    }
 
     const mine = loadMine();
     if (mine && mine.utc_date === todayUTC()) {
@@ -1718,15 +1785,17 @@
     if (lastVoiceCount > 0 && lastWordInfo) {
       lines.push(`last: ${lastWordInfo.word}, ${timeAgo(lastWordInfo.at)}`);
     }
-    if (lastVoiceCount > 0) {
-      lines.push(`${lastVoiceCount.toLocaleString()} ${lastVoiceCount === 1 ? "voice" : "voices"} today, climbing`);
-    }
     if (submitted) {
       const match = lastEntries.find(([w]) => w === mine.word);
       if (match && match[1] > 1) lines.push(`"${mine.word}" said by ${match[1] - 1} others today`);
     } else {
       const prompts = ["what's one word for today?", "if you had to choose one", "a word, briefly"];
       lines.push(prompts[Math.floor(Math.random() * prompts.length)]);
+    }
+    if (new Date().getUTCHours() >= 21) {
+      lines.push("the day ends in a few hours");
+      lines.push("today's words clear at midnight UTC");
+      lines.push("a new day soon");
     }
     return lines[Math.floor(Math.random() * lines.length)] || "";
   }
