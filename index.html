@@ -48,13 +48,15 @@
   /* — Header — */
   .header {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 28px;
     padding: 14px 32px;
     border-bottom: 2px solid var(--ink);
     flex-shrink: 0;
   }
+  .header .logo { justify-self: start; }
+  .header .nav  { justify-self: end; }
   .logo {
     display: flex;
     align-items: center;
@@ -841,36 +843,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* — Dev panel (hidden in production) — */
-  .dev-panel {
-    position: fixed; bottom: 14px; right: 14px;
-    background: var(--ink); color: var(--paper);
-    padding: 12px; z-index: 90;
-    box-shadow: 0 14px 30px -10px rgba(0,0,0,0.5);
-    border-left: 3px solid var(--cobalt);
-    display: none;
-  }
-  .dev-panel.show { display: block; }
-  .dev-panel .t {
-    font-family: var(--mono);
-    font-weight: 700;
-    color: var(--cobalt);
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .dev-panel button {
-    display: block; width: 100%;
-    background: transparent; color: var(--paper);
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 6px 10px; margin-bottom: 4px;
-    font-family: var(--mono);
-    font-weight: 500;
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    cursor: pointer;
-  }
-  .dev-panel button:hover { background: var(--cobalt); border-color: var(--cobalt); }
-  .dev-panel button.on { background: var(--cobalt); border-color: var(--cobalt); }
-
   /* — Mobile — */
   @media (max-width: 768px) {
     .header { padding: 12px 18px; }
@@ -918,7 +890,6 @@
     <nav class="nav">
       <button id="open-history">History</button>
       <button>About</button>
-      <button class="more">⌄</button>
     </nav>
   </header>
 
@@ -948,14 +919,6 @@
       <button class="tab" data-tab="week">Last 7 Days</button>
     </div>
     <div class="history-body" id="history-body"></div>
-  </div>
-
-  <div class="dev-panel" id="dev-panel">
-    <div class="t">Dev</div>
-    <button id="dev-reset">Reset</button>
-    <button id="dev-drop">Drop word</button>
-    <button id="dev-drip">Toggle drip</button>
-    <button id="dev-early">Toggle early state</button>
   </div>
 
 <script type="module">
@@ -1122,17 +1085,17 @@
   /* — Cloud sizing — */
   // size = minSize + (maxSize - minSize) * pow(count/maxCount, 0.55)
   // per-word variation: 0.92 + (hash(word) % 16)/100  (±8%)
-  const MIN_SIZE = 12;
-  const MAX_SIZE = 84;
+  const MIN_SIZE = 14;
+  const MAX_SIZE = 110;
   const MIN_SIZE_M = 11;
-  const MAX_SIZE_M = 56;
+  const MAX_SIZE_M = 64;
   function sizeFor(count, maxCount, word) {
     const isMobile = window.innerWidth <= 768;
     const min = isMobile ? MIN_SIZE_M : MIN_SIZE;
     const max = isMobile ? MAX_SIZE_M : MAX_SIZE;
-    // Truthful + amplified: small power > 1 expands differences so low counts
-    // don't crowd into the bottom tier.
-    const t = maxCount === 0 ? 0 : Math.pow(count / maxCount, 1.45);
+    // Pure linear: size is strictly proportional to count. Wide range
+    // (96px desktop) so each tier is unmistakable.
+    const t = maxCount === 0 ? 0 : count / maxCount;
     const base = min + (max - min) * t;
     const variation = 0.975 + ((hash(word) % 6) / 100);
     return Math.round(base * variation);
@@ -1196,8 +1159,6 @@
     el.dataset.count = count;
     return el;
   }
-
-  let earlyOverride = false;
 
   function clearCanvas() {
     canvasEl.innerHTML = "";
@@ -1310,7 +1271,7 @@
   }
 
   function renderCloudArea(entries, voices, mine, popWord) {
-    const useEarly = (voices < EARLY_THRESHOLD && !earlyOverride) || earlyOverride === "force";
+    const useEarly = voices < EARLY_THRESHOLD;
     if (useEarly) {
       renderEarly(entries, voices, mine);
     } else {
@@ -1921,63 +1882,6 @@
     pollT = setInterval(() => { if (!document.hidden) refresh(); }, POLL_INTERVAL_MS);
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
-
-  /* — Dev panel — */
-  const devParam = new URLSearchParams(location.search).get("dev");
-  if (devParam === "1") localStorage.setItem("mote.dev", "1");
-  if (devParam === "0") localStorage.removeItem("mote.dev");
-  const devOn = localStorage.getItem("mote.dev") === "1";
-  if (devOn) {
-    document.getElementById("dev-panel").classList.add("show");
-    document.getElementById("dev-reset").addEventListener("click", () => {
-      clearMine();
-      localStorage.setItem("mote.device", crypto.randomUUID());
-      location.reload();
-    });
-    function freshWord() {
-      const cons = "bcdfghjklmnpqrstvwxyz", vow = "aeiou";
-      const len = 4 + Math.floor(Math.random() * 3);
-      let s = "";
-      for (let i = 0; i < len; i++) s += (i % 2 === 0 ? cons : vow)[Math.floor(Math.random() * (i % 2 === 0 ? cons.length : vow.length))];
-      return s;
-    }
-    async function devInsert(word) {
-      await fetch(`${SUPABASE_URL}/rest/v1/words`, {
-        method: "POST",
-        headers: {
-          "apikey": SUPABASE_ANON_KEY,
-          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify({ word, device_id: "seed-" + crypto.randomUUID() })
-      });
-    }
-    document.getElementById("dev-drop").addEventListener("click", async () => {
-      const w = freshWord();
-      const n = 20 + Math.floor(Math.random() * 30);
-      await Promise.all(Array.from({ length: n }, () => devInsert(w)));
-      await refresh(w);
-    });
-    let dripT = null;
-    const dripBtn = document.getElementById("dev-drip");
-    dripBtn.addEventListener("click", () => {
-      if (dripT) {
-        clearInterval(dripT); dripT = null;
-        dripBtn.classList.remove("on");
-        dripBtn.textContent = "Toggle drip";
-      } else {
-        dripT = setInterval(() => document.getElementById("dev-drop").click(), 4000);
-        dripBtn.classList.add("on");
-        dripBtn.textContent = "Stop drip";
-      }
-    });
-    document.getElementById("dev-early").addEventListener("click", (e) => {
-      earlyOverride = earlyOverride === "force" ? false : "force";
-      e.target.classList.toggle("on", earlyOverride === "force");
-      refresh();
-    });
-  }
 
   /* — Boot — */
   refresh().then(() => runTyperCycle());
