@@ -47,10 +47,11 @@
 
   /* — Header — */
   .header {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    padding: 16px 32px;
+    gap: 28px;
+    padding: 14px 32px;
     border-bottom: 2px solid var(--ink);
     flex-shrink: 0;
   }
@@ -70,6 +71,30 @@
     font-size: 14px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+  }
+  .head-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    gap: 6px;
+  }
+  .head-title .title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .head-title .headline {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin: 0;
   }
   .nav {
     display: flex;
@@ -98,29 +123,6 @@
     line-height: 1;
   }
 
-  /* — Description — */
-  .description {
-    padding: 28px 32px 22px;
-    border-bottom: 1px solid var(--rule);
-    flex-shrink: 0;
-  }
-  .title {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 44px;
-    line-height: 1;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
-    margin: 0 0 14px;
-  }
-  .headline {
-    font-family: var(--sans);
-    font-weight: 500;
-    font-size: 13px;
-    letter-spacing: 0.06em;
-    color: var(--ink-soft);
-    margin: 0;
-  }
 
   /* — Cloud canvas — */
   .canvas-wrap {
@@ -894,17 +896,16 @@
       <div class="mark"></div>
       <div class="word">Mote</div>
     </div>
+    <div class="head-title">
+      <h1 class="title">Today, in a Word</h1>
+      <p class="headline">What's the world thinking today?</p>
+    </div>
     <nav class="nav">
       <button id="open-history">History</button>
       <button>About</button>
       <button class="more">⌄</button>
     </nav>
   </header>
-
-  <section class="description">
-    <h1 class="title">Today, in a Word</h1>
-    <p class="headline">What's the world thinking today?</p>
-  </section>
 
   <section class="canvas-wrap">
     <div class="canvas" id="canvas"></div>
@@ -953,8 +954,8 @@
 
   const POLL_INTERVAL_MS = 25000;
   const EARLY_THRESHOLD = 30;
-  const TOP_N = 60;
-  const COLLIDE_PAD = 12;
+  const TOP_N = 42;
+  const COLLIDE_PAD = 16;
 
   const canvasEl  = document.getElementById("canvas");
   const submitEl  = document.getElementById("submit-region");
@@ -1130,6 +1131,11 @@
 
   function spiralFind(w, h, others, canvasW, canvasH, anchorX, anchorY) {
     const margin = 4;
+    // Stretch the spiral horizontally so words distribute across full canvas width
+    // even when canvas is wider than tall.
+    const aspect = Math.max(1, canvasW / Math.max(1, canvasH));
+    const xScale = Math.sqrt(aspect);
+    const yScale = 1 / xScale;
     const candidate = (x, y) => ({ x: x - w / 2, y: y - h / 2, w, h });
     const tryCand = (cand) => {
       if (cand.x < margin || cand.y < margin) return false;
@@ -1141,12 +1147,12 @@
     const center = candidate(anchorX, anchorY);
     if (tryCand(center)) return center;
     for (let r = 14; r < Math.max(canvasW, canvasH); r += 4) {
-      const steps = Math.max(8, Math.floor(r * 0.55));
+      const steps = Math.max(10, Math.floor(r * 0.6));
       const phase = ((TODAY_SEED + Math.round(r * 13)) % 1000) / 1000 * Math.PI * 2;
       for (let s = 0; s < steps; s++) {
         const a = phase + (s / steps) * Math.PI * 2;
-        const x = anchorX + r * Math.cos(a);
-        const y = anchorY + r * Math.sin(a);
+        const x = anchorX + r * Math.cos(a) * xScale;
+        const y = anchorY + r * Math.sin(a) * yScale;
         const cand = candidate(x, y);
         if (tryCand(cand)) return cand;
       }
@@ -1155,12 +1161,12 @@
   }
 
   function dayAnchor(canvasW, canvasH) {
-    // 45% ± 5% horizontally, 50% ± 5% vertically — stable per day
-    const dx = ((TODAY_SEED >>> 0) % 100) / 100 - 0.5; // -0.5..0.5
+    // Centered ± small jitter, stable per day.
+    const dx = ((TODAY_SEED >>> 0) % 100) / 100 - 0.5;
     const dy = (((TODAY_SEED >>> 8) >>> 0) % 100) / 100 - 0.5;
     return {
-      x: canvasW * (0.45 + dx * 0.1),
-      y: canvasH * (0.50 + dy * 0.1)
+      x: canvasW * (0.50 + dx * 0.04),
+      y: canvasH * (0.50 + dy * 0.06)
     };
   }
 
