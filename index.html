@@ -5,33 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mote — Today, in a Word</title>
 <meta property="og:title" content="Mote — Today, in a Word" />
-<meta property="og:description" content="One word a day. The world's words, set big. Resets at midnight UTC." />
+<meta property="og:description" content="What's the world thinking today? One word per person, per day." />
 <meta property="og:url" content="https://mote.day" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:        #f1ede2;
-    --bg-2:      #e8e1cf;
-    --ink:       #0c0e12;
-    --ink-2:     #2a2d34;
-    --ink-soft:  #6b6a64;
-    --rule:      #c8c0aa;
-    --accent:    #ee3b1f;
-    --accent-d:  #c52b13;
-    --hi:        #fff7d0;
+    --paper:      #ffffff;
+    --ink:        #000000;
+    --ink-soft:   rgba(0,0,0,0.55);
+    --ink-faint:  rgba(0,0,0,0.32);
+    --ink-ghost:  rgba(0,0,0,0.12);
+    --rule:       rgba(0,0,0,0.12);
+    --cobalt:     #0033CC;
 
-    --sans: "Bricolage Grotesque", system-ui, sans-serif;
+    --sans: "Geist", system-ui, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
 
   html, body {
     margin: 0; padding: 0;
-    background: var(--bg);
+    background: var(--paper);
     color: var(--ink);
     font-family: var(--sans);
     -webkit-font-smoothing: antialiased;
@@ -42,630 +41,905 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    position: relative;
-  }
-
-  /* — Cloud canvas: spans entire viewport, sits behind UI — */
-  .cloud-canvas {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-  }
-  .cloud-canvas .w {
-    position: absolute;
-    font-family: var(--sans);
-    font-variation-settings: "wght" 500, "opsz" 96;
-    color: var(--ink);
-    cursor: pointer;
-    user-select: none;
-    line-height: 1;
-    letter-spacing: -0.025em;
-    transition: color 200ms ease, transform 200ms ease, font-size 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
-    opacity: 0;
-    animation: ink 500ms ease-out forwards;
-    white-space: nowrap;
-    pointer-events: auto;
-  }
-  .cloud-canvas .w.italic { color: var(--ink-soft); font-variation-settings: "wght" 400, "opsz" 24; }
-  .cloud-canvas .w:hover { color: var(--accent); transform: translateY(-2px); z-index: 6; }
-  .cloud-canvas .w.mine { color: var(--accent); font-variation-settings: "wght" 600, "opsz" 96; }
-  .cloud-canvas .w.pop {
-    animation: ink-bleed 1300ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-    z-index: 7;
-  }
-  .cloud-canvas .w.fresh { animation: ink 700ms ease-out forwards; }
-
-  @keyframes ink {
-    from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
-    to   { opacity: 1; transform: translateY(0);   filter: blur(0); }
-  }
-  @keyframes ink-bleed {
-    0%   { opacity: 0; transform: scale(0.5); filter: blur(10px); color: var(--accent); }
-    35%  { opacity: 1; transform: scale(1.25); filter: blur(0.5px); color: var(--accent); }
-    65%  { transform: scale(1); color: var(--accent); }
-    100% { opacity: 1; transform: scale(1); filter: blur(0); color: var(--ink); }
-  }
-
-  /* — UI overlay — */
-  .ui {
-    position: relative;
-    z-index: 2;
-    height: 100vh;
-    height: 100dvh;
     display: flex;
     flex-direction: column;
-    pointer-events: none;
   }
-  .ui > * { pointer-events: auto; }
 
-  /* — Top bar — */
-  .topbar {
+  /* — Header — */
+  .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 28px 12px;
-    gap: 20px;
-    border-bottom: 1px solid var(--rule);
-    background: var(--bg);
+    padding: 16px 32px;
+    border-bottom: 2px solid var(--ink);
     flex-shrink: 0;
   }
-  .topbar .brand {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 700, "opsz" 24;
-    font-size: 20px;
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
-  .topbar .brand .dot { color: var(--accent); }
-  .topbar .meta {
+  .logo {
     display: flex;
-    gap: 18px;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo .mark {
+    width: 11px;
+    height: 11px;
+    background: var(--cobalt);
+  }
+  .logo .word {
     font-family: var(--sans);
-    font-size: 11px;
-    font-variation-settings: "wght" 500, "opsz" 12;
-    letter-spacing: 0.16em;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-soft);
-    font-variant-numeric: tabular-nums;
+  }
+  .nav {
+    display: flex;
+    gap: 24px;
     align-items: center;
   }
-  .topbar .meta .sep { color: var(--rule); }
-  .topbar .meta .live {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--accent);
-    text-transform: none;
-    letter-spacing: 0.01em;
-    font-size: 12px;
-  }
-  .topbar .meta .live .pulse {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 1800ms ease-in-out infinite;
-  }
-  .topbar .meta .live .label {
-    color: var(--ink-soft);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-size: 11px;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.4; transform: scale(0.85); }
-    50%      { opacity: 1;   transform: scale(1.2); }
-  }
-  .topbar a {
+  .nav button, .nav a {
+    background: transparent;
+    border: none;
+    cursor: pointer;
     font-family: var(--sans);
+    font-weight: 600;
     font-size: 11px;
-    font-variation-settings: "wght" 500;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-soft);
+    color: var(--ink);
+    padding: 4px 0;
     text-decoration: none;
     transition: color 160ms ease;
   }
-  .topbar a:hover { color: var(--accent); }
+  .nav button:hover, .nav a:hover { color: var(--cobalt); }
+  .nav .more {
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 1;
+  }
 
-  /* — Title block (lives within page, words wrap around it) — */
-  .title-block {
-    text-align: center;
-    padding: 18px 24px 16px;
+  /* — Description — */
+  .description {
+    padding: 28px 32px 22px;
+    border-bottom: 1px solid var(--rule);
     flex-shrink: 0;
-    background: transparent;
   }
-  .title-block .title {
+  .title {
     font-family: var(--sans);
-    font-variation-settings: "wght" 600, "opsz" 96;
-    font-size: clamp(24px, 3.2vw, 40px);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    margin: 0 0 6px;
+    font-weight: 800;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
   }
-  .title-block .title .stamp {
-    color: var(--accent);
-    font-variation-settings: "wght" 700, "opsz" 96;
-  }
-  .title-block .subtitle {
+  .headline {
     font-family: var(--sans);
-    font-variation-settings: "wght" 400, "opsz" 16;
-    font-size: 14.5px;
-    line-height: 1.45;
-    color: var(--ink-2);
-    margin: 0 auto 2px;
-    max-width: 480px;
-  }
-  .title-block .subtext {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 400, "opsz" 12;
-    font-size: 12.5px;
-    line-height: 1.5;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.06em;
     color: var(--ink-soft);
-    margin: 0 auto;
-    max-width: 480px;
+    margin: 0;
   }
 
-  /* — Spacer (cloud lives in this region behind UI) — */
-  .spacer { flex: 1 1 auto; min-height: 0; pointer-events: none; }
-
-  /* — Dock (composer) — */
-  .dock {
-    padding: 16px 28px 18px;
-    border-top: 1px solid var(--rule);
-    background: var(--bg);
-    flex-shrink: 0;
+  /* — Cloud canvas — */
+  .canvas-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    padding: 28px 32px;
   }
-
-  .compose {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: stretch;
-    border-bottom: 2px solid var(--ink);
-    margin: 0 auto;
-    max-width: 720px;
+  .canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
   }
-  .compose input[type="text"] {
+  .canvas .w {
+    position: absolute;
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: color 200ms ease, transform 200ms ease, font-size 600ms cubic-bezier(0.65, 0, 0.35, 1);
+    opacity: 0;
+    animation: fade-in 800ms ease-out forwards;
+  }
+  .canvas .w:hover {
+    color: var(--cobalt);
+    transform: scale(1.04);
+    z-index: 4;
+  }
+  .canvas .w.mine { color: var(--cobalt); }
+  .canvas .w.pulse { animation: pulse-once 600ms cubic-bezier(0.65,0,0.35,1); }
+  .canvas .see-all {
+    position: absolute;
+    bottom: 6px;
+    right: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cobalt);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
     background: transparent;
     border: none;
-    font-family: var(--sans);
-    font-variation-settings: "wght" 500, "opsz" 48;
-    font-size: clamp(24px, 3vw, 32px);
-    line-height: 1.05;
+    padding: 4px 0;
+  }
+  .canvas .see-all:hover { text-decoration: underline; }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pulse-once {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  /* — Word tooltip — */
+  .word-tip {
+    position: fixed;
+    z-index: 60;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 8px 10px 10px;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity 160ms ease, transform 160ms ease;
+    font-family: var(--mono);
+  }
+  .word-tip.show { opacity: 1; transform: translateY(0); }
+  .word-tip .count {
+    font-size: 11px;
     color: var(--ink);
-    padding: 4px 14px 10px 0;
-    outline: none;
-    caret-color: var(--accent);
-    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+  .word-tip .feel {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--ink-ghost);
+    font-size: 10px;
+    color: var(--cobalt);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: transparent;
+    border-left: none; border-right: none; border-bottom: none;
+    padding-left: 0; padding-right: 0;
     width: 100%;
     text-align: left;
   }
-  .compose input::placeholder {
-    color: var(--ink-soft);
-    opacity: 0.55;
-  }
-  .cta {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
+
+  /* — Empty / loading / error cloud states — */
+  .canvas-msg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--mono);
     font-size: 12px;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    background: var(--ink);
-    color: var(--bg);
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  .canvas-msg button {
+    margin-left: 8px;
+    background: transparent;
     border: none;
-    padding: 0 26px;
-    margin-bottom: 4px;
+    font-family: var(--mono);
+    color: var(--cobalt);
     cursor: pointer;
-    transition: background 180ms ease, transform 180ms ease;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0;
+  }
+
+  /* — Early-day state — */
+  .early {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+  .early .narrative {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .early .big {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 88px;
+    line-height: 1;
+    color: var(--cobalt);
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+  }
+  .early .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+  }
+  .early .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--ink);
+    margin-bottom: 28px;
+  }
+  .early .words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    justify-content: center;
+    align-items: baseline;
+    max-width: 800px;
+  }
+  .early .words .w {
+    position: static;
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    cursor: pointer;
+    transition: color 200ms ease, transform 200ms ease;
+  }
+  .early .words .w:hover { color: var(--cobalt); transform: scale(1.04); }
+  .early .words .w.mine { color: var(--cobalt); }
+
+  /* — Stats strip — */
+  .stats {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 10px 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    overflow: hidden;
+  }
+  .stats .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     white-space: nowrap;
   }
-  .cta:hover { background: var(--accent); transform: translateY(-1px); }
-  .cta:active { transform: translateY(0); }
-  .cta:disabled { opacity: 0.6; cursor: wait; }
-
-  .compose-foot {
-    display: flex;
-    justify-content: space-between;
-    margin: 8px auto 0;
-    max-width: 720px;
-    gap: 12px;
-  }
-  .hint {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 400, "opsz" 12;
-    font-size: 12px;
-    line-height: 1.4;
-    color: var(--ink-soft);
-    text-align: left;
+  .stats .num { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stats .sep { color: var(--ink-faint); }
+  .stats .typer {
     flex: 1;
-  }
-  .hint.error { color: var(--accent); font-variation-settings: "wght" 500; }
-  .rules {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 500;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
     color: var(--ink-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+  }
+  .stats .typer .caret {
+    display: inline-block;
+    width: 1px;
+    height: 11px;
+    background: var(--cobalt);
+    margin-left: 1px;
+    vertical-align: -1px;
+    animation: blink 800ms steps(2, jump-none) infinite;
+  }
+  .stats .typer .caret.hidden { display: none; }
+  @keyframes blink {
+    50% { opacity: 0; }
   }
 
-  /* — You said state — */
-  .you {
-    max-width: 720px;
-    margin: 0 auto;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 18px;
-    padding-bottom: 6px;
-    border-bottom: 2px solid var(--ink);
+  /* — Submission — */
+  .submit {
+    padding: 20px 32px 24px;
+    flex-shrink: 0;
   }
-  .you .label {
+  .submit-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: 14px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 6px;
+  }
+  .submit-row .arrow {
+    font-family: var(--mono);
+    font-size: 18px;
+    color: var(--cobalt);
+    line-height: 1;
+    padding-bottom: 4px;
+  }
+  .submit-row input[type="text"] {
+    background: transparent;
+    border: none;
     font-family: var(--sans);
-    font-variation-settings: "wght" 500;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.1;
+    color: var(--ink);
+    padding: 0;
+    outline: none;
+    caret-color: var(--cobalt);
+    letter-spacing: -0.02em;
+    width: 100%;
+  }
+  .submit-row input::placeholder {
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+  .send {
+    font-family: var(--mono);
+    font-weight: 600;
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+  }
+  .send:hover { background: var(--paper); color: var(--ink); }
+  .send:disabled { opacity: 0.32; cursor: not-allowed; }
+  .send.confirm-btn { background: var(--cobalt); border-color: var(--cobalt); color: var(--paper); }
+  .send.confirm-btn:hover { background: var(--paper); color: var(--cobalt); }
+
+  .submit-foot {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .rules-text {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    flex-shrink: 0;
+    line-height: 1.5;
   }
-  .you .word {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600, "opsz" 72;
-    font-size: clamp(28px, 4vw, 40px);
-    color: var(--accent);
-    line-height: 1;
-    letter-spacing: -0.025em;
-  }
-  .you .meta {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 400, "opsz" 12;
-    font-size: 12px;
-    color: var(--ink-soft);
-    text-align: right;
-    flex-shrink: 0;
-  }
-  .you .meta strong {
-    color: var(--ink);
-    font-variation-settings: "wght" 600;
-    font-variant-numeric: tabular-nums;
+  .rules-text.error { color: var(--cobalt); }
+  .rules-text .match {
+    color: var(--cobalt);
+    margin-left: 8px;
   }
 
-  /* — Tooltip — */
-  .tooltip {
-    position: fixed;
-    z-index: 60;
-    background: var(--ink);
-    color: var(--bg);
-    padding: 12px 14px;
-    pointer-events: auto;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 140ms ease, transform 140ms ease;
-    min-width: 180px;
-    box-shadow: 0 14px 30px -10px rgba(0,0,0,0.5);
-    border-left: 3px solid var(--accent);
-  }
-  .tooltip.show { opacity: 1; transform: translateY(0); }
-  .tooltip .word {
+  .confirm-text {
     font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 20px;
-    line-height: 1;
-    color: var(--bg);
-    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .confirm-text .word {
+    color: var(--cobalt);
+    font-weight: 800;
+    text-transform: lowercase;
+    margin: 0 4px;
     letter-spacing: -0.02em;
   }
-  .tooltip .count {
-    font-family: var(--sans);
-    font-size: 12px;
-    color: rgba(241,237,226,0.7);
-    margin-bottom: 8px;
-  }
-  .tooltip .count strong {
-    color: var(--bg);
-    font-variation-settings: "wght" 600;
-    font-variant-numeric: tabular-nums;
-    margin-right: 4px;
-  }
-  .tooltip .row {
-    border-top: 1px solid rgba(241,237,226,0.14);
-    padding-top: 8px;
-  }
-  .tooltip button {
-    width: 100%;
-    background: var(--accent);
-    color: var(--bg);
+  .confirm-back {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    background: transparent;
     border: none;
-    padding: 8px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .confirm-back:hover { color: var(--cobalt); }
+
+  /* — You said panel — */
+  .you-said {
+    padding-bottom: 6px;
+  }
+  .you-said .label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .you-said .word {
     font-family: var(--sans);
-    font-variation-settings: "wght" 600;
+    font-weight: 800;
+    font-size: 40px;
+    color: var(--cobalt);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 10px;
+  }
+  .you-said .context {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* — Slide animation element — */
+  .slide-ghost {
+    position: fixed;
+    z-index: 80;
+    font-family: var(--sans);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    pointer-events: none;
+    will-change: transform, font-size, color;
+    white-space: nowrap;
+  }
+
+  /* — New-day banner — */
+  .new-day {
+    flex-shrink: 0;
+    background: var(--cobalt);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 32px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .new-day.show { display: flex; }
+  .new-day button {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid var(--paper);
+    padding: 6px 14px;
+    font-family: var(--mono);
     font-size: 10px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 160ms ease;
+    font-weight: 600;
   }
-  .tooltip button:hover { background: var(--accent-d); }
+  .new-day button:hover { background: var(--paper); color: var(--cobalt); }
 
-  /* — Modal (archive) — */
-  .modal-bg {
+  /* — History overlay — */
+  .history {
     position: fixed; inset: 0;
-    background: rgba(12,14,18,0.7);
-    backdrop-filter: blur(3px);
-    display: none;
-    align-items: center; justify-content: center;
-    padding: 24px; z-index: 80;
+    background: var(--paper);
+    z-index: 70;
+    transform: translateY(100%);
+    transition: transform 320ms cubic-bezier(0.65, 0, 0.35, 1);
+    display: flex;
+    flex-direction: column;
   }
-  .modal-bg.open { display: flex; animation: fade 220ms ease-out; }
-  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  .modal {
-    background: var(--bg);
-    max-width: 880px; width: 100%;
-    max-height: 86vh; overflow: auto;
-    padding: 30px 34px;
-    border: 1px solid var(--ink);
-    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
-  }
-  .modal-head {
-    display: flex; justify-content: space-between; align-items: baseline;
+  .history.open { transform: translateY(0); }
+  .history-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
     border-bottom: 2px solid var(--ink);
-    padding-bottom: 14px; margin-bottom: 22px;
-    gap: 16px;
+    flex-shrink: 0;
   }
-  .modal-head h3 {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600, "opsz" 48;
-    font-size: 28px;
-    margin: 0; line-height: 1; letter-spacing: -0.02em;
+  .history-bar h2 {
+    margin: 0;
+    font-family: var(--mono);
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
-  .modal-head .close {
-    background: transparent; color: var(--ink);
-    padding: 6px 0;
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    border: none; cursor: pointer;
-    transition: color 180ms ease;
-  }
-  .modal-head .close:hover { color: var(--accent); }
-
-  .archive-tabs {
-    display: flex; gap: 0;
-    border-bottom: 1px solid rgba(12,14,18,0.15);
-    margin-bottom: 24px;
-  }
-  .archive-tabs button {
-    background: transparent; color: rgba(12,14,18,0.55);
-    padding: 10px 18px 12px;
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    border: none; border-bottom: 2px solid transparent;
+  .history-bar .close {
+    background: transparent;
+    border: none;
     cursor: pointer;
-    transition: color 180ms ease, border-color 180ms ease;
-    margin-bottom: -1px;
+    font-family: var(--mono);
+    font-size: 22px;
+    line-height: 1;
+    color: var(--ink);
+    padding: 0;
+    transition: color 160ms ease;
   }
-  .archive-tabs button.active { color: var(--ink); border-bottom-color: var(--accent); }
-  .archive-tabs button:hover { color: var(--ink); }
+  .history-bar .close:hover { color: var(--cobalt); }
 
-  .archive-content > .stat-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 32px; margin-bottom: 28px;
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--ink-ghost);
+    padding: 0 32px;
+    flex-shrink: 0;
   }
-  .stat { border-left: 3px solid var(--accent); padding-left: 14px; }
-  .stat .label {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--ink-soft); margin-bottom: 4px;
-  }
-  .stat .value {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600, "opsz" 72;
-    font-size: 40px; line-height: 1; letter-spacing: -0.02em;
-  }
-  .stat .value.num { font-variant-numeric: tabular-nums; }
-  .stat .sub {
-    font-family: var(--sans); font-size: 12px; color: var(--ink-soft); margin-top: 6px;
-  }
-
-  .toplist h4 {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--ink-soft); margin: 0 0 14px;
-  }
-  .toplist ol {
-    list-style: none; margin: 0; padding: 0;
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 6px 28px; counter-reset: tc;
-  }
-  .toplist li {
-    counter-increment: tc;
-    display: flex; align-items: baseline; gap: 14px;
-    border-bottom: 1px solid rgba(12,14,18,0.1);
-    padding: 4px 0 6px;
-  }
-  .toplist li::before {
-    content: counter(tc, decimal-leading-zero);
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 10px; letter-spacing: 0.18em;
+  .tabs button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    font-variant-numeric: tabular-nums;
-    min-width: 22px;
+    padding: 14px 18px;
+    transition: color 160ms ease, background 160ms ease;
   }
-  .toplist .word {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 500, "opsz" 24;
-    font-size: 20px; color: var(--ink); flex: 1; letter-spacing: -0.02em;
-  }
-  .toplist .bar {
-    flex: 1; height: 3px;
-    background: rgba(12,14,18,0.08);
-    position: relative; margin-right: 10px; max-width: 120px;
-  }
-  .toplist .bar span {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    background: var(--accent);
-  }
-  .toplist .n {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 12px; color: var(--ink);
-    font-variant-numeric: tabular-nums;
-    min-width: 32px; text-align: right;
-  }
-
-  .week-chart {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 8px; margin-top: 12px; padding: 14px 0;
-  }
-  .week-chart .day {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-  }
-  .week-chart .bar {
-    width: 100%;
-    background: rgba(12,14,18,0.06);
-    height: 90px; position: relative; cursor: pointer;
-    transition: background 160ms ease;
-  }
-  .week-chart .bar span {
-    position: absolute; left: 0; right: 0; bottom: 0;
+  .tabs button:hover { color: var(--ink); }
+  .tabs button.active {
     background: var(--ink);
-    transition: background 160ms ease;
-  }
-  .week-chart .bar:hover span { background: var(--accent); }
-  .week-chart .day.active .bar span { background: var(--accent); }
-  .week-chart .label {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-  .week-chart .n {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink);
+    color: var(--paper);
   }
 
-  .archive-controls {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 18px; flex-wrap: wrap;
+  .history-body {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: 0 32px 40px;
   }
-  .archive-controls input[type="date"] {
-    background: var(--bg-2);
-    border: 1px solid rgba(12,14,18,0.2);
-    padding: 8px 10px;
-    font-family: var(--sans);
-    font-size: 13px; color: var(--ink);
+
+  .date-nav {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--ink-ghost);
   }
-  .archive-controls .legend {
+  .date-nav button {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+  }
+  .date-nav button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .date-nav button:disabled {
+    color: var(--ink-faint);
+    border-color: var(--ink-ghost);
+    cursor: not-allowed;
+  }
+  .date-nav .label {
+    text-align: center;
     font-family: var(--sans);
-    font-variation-settings: "wght" 600;
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    position: relative;
+  }
+  .date-nav .label .chev { color: var(--ink-soft); margin-left: 6px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 28px 0 14px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--ink-ghost);
+  }
+  .stat-grid .cell {
+    padding: 16px 14px;
+    border-right: 1px solid var(--ink-ghost);
+    border-bottom: 1px solid var(--ink-ghost);
+  }
+  .stat-grid .cell:last-child { border-right: none; }
+  .stat-grid .cell .v {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 8px;
+  }
+  .stat-grid .cell .v.cobalt { color: var(--cobalt); text-transform: lowercase; }
+  .stat-grid .cell .l {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .top-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .top-list li {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--ink-ghost);
+    cursor: default;
+    transition: padding-left 160ms ease;
+  }
+  .top-list li:hover { padding-left: 6px; }
+  .top-list li:hover .word { color: var(--cobalt); }
+  .top-list .rank {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .top-list .word {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    transition: color 160ms ease;
+  }
+  .top-list .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .top-list .n .x { color: var(--ink-faint); margin-left: 1px; }
+
+  .see-all-link {
+    margin-top: 14px;
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cobalt);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .see-all-link:hover { text-decoration: underline; }
+
+  .insight {
+    border-left: 3px solid var(--cobalt);
+    padding: 8px 0 8px 14px;
+    margin-top: 12px;
+  }
+  .insight .text {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .insight .text .v { color: var(--cobalt); font-weight: 700; }
+  .insight .meta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--ink-soft);
   }
 
-  /* — Dev panel — */
+  .day-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .day-list li {
+    display: grid;
+    grid-template-columns: 56px 120px 1fr auto;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--ink-ghost);
+  }
+  .day-list .day {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .day-list .date {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+  }
+  .day-list .word {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .day-list .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .day-list .n .x { color: var(--ink-faint); }
+
+  .all-words {
+    column-count: 4;
+    column-gap: 32px;
+  }
+  .all-words .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--ink-ghost);
+    break-inside: avoid;
+    font-family: var(--sans);
+    font-size: 14px;
+  }
+  .all-words .row .w { font-weight: 600; }
+  .all-words .row .n {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* — Dev panel (hidden in production) — */
   .dev-panel {
     position: fixed; bottom: 14px; right: 14px;
-    background: var(--ink); color: var(--bg);
+    background: var(--ink); color: var(--paper);
     padding: 12px; z-index: 90;
     box-shadow: 0 14px 30px -10px rgba(0,0,0,0.5);
-    border-left: 3px solid var(--accent);
+    border-left: 3px solid var(--cobalt);
     display: none;
   }
   .dev-panel.show { display: block; }
-  .dev-panel .title {
-    font-family: var(--sans);
-    font-variation-settings: "wght" 700;
-    color: var(--accent);
-    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  .dev-panel .t {
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--cobalt);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
     margin-bottom: 8px;
   }
   .dev-panel button {
     display: block; width: 100%;
-    background: transparent; color: var(--bg);
-    border: 1px solid rgba(241,237,226,0.18);
-    padding: 7px 10px; margin-bottom: 5px;
-    font-family: var(--sans);
-    font-variation-settings: "wght" 500;
-    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    background: transparent; color: var(--paper);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 10px; margin-bottom: 4px;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
     cursor: pointer;
-    transition: background 160ms ease, border-color 160ms ease;
   }
-  .dev-panel button:hover { background: var(--accent); border-color: var(--accent); }
-  .dev-panel button.on { background: var(--accent); border-color: var(--accent); }
+  .dev-panel button:hover { background: var(--cobalt); border-color: var(--cobalt); }
+  .dev-panel button.on { background: var(--cobalt); border-color: var(--cobalt); }
 
   /* — Mobile — */
-  @media (max-width: 720px) {
-    .topbar { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 18px 10px; }
-    .topbar .meta { flex-wrap: wrap; gap: 12px; }
-    .title-block { padding: 12px 18px 14px; }
-    .compose { grid-template-columns: 1fr; border-bottom: none; }
-    .compose input[type="text"] { border-bottom: 2px solid var(--ink); padding-right: 0; }
-    .cta { padding: 12px; margin-top: 8px; margin-bottom: 0; }
-    .compose-foot { flex-direction: column; }
-    .archive-content > .stat-row { grid-template-columns: 1fr; gap: 16px; }
-    .toplist ol { grid-template-columns: 1fr; }
-    .you { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .you .meta { text-align: left; }
+  @media (max-width: 768px) {
+    .header { padding: 12px 18px; }
+    .nav { gap: 14px; }
+    .nav button:not(.more) { display: none; }
+    .description { padding: 22px 18px 18px; }
+    .title { font-size: 30px; letter-spacing: -0.035em; }
+    .canvas-wrap { padding: 18px 18px; }
+    .stats { padding: 8px 18px; gap: 10px; font-size: 10px; }
+    .stats .item:nth-child(n+3) { display: none; }
+    .submit { padding: 14px 18px 18px; }
+    .submit-row { gap: 8px; }
+    .submit-row input[type="text"] { font-size: 18px; }
+    .send { padding: 8px 14px; font-size: 10px; }
+    .new-day { padding: 8px 18px; font-size: 10px; }
+    .history-bar { padding: 12px 18px; }
+    .history-body { padding: 0 18px 32px; }
+    .tabs { padding: 0 18px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .stat-grid .cell { border-right: 1px solid var(--ink-ghost); }
+    .stat-grid .cell:nth-child(2n) { border-right: none; }
+    .stat-grid .cell .v { font-size: 26px; }
+    .day-list li { grid-template-columns: 56px 1fr auto; }
+    .day-list .date { display: none; }
+    .all-words { column-count: 2; }
+    .early .big { font-size: 64px; }
   }
 </style>
 </head>
 <body>
-  <div class="cloud-canvas" id="cloud"></div>
-
-  <div class="ui">
-    <div class="topbar">
-      <div class="brand">Mote<span class="dot">.</span></div>
-      <div class="meta">
-        <span id="dateline">—</span>
-        <span class="sep">/</span>
-        <span id="issue">No. —</span>
-        <span class="sep">/</span>
-        <span class="live"><span class="pulse"></span><span id="live-count">—</span><span class="label">voices</span></span>
-        <span class="sep">/</span>
-        <a href="#" id="open-archive">Archive</a>
-      </div>
-    </div>
-    <div class="title-block">
-      <h1 class="title">Today, in <span class="stamp">a&nbsp;word.</span></h1>
-      <p class="subtitle">What is the world thinking today?</p>
-      <p class="subtext">Everyone shares one word. The more people say it, the bigger it stands. Resets at midnight, Greenwich.</p>
-    </div>
-    <div class="spacer"></div>
-    <div class="dock">
-      <section id="composer"></section>
-    </div>
+  <div class="new-day" id="new-day">
+    <span>A new day has started.</span>
+    <button id="new-day-refresh">Refresh →</button>
   </div>
 
-  <div class="tooltip" id="tooltip" role="tooltip"></div>
-
-  <div class="modal-bg" id="modal" role="dialog" aria-modal="true">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>The Archive</h3>
-        <button class="close" id="modal-close">Close ✕</button>
-      </div>
-      <div class="archive-tabs">
-        <button class="tab active" data-tab="yesterday">Yesterday</button>
-        <button class="tab" data-tab="week">Last 7 days</button>
-        <button class="tab" data-tab="pick">Pick a date</button>
-      </div>
-      <div class="archive-content" id="archive-content"></div>
+  <header class="header">
+    <div class="logo">
+      <div class="mark"></div>
+      <div class="word">Mote</div>
     </div>
+    <nav class="nav">
+      <button id="open-history">History</button>
+      <button>About</button>
+      <button class="more">⌄</button>
+    </nav>
+  </header>
+
+  <section class="description">
+    <h1 class="title">Today, in a Word</h1>
+    <p class="headline">What's the world thinking today?</p>
+  </section>
+
+  <section class="canvas-wrap">
+    <div class="canvas" id="canvas"></div>
+  </section>
+
+  <section class="stats" id="stats">
+    <span class="item"><span class="num" id="s-voices">—</span> voices</span>
+    <span class="sep">·</span>
+    <span class="item"><span class="num" id="s-words">—</span> words</span>
+    <span class="sep">·</span>
+    <span class="typer" id="typer"></span>
+  </section>
+
+  <section class="submit" id="submit-region"></section>
+
+  <div class="word-tip" id="word-tip"></div>
+
+  <div class="history" id="history" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="history-bar">
+      <h2>History</h2>
+      <button class="close" id="history-close" aria-label="Close">×</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="single">Single Day</button>
+      <button class="tab" data-tab="week">Last 7 Days</button>
+    </div>
+    <div class="history-body" id="history-body"></div>
   </div>
 
   <div class="dev-panel" id="dev-panel">
-    <div class="title">Dev panel</div>
-    <button id="dev-reset">Reset my word</button>
-    <button id="dev-drop">Drop random word</button>
-    <button id="dev-drip">Toggle drip (3s)</button>
-    <button id="dev-refresh">Force refresh</button>
+    <div class="t">Dev</div>
+    <button id="dev-reset">Reset</button>
+    <button id="dev-drop">Drop word</button>
+    <button id="dev-drip">Toggle drip</button>
+    <button id="dev-early">Toggle early state</button>
   </div>
 
 <script type="module">
@@ -677,60 +951,59 @@
     "slut","whore","fag","nigger","retard"
   ]);
 
-  const composer  = document.getElementById("composer");
-  const cloudEl   = document.getElementById("cloud");
-  const dockEl    = document.querySelector(".dock");
-  const titleBlockEl = document.querySelector(".title-block");
-  const topbarEl  = document.querySelector(".topbar");
-  const tooltipEl = document.getElementById("tooltip");
-  const modal     = document.getElementById("modal");
-  const archiveContent = document.getElementById("archive-content");
-  const liveCountEl = document.getElementById("live-count");
+  const POLL_INTERVAL_MS = 25000;
+  const EARLY_THRESHOLD = 30;
+  const TOP_N = 100;
+
+  const canvasEl  = document.getElementById("canvas");
+  const submitEl  = document.getElementById("submit-region");
+  const tipEl     = document.getElementById("word-tip");
+  const historyEl = document.getElementById("history");
+  const historyBody = document.getElementById("history-body");
+  const newDayEl  = document.getElementById("new-day");
+  const sVoices   = document.getElementById("s-voices");
+  const sWords    = document.getElementById("s-words");
+  const typerEl   = document.getElementById("typer");
 
   /* — Date helpers — */
-  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const FULLMONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const WEEKDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const FULLWEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-
-  function ordinal(n) {
-    const s = ["th","st","nd","rd"], v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
-  }
-  function toRoman(n) {
-    const map = [["M",1000],["CM",900],["D",500],["CD",400],["C",100],["XC",90],["L",50],["XL",40],["X",10],["IX",9],["V",5],["IV",4],["I",1]];
-    let r = "";
-    for (const [s, v] of map) while (n >= v) { r += s; n -= v; }
-    return r;
-  }
-  function dayOfYear(d) {
-    const start = Date.UTC(d.getUTCFullYear(), 0, 0);
-    return Math.floor((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - start) / 86400000);
-  }
   function todayUTC() { return new Date().toISOString().slice(0, 10); }
-  function yesterdayUTC() {
-    const d = new Date();
-    d.setUTCDate(d.getUTCDate() - 1);
-    return d.toISOString().slice(0, 10);
-  }
   function isoDayBack(daysBack) {
     const d = new Date();
     d.setUTCDate(d.getUTCDate() - daysBack);
     return d.toISOString().slice(0, 10);
   }
+  const FULLDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const SHORTDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   function prettyDate(iso) {
-    const [y, m, day] = iso.split("-").map(Number);
-    const d = new Date(Date.UTC(y, m - 1, day));
-    return `${FULLWEEKDAYS[d.getUTCDay()]} · ${ordinal(d.getUTCDate())} ${FULLMONTHS[d.getUTCMonth()]}`;
+    const [y, m, d] = iso.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return `${FULLDAYS[dt.getUTCDay()]}, ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCDate()}, ${dt.getUTCFullYear()}`;
+  }
+  function shortDate(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return `${MONTHS_SHORT[dt.getUTCMonth()]} ${dt.getUTCDate()}, ${dt.getUTCFullYear()}`;
+  }
+  function dayLabel(iso) {
+    if (iso === todayUTC()) return "Today";
+    if (iso === isoDayBack(1)) return "Yesterday";
+    const [y, m, d] = iso.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return SHORTDAYS[dt.getUTCDay()];
   }
 
-  function setBar() {
-    const now = new Date();
-    document.getElementById("dateline").textContent =
-      `${WEEKDAYS[now.getUTCDay()]} · ${MONTHS[now.getUTCMonth()]} ${now.getUTCDate()}`;
-    document.getElementById("issue").textContent = `No. ${toRoman(dayOfYear(now))}`;
+  /* — Stable per-day hash — */
+  function hash(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
   }
-  setBar();
+  const TODAY_SEED = hash(todayUTC());
 
   /* — Identity — */
   const deviceId = (() => {
@@ -772,13 +1045,34 @@
     });
   }
 
+  async function fetchToday() {
+    const date = todayUTC();
+    const [countsRes, lastRes] = await Promise.all([
+      api(`word_counts?utc_date=eq.${date}&select=word,count&order=count.desc`),
+      api(`words?utc_date=eq.${date}&select=word,submitted_at&order=submitted_at.desc&limit=1`)
+    ]);
+    if (!countsRes.ok) throw new Error("today counts failed");
+    const rows = await countsRes.json();
+    const entries = rows.map(r => [r.word, r.count]);
+    const voices = entries.reduce((s, [, c]) => s + c, 0);
+    const unique = entries.length;
+    let last = null;
+    if (lastRes.ok) {
+      const [row] = await lastRes.json();
+      if (row) last = { word: row.word, at: new Date(row.submitted_at) };
+    }
+    return { entries, voices, unique, last };
+  }
+
   async function fetchDay(date) {
     const res = await api(`word_counts?utc_date=eq.${date}&select=word,count&order=count.desc`);
-    if (!res.ok) return { entries: [], total: 0 };
+    if (!res.ok) return { entries: [], voices: 0, unique: 0, said_once: 0 };
     const rows = await res.json();
-    const entries = rows.map(r => [r.word, r.count]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    const total = rows.reduce((s, r) => s + r.count, 0);
-    return { entries, total };
+    const entries = rows.map(r => [r.word, r.count]);
+    const voices = entries.reduce((s, [, c]) => s + c, 0);
+    const unique = entries.length;
+    const said_once = entries.filter(([, c]) => c === 1).length;
+    return { entries, voices, unique, said_once };
   }
 
   async function fetchLastDays(n) {
@@ -788,9 +1082,9 @@
     const rows = await res.json();
     const byDay = new Map();
     for (const r of rows) {
-      if (!byDay.has(r.utc_date)) byDay.set(r.utc_date, { total: 0, counts: new Map() });
+      if (!byDay.has(r.utc_date)) byDay.set(r.utc_date, { voices: 0, counts: new Map() });
       const d = byDay.get(r.utc_date);
-      d.total += r.count;
+      d.voices += r.count;
       d.counts.set(r.word, (d.counts.get(r.word) || 0) + r.count);
     }
     return { byDay };
@@ -801,80 +1095,57 @@
     if (res.status === 409) return { ok: false, reason: "duplicate" };
     if (!res.ok) {
       const txt = await res.text();
-      if (txt.includes("words_device_date_uidx") || txt.includes("duplicate")) return { ok: false, reason: "duplicate" };
+      if (txt.includes("words_one_per_device_per_day") || txt.includes("duplicate") || res.status === 403) return { ok: false, reason: "duplicate" };
       return { ok: false, reason: "error", detail: txt };
     }
     const [row] = await res.json();
     return { ok: true, row };
   }
 
-  /* — Live count animation — */
-  function animateCount(target) {
-    const el = liveCountEl;
-    const start = parseInt(el.dataset.cur || "0", 10);
-    if (start === target) { el.textContent = target.toLocaleString(); return; }
-    const dur = 600;
-    const t0 = performance.now();
-    function tick(t) {
-      const p = Math.min((t - t0) / dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      const v = Math.round(start + (target - start) * eased);
-      el.textContent = v.toLocaleString();
-      el.dataset.cur = v;
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
-
   /* — Cloud sizing — */
-  function sizeFor(count, max, min) {
-    const t = max === min ? 0.5 : (count - min) / (max - min);
-    // Pow curve gives small words a floor, big ones can be huge
-    return 18 + Math.round(Math.pow(t, 0.7) * 78);
+  // size = minSize + (maxSize - minSize) * pow(count/maxCount, 0.55)
+  // per-word variation: 0.92 + (hash(word) % 16)/100  (±8%)
+  const MIN_SIZE = 14;
+  const MAX_SIZE = 56;
+  const MIN_SIZE_M = 11;
+  const MAX_SIZE_M = 44;
+  function sizeFor(count, maxCount, word) {
+    const isMobile = window.innerWidth <= 768;
+    const min = isMobile ? MIN_SIZE_M : MIN_SIZE;
+    const max = isMobile ? MAX_SIZE_M : MAX_SIZE;
+    const t = maxCount === 0 ? 0 : Math.pow(count / maxCount, 0.55);
+    const base = min + (max - min) * t;
+    const variation = 0.92 + ((hash(word) % 16) / 100);
+    return Math.round(base * variation);
   }
 
   /* — Spiral packing — */
-  // Maintains a positions Map: word -> { el, x, y, w, h, size, count }
-  // Re-pack only places NEW words; existing words keep position, only resize.
-  const positions = new Map();
+  const positions = new Map(); // word -> { el, x, y, w, h, size, count }
 
-  function rectsOverlap(a, b, pad = 4) {
+  function rectsOverlap(a, b, pad = 0) {
     return !(a.x + a.w + pad < b.x || b.x + b.w + pad < a.x ||
              a.y + a.h + pad < b.y || b.y + b.h + pad < a.y);
   }
 
-  function reservedRects() {
-    const rects = [];
-    for (const el of [topbarEl, titleBlockEl, dockEl]) {
-      if (!el) continue;
-      const r = el.getBoundingClientRect();
-      rects.push({ x: r.left - 8, y: r.top - 8, w: r.width + 16, h: r.height + 16 });
-    }
-    return rects;
-  }
-
-  function spiralFind(w, h, others, stageW, stageH, reserved) {
-    const cx = stageW / 2, cy = stageH / 2;
+  function spiralFind(w, h, others, canvasW, canvasH, anchorX, anchorY) {
     const margin = 4;
     const candidate = (x, y) => ({ x: x - w / 2, y: y - h / 2, w, h });
     const tryCand = (cand) => {
       if (cand.x < margin || cand.y < margin) return false;
-      if (cand.x + w > stageW - margin) return false;
-      if (cand.y + h > stageH - margin) return false;
-      for (const r of reserved) if (rectsOverlap(cand, r, 0)) return false;
-      for (const o of others) if (rectsOverlap(cand, o, 6)) return false;
+      if (cand.x + w > canvasW - margin) return false;
+      if (cand.y + h > canvasH - margin) return false;
+      for (const o of others) if (rectsOverlap(cand, o, 7)) return false;
       return true;
     };
-    // Try center
-    const center = candidate(cx, cy);
+    const center = candidate(anchorX, anchorY);
     if (tryCand(center)) return center;
-    for (let r = 18; r < Math.max(stageW, stageH); r += 5) {
-      const steps = Math.max(10, Math.floor(r * 0.55));
-      const phase = Math.random() * Math.PI * 2;
+    for (let r = 14; r < Math.max(canvasW, canvasH); r += 4) {
+      const steps = Math.max(8, Math.floor(r * 0.55));
+      const phase = ((TODAY_SEED + Math.round(r * 13)) % 1000) / 1000 * Math.PI * 2;
       for (let s = 0; s < steps; s++) {
         const a = phase + (s / steps) * Math.PI * 2;
-        const x = cx + r * Math.cos(a);
-        const y = cy + r * Math.sin(a);
+        const x = anchorX + r * Math.cos(a);
+        const y = anchorY + r * Math.sin(a);
         const cand = candidate(x, y);
         if (tryCand(cand)) return cand;
       }
@@ -882,11 +1153,19 @@
     return null;
   }
 
-  let isPacking = false;
+  function dayAnchor(canvasW, canvasH) {
+    // 45% ± 5% horizontally, 50% ± 5% vertically — stable per day
+    const dx = ((TODAY_SEED >>> 0) % 100) / 100 - 0.5; // -0.5..0.5
+    const dy = (((TODAY_SEED >>> 8) >>> 0) % 100) / 100 - 0.5;
+    return {
+      x: canvasW * (0.45 + dx * 0.1),
+      y: canvasH * (0.50 + dy * 0.1)
+    };
+  }
 
-  function makeWordEl(word, size, italic, mine, isFresh, count) {
+  function makeWordEl(word, size, mine, count) {
     const el = document.createElement("span");
-    el.className = "w" + (italic ? " italic" : "") + (mine ? " mine" : "") + (isFresh ? " fresh" : "");
+    el.className = "w" + (mine ? " mine" : "");
     el.textContent = word;
     el.style.fontSize = size + "px";
     el.dataset.word = word;
@@ -894,206 +1173,188 @@
     return el;
   }
 
-  function repackCloud(entries, mine, popWord) {
-    if (!entries.length) {
-      cloudEl.innerHTML = "";
-      positions.clear();
-      const empty = document.createElement("div");
-      empty.style.cssText = "position:absolute; left:50%; top:55%; transform:translate(-50%,-50%); font-family:var(--sans); font-size:18px; color:var(--ink-soft);";
-      empty.textContent = "Be the first to set a word.";
-      cloudEl.appendChild(empty);
-      return;
-    }
+  let earlyOverride = false;
 
-    const isMobile = window.innerWidth <= 720;
-    if (isMobile) {
-      // mobile: simple flex-wrap inside the canvas, positioned to fill space between title and dock
-      cloudEl.innerHTML = "";
-      positions.clear();
-      const wrap = document.createElement("div");
-      const titleR = titleBlockEl.getBoundingClientRect();
-      const dockR = dockEl.getBoundingClientRect();
-      wrap.style.cssText = `position:absolute; left:0; right:0; top:${titleR.bottom + 8}px; bottom:${window.innerHeight - dockR.top + 8}px; padding:12px 16px; display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline; justify-content:center; overflow:hidden;`;
-      cloudEl.appendChild(wrap);
-      const max = entries[0][1], min = entries[entries.length - 1][1];
-      entries.forEach(([word, count], i) => {
-        const size = Math.min(44, sizeFor(count, max, min));
-        const el = makeWordEl(word, size, count === 1 && max > 1, mine && mine.word === word, false, count);
-        el.style.position = "static";
-        el.style.animationDelay = Math.min(i * 12, 500) + "ms";
-        if (popWord && word === popWord) { el.classList.add("pop"); el.style.animationDelay = "0ms"; }
-        wrap.appendChild(el);
-        attachWordHandlers(el);
-      });
-      return;
-    }
+  function clearCanvas() {
+    canvasEl.innerHTML = "";
+    positions.clear();
+  }
 
-    isPacking = true;
-    const stageW = window.innerWidth;
-    const stageH = window.innerHeight;
-    const reserved = reservedRects();
-    // cap visible words so the cloud isn't so dense that new words can't be placed
-    const VISIBLE_CAP = 60;
-    let visible = entries.slice(0, VISIBLE_CAP);
-    // ensure popWord is always rendered, even if outside the cap
-    if (popWord && !visible.find(([w]) => w === popWord)) {
+  function renderEarly(entries, voices, mine) {
+    canvasEl.innerHTML = "";
+    positions.clear();
+    const wrap = document.createElement("div");
+    wrap.className = "early";
+    wrap.innerHTML = `
+      <div class="narrative">Today is just beginning. The first words are arriving.</div>
+      <div class="big">${voices}</div>
+      <div class="label">Voices so far</div>
+      <div class="divider"></div>
+      <div class="words"></div>
+    `;
+    canvasEl.appendChild(wrap);
+    const wordsEl = wrap.querySelector(".words");
+    const max = entries[0] ? entries[0][1] : 1;
+    entries.forEach(([word, count]) => {
+      const baseSize = 32 + Math.round((count / max) * 8);
+      const el = makeWordEl(word, baseSize, mine && mine.word === word, count);
+      wordsEl.appendChild(el);
+      attachWordHandlers(el);
+    });
+  }
+
+  function packCloud(entries, mine, popWord) {
+    const visible = entries.slice(0, TOP_N);
+    if (visible.length && popWord && !visible.find(([w]) => w === popWord)) {
       const popEntry = entries.find(([w]) => w === popWord);
       if (popEntry) {
-        visible = visible.slice(0, VISIBLE_CAP - 1);
+        visible.pop();
         visible.push(popEntry);
       }
     }
-    entries = visible;
-    const max = entries[0][1], min = entries[entries.length - 1][1];
-    const targetWords = new Set(entries.map(([w]) => w));
+    const max = visible.length ? visible[0][1] : 0;
+    const targetSet = new Set(visible.map(([w]) => w));
+    const canvasW = canvasEl.clientWidth;
+    const canvasH = canvasEl.clientHeight;
+    const anchor = dayAnchor(canvasW, canvasH);
 
-    // Update existing or mark for placement
+    // Update or queue place
     const toPlace = [];
-    for (const [word, count] of entries) {
-      const target = sizeFor(count, max, min);
+    for (const [word, count] of visible) {
+      const target = sizeFor(count, max, word);
       const isMine = !!(mine && mine.word === word);
-      const italic = count === 1 && max > 1;
       const existing = positions.get(word);
       if (existing) {
-        // update size, italic, mine state
         existing.count = count;
+        existing.el.dataset.count = count;
+        existing.el.classList.toggle("mine", isMine);
         if (Math.abs(existing.size - target) >= 2) {
           existing.size = target;
           existing.el.style.fontSize = target + "px";
-          // re-measure async
           requestAnimationFrame(() => {
             existing.w = existing.el.offsetWidth;
             existing.h = existing.el.offsetHeight;
           });
         }
-        existing.el.classList.toggle("italic", italic);
-        existing.el.classList.toggle("mine", isMine);
-        existing.el.dataset.count = count;
         if (popWord && word === popWord) {
-          existing.el.classList.remove("pop"); void existing.el.offsetWidth;
-          existing.el.classList.add("pop");
+          existing.el.classList.remove("pulse"); void existing.el.offsetWidth;
+          existing.el.classList.add("pulse");
         }
       } else {
-        toPlace.push({ word, count, target, italic, isMine });
+        toPlace.push({ word, count, target, isMine });
       }
     }
 
-    // Remove words not in entries (rare, but possible if all rows for a word vanished)
+    // Remove stale
     for (const [word, p] of [...positions.entries()]) {
-      if (!targetWords.has(word)) {
+      if (!targetSet.has(word)) {
         p.el.remove();
         positions.delete(word);
       }
     }
 
-    // Place new ones, biggest first
     toPlace.sort((a, b) => b.target - a.target);
-    let placed = 0;
-
-    // Need to measure each new el. Append off-screen first.
     for (const item of toPlace) {
-      const el = makeWordEl(item.word, item.target, item.italic, item.isMine, true, item.count);
+      const el = makeWordEl(item.word, item.target, item.isMine, item.count);
       el.style.left = "-9999px";
       el.style.top = "-9999px";
-      cloudEl.appendChild(el);
+      canvasEl.appendChild(el);
       const w = el.offsetWidth, h = el.offsetHeight;
       const others = [...positions.values()];
-      const pos = spiralFind(w, h, others, stageW, stageH, reserved);
+      // attempt up to 400 spirals: spiralFind already does that effectively
+      const pos = spiralFind(w, h, others, canvasW, canvasH, anchor.x, anchor.y);
       if (!pos) { el.remove(); continue; }
       el.style.left = pos.x + "px";
       el.style.top  = pos.y + "px";
-      el.style.animationDelay = Math.min(placed * 14, 600) + "ms";
-      if (popWord && item.word === popWord) {
-        el.classList.remove("fresh"); void el.offsetWidth; el.classList.add("pop");
-        el.style.animationDelay = "0ms";
-      }
       attachWordHandlers(el);
       positions.set(item.word, { el, x: pos.x, y: pos.y, w, h, size: item.target, count: item.count });
-      placed++;
     }
-    isPacking = false;
+
+    // See-all link if more words exist than rendered
+    let seeAllEl = canvasEl.querySelector(".see-all");
+    if (entries.length > visible.length) {
+      if (!seeAllEl) {
+        seeAllEl = document.createElement("button");
+        seeAllEl.className = "see-all";
+        seeAllEl.addEventListener("click", () => openHistoryAllWords(todayUTC()));
+        canvasEl.appendChild(seeAllEl);
+      }
+      seeAllEl.textContent = `See all ${entries.length} words →`;
+    } else if (seeAllEl) {
+      seeAllEl.remove();
+    }
   }
 
-  function fullReplaceCloud() {
-    cloudEl.innerHTML = "";
-    positions.clear();
+  function renderCloudArea(entries, voices, mine, popWord) {
+    const useEarly = (voices < EARLY_THRESHOLD && !earlyOverride) || earlyOverride === "force";
+    if (useEarly) {
+      renderEarly(entries, voices, mine);
+    } else {
+      // exit early state if we were in it
+      if (canvasEl.querySelector(".early")) {
+        canvasEl.innerHTML = "";
+        positions.clear();
+      }
+      packCloud(entries, mine, popWord);
+    }
   }
 
-  /* — Tooltip + word interactions — */
-  let tooltipWord = null;
-  let tooltipHideT = null;
+  /* — Word interactions — */
+  let tipWord = null;
+  let tipHideT = null;
+  let tipShowT = null;
 
-  function showTooltip(el) {
-    clearTimeout(tooltipHideT);
+  function showTip(el) {
+    clearTimeout(tipHideT);
+    clearTimeout(tipShowT);
     const word = el.dataset.word;
     const count = parseInt(el.dataset.count, 10);
     const mine = loadMine();
     const alreadySaid = mine && mine.utc_date === todayUTC();
-    tooltipWord = word;
-    tooltipEl.innerHTML = `
-      <div class="word">${word}</div>
-      <div class="count"><strong>${count.toLocaleString()}</strong>${count === 1 ? " voice" : " voices"} today</div>
-      ${alreadySaid ? "" : `<div class="row"><button data-action="me">I feel the same</button></div>`}
+    tipWord = word;
+    tipEl.innerHTML = `
+      <div class="count">${count} ${count === 1 ? "person" : "people"}</div>
+      ${alreadySaid ? "" : `<button class="feel" data-action="feel">→ I feel the same</button>`}
     `;
-    const r = el.getBoundingClientRect();
-    const tw = 200, th = 130;
-    let x = r.left + r.width / 2 - tw / 2;
-    let y = r.bottom + 10;
-    if (y + th > window.innerHeight - 16) y = r.top - th - 10;
-    x = Math.max(12, Math.min(window.innerWidth - tw - 12, x));
-    tooltipEl.style.left = x + "px";
-    tooltipEl.style.top  = y + "px";
-    tooltipEl.style.minWidth = tw + "px";
-    tooltipEl.classList.add("show");
+    tipShowT = setTimeout(() => {
+      const r = el.getBoundingClientRect();
+      const tw = tipEl.offsetWidth || 140;
+      const th = tipEl.offsetHeight || 40;
+      let x = r.left + r.width / 2 - tw / 2;
+      let y = r.bottom + 6;
+      if (y + th > window.innerHeight - 16) y = r.top - th - 6;
+      x = Math.max(8, Math.min(window.innerWidth - tw - 8, x));
+      tipEl.style.left = x + "px";
+      tipEl.style.top  = y + "px";
+      tipEl.classList.add("show");
+    }, 250);
   }
-  function hideTooltip(immediate = false) {
-    clearTimeout(tooltipHideT);
-    if (immediate) { tooltipEl.classList.remove("show"); tooltipWord = null; return; }
-    tooltipHideT = setTimeout(() => { tooltipEl.classList.remove("show"); tooltipWord = null; }, 200);
+  function hideTip(immediate = false) {
+    clearTimeout(tipShowT);
+    if (immediate) { tipEl.classList.remove("show"); tipWord = null; return; }
+    tipHideT = setTimeout(() => { tipEl.classList.remove("show"); tipWord = null; }, 180);
   }
-
-  tooltipEl.addEventListener("mouseenter", () => clearTimeout(tooltipHideT));
-  tooltipEl.addEventListener("mouseleave", () => hideTooltip());
-  tooltipEl.addEventListener("click", async (e) => {
+  tipEl.addEventListener("mouseenter", () => clearTimeout(tipHideT));
+  tipEl.addEventListener("mouseleave", () => hideTip());
+  tipEl.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
-    const action = btn.dataset.action;
-    const word = tooltipWord;
-    if (!word) return;
-    if (action === "copy") {
-      try {
-        await navigator.clipboard.writeText(word);
-        btn.textContent = "Copied ✓";
-        setTimeout(() => { btn.textContent = "Copy"; }, 1200);
-      } catch {}
-    } else if (action === "me") {
-      hideTooltip(true);
-      // populate input
+    if (btn.dataset.action === "feel" && tipWord) {
+      const word = tipWord;
+      hideTip(true);
       const input = document.getElementById("word");
       if (input) {
         input.value = word;
         input.focus();
         input.dispatchEvent(new Event("input"));
-      } else {
-        // composer might be in "you" state — render input first if no submission today
-        const mine = loadMine();
-        if (!(mine && mine.utc_date === todayUTC())) {
-          renderInput();
-          setTimeout(() => {
-            const i2 = document.getElementById("word");
-            if (i2) { i2.value = word; i2.focus(); i2.dispatchEvent(new Event("input")); }
-          }, 30);
-        }
       }
-      dockEl.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   });
 
   function attachWordHandlers(el) {
-    el.addEventListener("mouseenter", () => showTooltip(el));
-    el.addEventListener("mouseleave", () => hideTooltip());
+    el.addEventListener("mouseenter", () => showTip(el));
+    el.addEventListener("mouseleave", () => hideTip());
     el.addEventListener("click", () => {
-      // tap to populate (mobile + accessibility)
       const word = el.dataset.word;
       const mine = loadMine();
       if (mine && mine.utc_date === todayUTC()) return;
@@ -1102,289 +1363,526 @@
         input.value = word;
         input.focus();
         input.dispatchEvent(new Event("input"));
-      } else {
-        renderInput();
-        setTimeout(() => {
-          const i2 = document.getElementById("word");
-          if (i2) { i2.value = word; i2.focus(); i2.dispatchEvent(new Event("input")); }
-        }, 30);
       }
-      dockEl.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 
-  /* — Composer — */
+  /* — Validation — */
   function validate(raw) {
     const word = raw.trim().toLowerCase();
-    if (!word) return { ok: false, msg: "Type a word — anything." };
-    if (!/^[a-z]+$/.test(word)) return { ok: false, msg: "Letters only. No spaces, numbers, or punctuation." };
+    if (!word) return { ok: false, msg: "Type one word." };
+    if (!/^[a-z]+$/.test(word)) return { ok: false, msg: "Letters only." };
     if (word.length > 20) return { ok: false, msg: "Twenty letters or fewer." };
-    if (PROFANITY.has(word)) return { ok: false, msg: "Try another word." };
+    if (PROFANITY.has(word)) return { ok: false, msg: "Try a different word." };
     return { ok: true, word };
   }
+  function sanitize(raw) {
+    return raw.toLowerCase().replace(/[^a-z]/g, "").slice(0, 20);
+  }
 
-  function renderInput() {
-    composer.innerHTML = `
-      <div class="compose">
-        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="your word…" />
-        <button class="cta" id="next">Press it →</button>
+  /* — Submit region: input / confirm / you-said — */
+  let lastEntries = [];
+  let lastVoices = 0;
+
+  function renderSubmitInput() {
+    submitEl.innerHTML = `
+      <div class="submit-row">
+        <span class="arrow">→</span>
+        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="type one word…" />
+        <button class="send" id="send" disabled>Send</button>
       </div>
-      <div class="compose-foot">
-        <div class="hint" id="hint">One word, lowercase. Once set, it cannot be unset.</div>
-        <div class="rules">A–Z · max 20</div>
+      <div class="submit-foot">
+        <div class="rules-text" id="rules">One word per person, per day. The more times a word is mentioned, the bigger it is. Reset 00:00 UTC.</div>
       </div>
     `;
     const input = document.getElementById("word");
-    const hint = document.getElementById("hint");
-    const next = document.getElementById("next");
-    let submitting = false;
+    const send = document.getElementById("send");
+    const rules = document.getElementById("rules");
+    setTimeout(() => input.focus(), 40);
 
-    async function go() {
-      if (submitting) return;
-      const v = validate(input.value);
-      if (!v.ok) { hint.textContent = v.msg; hint.classList.add("error"); return; }
-      submitting = true;
-      next.disabled = true;
-      const original = next.textContent;
-      next.textContent = "Pressing…";
-      const r = await submitWord(v.word);
-      if (!r.ok && r.reason === "duplicate") {
-        const mine = { word: v.word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
-        saveMine(mine);
-        await refresh(v.word);
-        return;
-      }
-      if (!r.ok) {
-        hint.textContent = "The press jammed. Try again.";
-        hint.classList.add("error");
-        next.disabled = false;
-        next.textContent = original;
-        submitting = false;
-        return;
-      }
-      const mine = { word: r.row.word, submitted_at: r.row.submitted_at, utc_date: r.row.utc_date };
-      saveMine(mine);
-      await refresh(r.row.word);
-    }
     input.addEventListener("input", () => {
-      hint.classList.remove("error");
-      hint.textContent = "One word, lowercase. Once set, it cannot be unset.";
+      const cleaned = sanitize(input.value);
+      if (cleaned !== input.value) input.value = cleaned;
+      send.disabled = cleaned.length < 1;
+      rules.classList.remove("error");
+      // match note
+      const match = lastEntries.find(([w]) => w === cleaned);
+      if (cleaned && match) {
+        rules.innerHTML = `One word per person, per day. <span class="match">${match[1]} other${match[1] === 1 ? "" : "s"} said this.</span>`;
+      } else {
+        rules.textContent = "One word per person, per day. The more times a word is mentioned, the bigger it is. Reset 00:00 UTC.";
+      }
     });
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
-    next.addEventListener("click", go);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !send.disabled) renderSubmitConfirm(input.value);
+    });
+    send.addEventListener("click", () => renderSubmitConfirm(input.value));
   }
 
-
-  function renderYou(mine, total) {
-    const today = todayUTC();
-    const isYesterday = mine.utc_date && mine.utc_date !== today;
-    composer.innerHTML = `
-      <div class="you">
-        <span class="label">${isYesterday ? "You said yesterday" : "You said today"}</span>
-        <span class="word">${mine.word}</span>
-        <span class="meta">among <strong>${total.toLocaleString()}</strong> voices</span>
-      </div>
-    `;
-  }
-
-  /* — Refresh — */
-  async function refresh(popWord) {
-    const mine = loadMine();
-    const today = todayUTC();
-    const showingTodayMine = mine && mine.utc_date === today;
-    const { entries, total } = await fetchDay(today);
-    animateCount(total);
-    if (mine) renderYou(mine, total);
-    else if (!composer.querySelector(".compose, .confirm")) renderInput();
-    const highlightMine = showingTodayMine ? mine : null;
-    repackCloud(entries, highlightMine, popWord);
-  }
-
-  // Polling
-  let pollTimer = null;
-  function startPolling() {
-    if (pollTimer) return;
-    pollTimer = setInterval(() => { if (!document.hidden) refresh(); }, 3000);
-  }
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
-
-  /* — Archive modal — */
-  document.getElementById("open-archive").addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.classList.add("open");
-    showArchiveTab("yesterday");
-  });
-  document.getElementById("modal-close").addEventListener("click", () => modal.classList.remove("open"));
-  modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") modal.classList.remove("open"); });
-
-  document.querySelectorAll(".archive-tabs .tab").forEach(b => {
-    b.addEventListener("click", () => showArchiveTab(b.dataset.tab));
-  });
-
-  async function showArchiveTab(name) {
-    document.querySelectorAll(".archive-tabs .tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-    archiveContent.innerHTML = `<div style="font-family:var(--display); font-style:italic; color:var(--ink-faint); padding:12px 0;">Loading…</div>`;
-    if (name === "yesterday") {
-      const date = yesterdayUTC();
-      const { entries, total } = await fetchDay(date);
-      renderDayView(date, entries, total);
-    } else if (name === "week") {
-      const { byDay } = await fetchLastDays(7);
-      renderWeekView(byDay);
-    } else if (name === "pick") {
-      renderPickView();
+  function renderSubmitConfirm(rawWord) {
+    const v = validate(rawWord);
+    if (!v.ok) {
+      const rules = document.getElementById("rules");
+      if (rules) { rules.textContent = v.msg; rules.classList.add("error"); }
+      return;
     }
-  }
-
-  function renderDayView(date, entries, total) {
-    const top = entries[0] ? entries[0][0] : "—";
-    const max = entries[0] ? entries[0][1] : 1;
-    const top10 = entries.slice(0, 10);
-    archiveContent.innerHTML = `
-      <div class="stat-row">
-        <div class="stat">
-          <div class="label">${prettyDate(date)}</div>
-          <div class="value num">${total.toLocaleString()}</div>
-          <div class="sub">voices on the page</div>
-        </div>
-        <div class="stat">
-          <div class="label">Loudest word</div>
-          <div class="value">${top}</div>
-          <div class="sub">${entries[0] ? entries[0][1].toLocaleString() + (entries[0][1] === 1 ? " voice" : " voices") : "—"}</div>
-        </div>
+    submitEl.innerHTML = `
+      <div class="submit-row">
+        <span class="arrow">→</span>
+        <span class="confirm-text">You said:<span class="word">${v.word}</span></span>
+        <button class="send confirm-btn" id="send-confirm">Send</button>
       </div>
-      <div class="toplist">
-        <h4>Top 10</h4>
-        <ol>
-          ${top10.map(([w, c]) => `
-            <li>
-              <span class="word">${w}</span>
-              <span class="bar"><span style="width:${(c / max) * 100}%"></span></span>
-              <span class="n">${c.toLocaleString()}</span>
-            </li>
-          `).join("")}
-        </ol>
+      <div class="submit-foot">
+        <button class="confirm-back" id="confirm-back">← Edit</button>
+        <div class="rules-text">Press send again to commit. One word per day, no edits, no deletes.</div>
       </div>
     `;
-  }
-
-  function renderWeekView(byDay) {
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = isoDayBack(i);
-      const d = byDay.get(date);
-      days.push({ date, total: d ? d.total : 0, counts: d ? d.counts : new Map() });
-    }
-    const max = Math.max(1, ...days.map(d => d.total));
-    const totalAll = days.reduce((a, d) => a + d.total, 0);
-    const allCounts = new Map();
-    for (const d of days) for (const [w, c] of d.counts) allCounts.set(w, (allCounts.get(w) || 0) + c);
-    const top10 = [...allCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const top10Max = top10[0] ? top10[0][1] : 1;
-
-    archiveContent.innerHTML = `
-      <div class="stat-row">
-        <div class="stat">
-          <div class="label">Last 7 days</div>
-          <div class="value num">${totalAll.toLocaleString()}</div>
-          <div class="sub">voices, all together</div>
-        </div>
-        <div class="stat">
-          <div class="label">Daily average</div>
-          <div class="value num">${Math.round(totalAll / 7).toLocaleString()}</div>
-          <div class="sub">voices per day</div>
-        </div>
-      </div>
-      <div class="archive-controls">
-        <span class="legend">Daily volume</span>
-      </div>
-      <div class="week-chart" id="week-chart">
-        ${days.map(d => {
-          const dt = new Date(d.date + "T00:00:00Z");
-          const lbl = WEEKDAYS[dt.getUTCDay()];
-          const num = dt.getUTCDate();
-          const h = (d.total / max) * 100;
-          return `
-            <div class="day" data-date="${d.date}">
-              <div class="bar"><span style="height:${h}%"></span></div>
-              <div class="label">${lbl} ${num}</div>
-              <div class="n">${d.total.toLocaleString()}</div>
-            </div>
-          `;
-        }).join("")}
-      </div>
-      <div class="toplist" style="margin-top:32px">
-        <h4>Top 10 over 7 days</h4>
-        <ol>
-          ${top10.map(([w, c]) => `
-            <li>
-              <span class="word">${w}</span>
-              <span class="bar"><span style="width:${(c / top10Max) * 100}%"></span></span>
-              <span class="n">${c.toLocaleString()}</span>
-            </li>
-          `).join("")}
-        </ol>
-      </div>
-    `;
-    document.querySelectorAll("#week-chart .day").forEach(d => {
-      d.addEventListener("click", async () => {
-        const date = d.dataset.date;
-        const { entries, total } = await fetchDay(date);
-        renderDayView(date, entries, total);
-      });
+    document.getElementById("confirm-back").addEventListener("click", () => {
+      renderSubmitInput();
+      const input = document.getElementById("word");
+      if (input) {
+        input.value = v.word;
+        input.focus();
+        input.dispatchEvent(new Event("input"));
+      }
+    });
+    document.getElementById("send-confirm").addEventListener("click", async () => {
+      const btn = document.getElementById("send-confirm");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      await commitSubmission(v.word);
     });
   }
 
-  function renderPickView() {
-    const today = todayUTC();
-    archiveContent.innerHTML = `
-      <div class="archive-controls">
-        <span class="legend">Choose a date</span>
-        <input type="date" id="date-picker" max="${today}" value="${yesterdayUTC()}">
+  function renderYouSaid(mine, voices) {
+    const others = Math.max(0, voices - 1);
+    submitEl.innerHTML = `
+      <div class="you-said">
+        <div class="label">You said</div>
+        <div class="word">${mine.word}</div>
+        <div class="context">${others.toLocaleString()} other ${others === 1 ? "person" : "people"} said this today</div>
       </div>
-      <div id="pick-result"></div>
     `;
-    const picker = document.getElementById("date-picker");
-    const renderForDate = async () => {
-      const date = picker.value;
-      if (!date) return;
-      const result = document.getElementById("pick-result");
-      result.innerHTML = `<div style="font-family:var(--display); font-style:italic; color:var(--ink-faint); padding:12px 0;">Loading…</div>`;
-      const { entries, total } = await fetchDay(date);
-      const top = entries[0] ? entries[0][0] : "—";
-      const max = entries[0] ? entries[0][1] : 1;
-      const top10 = entries.slice(0, 10);
-      result.innerHTML = `
-        <div class="stat-row">
-          <div class="stat">
-            <div class="label">${prettyDate(date)}</div>
-            <div class="value num">${total.toLocaleString()}</div>
-            <div class="sub">voices that day</div>
-          </div>
-          <div class="stat">
-            <div class="label">Loudest word</div>
-            <div class="value">${top}</div>
-            <div class="sub">${entries[0] ? entries[0][1].toLocaleString() + (entries[0][1] === 1 ? " voice" : " voices") : "—"}</div>
-          </div>
+  }
+
+  /* — Slide animation — */
+  async function commitSubmission(word) {
+    // Fetch current state
+    const before = await fetchToday();
+    lastEntries = before.entries;
+    lastVoices = before.voices;
+
+    // Where the word would land
+    const matchEntry = before.entries.find(([w]) => w === word);
+    const futureCount = matchEntry ? matchEntry[1] + 1 : 1;
+    const futureMax = Math.max(matchEntry ? matchEntry[1] + 1 : 0,
+      ...before.entries.map(([, c]) => c));
+
+    const inputBtn = submitEl.querySelector(".confirm-text .word");
+    const sourceRect = inputBtn ? inputBtn.getBoundingClientRect() : submitEl.getBoundingClientRect();
+
+    // Make API call
+    const res = await submitWord(word);
+    if (!res.ok && res.reason === "duplicate") {
+      // already submitted today — server says no
+      saveMine({ word, submitted_at: new Date().toISOString(), utc_date: todayUTC() });
+      await refresh(word);
+      return;
+    }
+    if (!res.ok) {
+      submitEl.innerHTML = `
+        <div class="submit-row">
+          <span class="arrow">→</span>
+          <span class="confirm-text" style="color:var(--cobalt)">Couldn't send.</span>
+          <button class="send" id="retry">Try again</button>
         </div>
-        <div class="toplist">
-          <h4>Top 10</h4>
-          <ol>
-            ${top10.map(([w, c]) => `
-              <li>
-                <span class="word">${w}</span>
-                <span class="bar"><span style="width:${(c / max) * 100}%"></span></span>
-                <span class="n">${c.toLocaleString()}</span>
-              </li>
-            `).join("")}
-          </ol>
+        <div class="submit-foot">
+          <div class="rules-text error">Try again in a moment.</div>
         </div>
       `;
-    };
-    picker.addEventListener("change", renderForDate);
-    renderForDate();
+      document.getElementById("retry").addEventListener("click", () => renderSubmitConfirm(word));
+      return;
+    }
+
+    saveMine({ word: res.row.word, submitted_at: res.row.submitted_at, utc_date: res.row.utc_date });
+
+    // Compute target rect:
+    // If word exists in cloud → its current rect; we'll grow it after slide.
+    // Else → spiral-find a position for the new word at projected size.
+    let targetRect = null;
+    let resizeExisting = null;
+
+    if (matchEntry && positions.has(word)) {
+      const p = positions.get(word);
+      const r = p.el.getBoundingClientRect();
+      targetRect = { left: r.left, top: r.top, fontSize: p.size };
+      resizeExisting = { word, newCount: matchEntry[1] + 1, newMax: futureMax };
+    } else {
+      // try to place
+      const canvasW = canvasEl.clientWidth, canvasH = canvasEl.clientHeight;
+      const newSize = sizeFor(futureCount, futureMax, word);
+      // measure
+      const tmp = document.createElement("span");
+      tmp.className = "w";
+      tmp.style.cssText = "position:absolute; left:-9999px; top:-9999px; font-size:" + newSize + "px;";
+      tmp.textContent = word;
+      canvasEl.appendChild(tmp);
+      const w = tmp.offsetWidth, h = tmp.offsetHeight;
+      tmp.remove();
+      const others = [...positions.values()];
+      const anchor = dayAnchor(canvasW, canvasH);
+      const pos = spiralFind(w, h, others, canvasW, canvasH, anchor.x, anchor.y);
+      if (pos) {
+        const cR = canvasEl.getBoundingClientRect();
+        targetRect = { left: cR.left + pos.x, top: cR.top + pos.y, fontSize: newSize };
+      } else {
+        // can't place — just refresh
+        await refresh(word);
+        return;
+      }
+    }
+
+    // Run slide
+    await runSlide(word, sourceRect, targetRect);
+
+    // Hide the input area immediately while sliding (already done via overwrite below)
+    // Show "you said"
+    renderYouSaid({ word: res.row.word, utc_date: res.row.utc_date }, before.voices + 1);
+
+    // Refresh cloud (will pulse the word)
+    await refresh(word);
   }
+
+  function runSlide(word, sourceRect, targetRect) {
+    return new Promise(resolve => {
+      // Hide input row
+      submitEl.style.opacity = "0";
+      setTimeout(() => { submitEl.style.opacity = ""; }, 200);
+
+      const ghost = document.createElement("div");
+      ghost.className = "slide-ghost";
+      ghost.textContent = word;
+      ghost.style.left = sourceRect.left + "px";
+      ghost.style.top = sourceRect.top + "px";
+      ghost.style.fontSize = "22px";
+      ghost.style.color = "#000";
+      document.body.appendChild(ghost);
+
+      // Force layout
+      void ghost.offsetWidth;
+
+      const dx = targetRect.left - sourceRect.left;
+      const dy = targetRect.top - sourceRect.top;
+      // arc peak
+      const peakY = Math.min(sourceRect.top, targetRect.top) - 30;
+      const midX = sourceRect.left + dx / 2;
+
+      // Use Web Animations API for arc (two-phase)
+      const dur = 750;
+      ghost.animate([
+        { transform: "translate(0,0)", fontSize: "22px", color: "#000", offset: 0 },
+        { transform: `translate(${midX - sourceRect.left}px, ${peakY - sourceRect.top}px)`, fontSize: ((22 + targetRect.fontSize) / 2) + "px", color: "#001a99", offset: 0.6 },
+        { transform: `translate(${dx}px, ${dy}px)`, fontSize: targetRect.fontSize + "px", color: "#0033CC", offset: 1 }
+      ], {
+        duration: dur,
+        easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+        fill: "forwards"
+      }).onfinish = () => {
+        ghost.remove();
+        resolve();
+      };
+    });
+  }
+
+  /* — Refresh cloud + stats — */
+  let lastTodayKey = todayUTC();
+  let lastVoiceCount = 0;
+  let lastWordInfo = null; // { word, at }
+
+  async function refresh(popWord) {
+    if (todayUTC() !== lastTodayKey) {
+      // day rolled over
+      newDayEl.classList.add("show");
+      lastTodayKey = todayUTC();
+    }
+    let data;
+    try {
+      data = await fetchToday();
+    } catch (e) {
+      // error state
+      canvasEl.innerHTML = `<div class="canvas-msg">Couldn't reach today's words. <button id="retry-cloud">Try again</button></div>`;
+      const r = document.getElementById("retry-cloud");
+      if (r) r.addEventListener("click", () => refresh());
+      sVoices.textContent = "—";
+      sWords.textContent = "—";
+      return;
+    }
+    lastEntries = data.entries;
+    lastVoices = data.voices;
+    lastVoiceCount = data.voices;
+    lastWordInfo = data.last;
+
+    sVoices.textContent = data.voices.toLocaleString();
+    sWords.textContent = data.unique.toLocaleString();
+
+    const mine = loadMine();
+    if (mine && mine.utc_date === todayUTC()) {
+      if (!submitEl.querySelector(".you-said")) renderYouSaid(mine, data.voices);
+    } else {
+      // show input if not currently in confirm state
+      if (!submitEl.querySelector(".confirm-text") && !submitEl.querySelector(".compose")) {
+        if (!submitEl.querySelector(".submit-row")) renderSubmitInput();
+      }
+    }
+
+    renderCloudArea(data.entries, data.voices, mine && mine.utc_date === todayUTC() ? mine : null, popWord);
+  }
+
+  /* — Stats typer (Type 1 + Type 3 + Type 4) — */
+  let typerCycleT = null;
+  let typerActive = false;
+
+  function timeAgo(d) {
+    const s = Math.max(0, Math.round((Date.now() - d.getTime()) / 1000));
+    if (s < 60) return s + "s ago";
+    const m = Math.round(s / 60);
+    if (m < 60) return m + "m ago";
+    return Math.round(m / 60) + "h ago";
+  }
+
+  function pickLine() {
+    const mine = loadMine();
+    const submitted = mine && mine.utc_date === todayUTC();
+    const lines = [];
+    if (lastVoiceCount > 0 && lastWordInfo) {
+      lines.push(`last: ${lastWordInfo.word}, ${timeAgo(lastWordInfo.at)}`);
+    }
+    if (lastVoiceCount > 0) {
+      lines.push(`${lastVoiceCount.toLocaleString()} voices today, climbing`);
+    }
+    if (submitted) {
+      const match = lastEntries.find(([w]) => w === mine.word);
+      if (match && match[1] > 1) lines.push(`"${mine.word}" said by ${match[1] - 1} others today`);
+    } else {
+      const prompts = ["what's one word for today?", "if you had to choose one", "a word, briefly"];
+      lines.push(prompts[Math.floor(Math.random() * prompts.length)]);
+    }
+    return lines[Math.floor(Math.random() * lines.length)] || "";
+  }
+
+  async function typeLine(text) {
+    typerEl.innerHTML = `<span class="t"></span><span class="caret"></span>`;
+    const t = typerEl.querySelector(".t");
+    const caret = typerEl.querySelector(".caret");
+    for (let i = 0; i < text.length; i++) {
+      t.textContent += text[i];
+      const ch = text[i];
+      let delay = 25 + Math.random() * 35;
+      if (ch === " " || /[.,;:!?]/.test(ch)) delay = 140;
+      await new Promise(r => setTimeout(r, delay));
+    }
+    caret.classList.add("hidden");
+  }
+
+  async function runTyperCycle() {
+    if (typerActive) return;
+    typerActive = true;
+    while (typerActive) {
+      const line = pickLine();
+      if (line) await typeLine(line);
+      await new Promise(r => setTimeout(r, 17000)); // ~25s total cycle (≈3s typing + 14-17s wait)
+    }
+  }
+
+  /* — History overlay — */
+  let historyTab = "single";
+  let historyDate = todayUTC();
+
+  document.getElementById("open-history").addEventListener("click", () => openHistory());
+  document.getElementById("history-close").addEventListener("click", () => closeHistory());
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && historyEl.classList.contains("open")) closeHistory(); });
+  document.querySelectorAll(".tabs .tab").forEach(b => {
+    b.addEventListener("click", () => {
+      historyTab = b.dataset.tab;
+      document.querySelectorAll(".tabs .tab").forEach(x => x.classList.toggle("active", x.dataset.tab === historyTab));
+      renderHistory();
+    });
+  });
+
+  function openHistory() {
+    historyEl.classList.add("open");
+    historyEl.setAttribute("aria-hidden", "false");
+    historyTab = "single";
+    historyDate = todayUTC();
+    document.querySelectorAll(".tabs .tab").forEach(x => x.classList.toggle("active", x.dataset.tab === "single"));
+    renderHistory();
+  }
+  function closeHistory() {
+    historyEl.classList.remove("open");
+    historyEl.setAttribute("aria-hidden", "true");
+  }
+  function openHistoryAllWords(date) {
+    openHistory();
+    historyDate = date;
+    historyTab = "single";
+    renderHistory(true);
+  }
+
+  async function renderHistory(showAllWords = false) {
+    historyBody.innerHTML = `<div style="font-family:var(--mono); font-size:12px; padding:24px 0; color:var(--ink-soft); letter-spacing:0.06em; text-transform:uppercase;">Loading…</div>`;
+    if (historyTab === "single") {
+      await renderHistorySingle(showAllWords);
+    } else {
+      await renderHistoryWeek();
+    }
+  }
+
+  async function renderHistorySingle(showAllWords = false) {
+    const date = historyDate;
+    const data = await fetchDay(date);
+    const mostSaid = data.entries[0] ? data.entries[0][0] : null;
+    const mostSaidCount = data.entries[0] ? data.entries[0][1] : 0;
+    const top10 = data.entries.slice(0, 10);
+    const max = top10[0] ? top10[0][1] : 1;
+    const isToday = date === todayUTC();
+
+    // Compare to same weekday last week
+    let insightHTML = "";
+    try {
+      const prevDate = isoDayBack(7 + Math.round((Date.parse(todayUTC()) - Date.parse(date)) / (24*60*60*1000)));
+      const prev = await fetchDay(prevDate);
+      if (prev.voices > 0) {
+        const pct = Math.round(((data.voices - prev.voices) / prev.voices) * 100);
+        const dir = pct >= 0 ? "Up" : "Down";
+        const [y, m, d] = prevDate.split("-").map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        insightHTML = `
+          <div class="insight">
+            <div class="text">${dir} <span class="v">${Math.abs(pct)}%</span> from last ${FULLDAYS[dt.getUTCDay()]}.</div>
+            <div class="meta">${data.voices.toLocaleString()} voices ${isToday ? "today" : "this day"} · ${prev.voices.toLocaleString()} last ${SHORTDAYS[dt.getUTCDay()]}</div>
+          </div>
+        `;
+      }
+    } catch {}
+
+    historyBody.innerHTML = `
+      <div class="date-nav">
+        <button id="prev-day">‹ ${isToday ? "Yesterday" : "Earlier"}</button>
+        <button class="label" id="date-label">${prettyDate(date)}<span class="chev">⌄</span></button>
+        <button id="next-day" ${isToday ? "disabled" : ""}>Tomorrow ›</button>
+      </div>
+
+      <div class="section-label">Stats</div>
+      <div class="stat-grid">
+        <div class="cell"><div class="v">${data.voices.toLocaleString()}</div><div class="l">Voices</div></div>
+        <div class="cell"><div class="v">${data.unique.toLocaleString()}</div><div class="l">Unique words</div></div>
+        <div class="cell"><div class="v">${data.said_once.toLocaleString()}</div><div class="l">Said only once</div></div>
+        <div class="cell"><div class="v cobalt">${mostSaid || "—"}</div><div class="l">Most-said${mostSaidCount ? " · " + mostSaidCount + "×" : ""}</div></div>
+      </div>
+
+      <div class="section-label">Top 10</div>
+      <ul class="top-list">
+        ${top10.map(([w, c], i) => `
+          <li>
+            <span class="rank">${String(i + 1).padStart(2, "0")}</span>
+            <span class="word">${w}</span>
+            <span class="n">${c}<span class="x">×</span></span>
+          </li>
+        `).join("")}
+      </ul>
+      <button class="see-all-link" id="see-all">See all ${data.entries.length} words →</button>
+
+      ${insightHTML ? '<div class="section-label">Insight</div>' + insightHTML : ""}
+
+      ${showAllWords ? `
+        <div class="section-label" style="margin-top:32px">All ${data.entries.length} words</div>
+        <div class="all-words">
+          ${data.entries.map(([w, c]) => `<div class="row"><span class="w">${w}</span><span class="n">${c}×</span></div>`).join("")}
+        </div>
+      ` : ""}
+    `;
+
+    document.getElementById("prev-day").addEventListener("click", () => {
+      historyDate = (() => {
+        const [y, m, d] = historyDate.split("-").map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        dt.setUTCDate(dt.getUTCDate() - 1);
+        return dt.toISOString().slice(0, 10);
+      })();
+      renderHistorySingle();
+    });
+    if (!isToday) {
+      document.getElementById("next-day").addEventListener("click", () => {
+        historyDate = (() => {
+          const [y, m, d] = historyDate.split("-").map(Number);
+          const dt = new Date(Date.UTC(y, m - 1, d));
+          dt.setUTCDate(dt.getUTCDate() + 1);
+          return dt.toISOString().slice(0, 10);
+        })();
+        renderHistorySingle();
+      });
+    }
+    document.getElementById("date-label").addEventListener("click", () => {
+      // simple native date picker fallback
+      const inp = document.createElement("input");
+      inp.type = "date";
+      inp.max = todayUTC();
+      inp.value = historyDate;
+      inp.style.cssText = "position:fixed; left:-9999px;";
+      document.body.appendChild(inp);
+      inp.addEventListener("change", () => {
+        if (inp.value) { historyDate = inp.value; renderHistorySingle(); }
+        inp.remove();
+      });
+      inp.click();
+    });
+    document.getElementById("see-all").addEventListener("click", () => renderHistorySingle(true));
+  }
+
+  async function renderHistoryWeek() {
+    const { byDay } = await fetchLastDays(7);
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = isoDayBack(i);
+      const d = byDay.get(date);
+      const top = d ? [...d.counts.entries()].sort((a, b) => b[1] - a[1])[0] : null;
+      days.push({ date, voices: d ? d.voices : 0, top });
+    }
+    // most frequent top word across days
+    const winnerMap = new Map();
+    for (const d of days) if (d.top) winnerMap.set(d.top[0], (winnerMap.get(d.top[0]) || 0) + 1);
+    const winner = [...winnerMap.entries()].sort((a, b) => b[1] - a[1])[0];
+
+    historyBody.innerHTML = `
+      <div class="section-label" style="margin-top:24px">Top word, each day</div>
+      <ul class="day-list">
+        ${days.map(d => `
+          <li>
+            <span class="day">${dayLabel(d.date)}</span>
+            <span class="date">${shortDate(d.date)}</span>
+            <span class="word">${d.top ? d.top[0] : "—"}</span>
+            <span class="n">${d.top ? d.top[1] : 0}<span class="x">×</span></span>
+          </li>
+        `).join("")}
+      </ul>
+      ${winner ? `
+        <div class="insight" style="margin-top:24px">
+          <div class="text"><span class="v">${winner[0]}</span> won ${winner[1]} of the last 7 days.</div>
+        </div>
+      ` : ""}
+    `;
+  }
+
+  /* — New-day — */
+  document.getElementById("new-day-refresh").addEventListener("click", () => location.reload());
+
+  /* — Polling — */
+  let pollT = null;
+  function startPolling() {
+    if (pollT) return;
+    pollT = setInterval(() => { if (!document.hidden) refresh(); }, POLL_INTERVAL_MS);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
   /* — Dev panel — */
   const devParam = new URLSearchParams(location.search).get("dev");
@@ -1393,14 +1891,20 @@
   const devOn = localStorage.getItem("mote.dev") === "1";
   if (devOn) {
     document.getElementById("dev-panel").classList.add("show");
-    document.getElementById("dev-reset").addEventListener("click", async () => {
+    document.getElementById("dev-reset").addEventListener("click", () => {
       clearMine();
-      // also clear device id so a fresh insert is allowed
       localStorage.setItem("mote.device", crypto.randomUUID());
       location.reload();
     });
+    function freshWord() {
+      const cons = "bcdfghjklmnpqrstvwxyz", vow = "aeiou";
+      const len = 4 + Math.floor(Math.random() * 3);
+      let s = "";
+      for (let i = 0; i < len; i++) s += (i % 2 === 0 ? cons : vow)[Math.floor(Math.random() * (i % 2 === 0 ? cons.length : vow.length))];
+      return s;
+    }
     async function devInsert(word) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/words`, {
+      await fetch(`${SUPABASE_URL}/rest/v1/words`, {
         method: "POST",
         headers: {
           "apikey": SUPABASE_ANON_KEY,
@@ -1410,22 +1914,10 @@
         },
         body: JSON.stringify({ word, device_id: "seed-" + crypto.randomUUID() })
       });
-      if (!res.ok) console.warn("dev insert failed", res.status, await res.text());
-      return res.ok;
-    }
-    function freshWord() {
-      // generate a unique pseudo-word so it appears as a new entry in the cloud
-      const cons = "bcdfghjklmnpqrstvwxyz";
-      const vow = "aeiou";
-      const len = 4 + Math.floor(Math.random() * 3); // 4–6 letters
-      let s = "";
-      for (let i = 0; i < len; i++) s += (i % 2 === 0 ? cons : vow)[Math.floor(Math.random() * (i % 2 === 0 ? cons.length : vow.length))];
-      return s;
     }
     document.getElementById("dev-drop").addEventListener("click", async () => {
       const w = freshWord();
-      const n = 30 + Math.floor(Math.random() * 30); // 30–60 voices: definitely visible
-      console.log(`dev: dropping ${n}× "${w}"`);
+      const n = 20 + Math.floor(Math.random() * 30);
       await Promise.all(Array.from({ length: n }, () => devInsert(w)));
       await refresh(w);
     });
@@ -1435,35 +1927,30 @@
       if (dripT) {
         clearInterval(dripT); dripT = null;
         dripBtn.classList.remove("on");
-        dripBtn.textContent = "Toggle drip (3s)";
+        dripBtn.textContent = "Toggle drip";
       } else {
-        dripT = setInterval(() => document.getElementById("dev-drop").click(), 3000);
+        dripT = setInterval(() => document.getElementById("dev-drop").click(), 4000);
         dripBtn.classList.add("on");
         dripBtn.textContent = "Stop drip";
       }
     });
-    document.getElementById("dev-refresh").addEventListener("click", () => {
-      fullReplaceCloud();
+    document.getElementById("dev-early").addEventListener("click", (e) => {
+      earlyOverride = earlyOverride === "force" ? false : "force";
+      e.target.classList.toggle("on", earlyOverride === "force");
       refresh();
     });
   }
 
   /* — Boot — */
-  refresh();
+  refresh().then(() => runTyperCycle());
   startPolling();
-  // re-pack once fonts are loaded so reserved rects use the real measured sizes
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => { fullReplaceCloud(); refresh(); });
+    document.fonts.ready.then(() => { clearCanvas(); refresh(); });
   }
-
-  // Re-pack on resize (debounced) — full replace because positions change
   let resizeT = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeT);
-    resizeT = setTimeout(() => {
-      fullReplaceCloud();
-      refresh();
-    }, 250);
+    resizeT = setTimeout(() => { clearCanvas(); refresh(); }, 250);
   });
 </script>
 </body>
