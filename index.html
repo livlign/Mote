@@ -953,7 +953,8 @@
 
   const POLL_INTERVAL_MS = 25000;
   const EARLY_THRESHOLD = 30;
-  const TOP_N = 100;
+  const TOP_N = 60;
+  const COLLIDE_PAD = 12;
 
   const canvasEl  = document.getElementById("canvas");
   const submitEl  = document.getElementById("submit-region");
@@ -1134,7 +1135,7 @@
       if (cand.x < margin || cand.y < margin) return false;
       if (cand.x + w > canvasW - margin) return false;
       if (cand.y + h > canvasH - margin) return false;
-      for (const o of others) if (rectsOverlap(cand, o, 7)) return false;
+      for (const o of others) if (rectsOverlap(cand, o, COLLIDE_PAD)) return false;
       return true;
     };
     const center = candidate(anchorX, anchorY);
@@ -1413,46 +1414,22 @@
         rules.textContent = "One word per person, per day. The more times a word is mentioned, the bigger it is. Reset 00:00 UTC.";
       }
     });
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !send.disabled) renderSubmitConfirm(input.value);
-    });
-    send.addEventListener("click", () => renderSubmitConfirm(input.value));
+    async function go() {
+      if (send.disabled) return;
+      const v = validate(input.value);
+      if (!v.ok) {
+        rules.textContent = v.msg;
+        rules.classList.add("error");
+        return;
+      }
+      send.disabled = true;
+      send.textContent = "Sending…";
+      await commitSubmission(v.word);
+    }
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+    send.addEventListener("click", go);
   }
 
-  function renderSubmitConfirm(rawWord) {
-    const v = validate(rawWord);
-    if (!v.ok) {
-      const rules = document.getElementById("rules");
-      if (rules) { rules.textContent = v.msg; rules.classList.add("error"); }
-      return;
-    }
-    submitEl.innerHTML = `
-      <div class="submit-row">
-        <span class="arrow">→</span>
-        <span class="confirm-text">You said:<span class="word">${v.word}</span></span>
-        <button class="send confirm-btn" id="send-confirm">Send</button>
-      </div>
-      <div class="submit-foot">
-        <button class="confirm-back" id="confirm-back">← Edit</button>
-        <div class="rules-text">Press send again to commit. One word per day, no edits, no deletes.</div>
-      </div>
-    `;
-    document.getElementById("confirm-back").addEventListener("click", () => {
-      renderSubmitInput();
-      const input = document.getElementById("word");
-      if (input) {
-        input.value = v.word;
-        input.focus();
-        input.dispatchEvent(new Event("input"));
-      }
-    });
-    document.getElementById("send-confirm").addEventListener("click", async () => {
-      const btn = document.getElementById("send-confirm");
-      btn.disabled = true;
-      btn.textContent = "Sending…";
-      await commitSubmission(v.word);
-    });
-  }
 
   function renderYouSaid(mine, voices) {
     const others = Math.max(0, voices - 1);
@@ -1478,8 +1455,8 @@
     const futureMax = Math.max(matchEntry ? matchEntry[1] + 1 : 0,
       ...before.entries.map(([, c]) => c));
 
-    const inputBtn = submitEl.querySelector(".confirm-text .word");
-    const sourceRect = inputBtn ? inputBtn.getBoundingClientRect() : submitEl.getBoundingClientRect();
+    const inputEl = document.getElementById("word");
+    const sourceRect = inputEl ? inputEl.getBoundingClientRect() : submitEl.getBoundingClientRect();
 
     // Make API call
     const res = await submitWord(word);
@@ -1500,7 +1477,7 @@
           <div class="rules-text error">Try again in a moment.</div>
         </div>
       `;
-      document.getElementById("retry").addEventListener("click", () => renderSubmitConfirm(word));
+      document.getElementById("retry").addEventListener("click", () => { renderSubmitInput(); const i = document.getElementById("word"); if (i) { i.value = word; i.focus(); i.dispatchEvent(new Event("input")); } });
       return;
     }
 
@@ -1630,9 +1607,7 @@
       if (!submitEl.querySelector(".you-said")) renderYouSaid(mine, data.voices);
     } else {
       // show input if not currently in confirm state
-      if (!submitEl.querySelector(".confirm-text") && !submitEl.querySelector(".compose")) {
-        if (!submitEl.querySelector(".submit-row")) renderSubmitInput();
-      }
+      if (!submitEl.querySelector(".submit-row")) renderSubmitInput();
     }
 
     renderCloudArea(data.entries, data.voices, mine && mine.utc_date === todayUTC() ? mine : null, popWord);
