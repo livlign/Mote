@@ -1,53 +1,76 @@
 # Mote
 
-One word per person, per day. The world's words, set big. Resets at 00:00 UTC.
+> **One word per person, per day. The world's words, set big.**
 
-Live at **[mote.day](https://mote.day)**.
+A daily word ritual. Each visitor types one word about their day, and the world's words gather into a live cloud — bigger when more people say the same thing. The canvas resets at 00:00 UTC, and yesterday slips into the history view.
+
+🌐 **Live:** [mote.day](https://mote.day)
+📜 **License:** [MIT](LICENSE)
+
+![Mote — Today, in a Word](og.png)
+
+---
+
+## Why
+
+Twitter feeds are loud, polls are leading, and "how are you?" expects "fine." Mote asks for one word and shows you the planet's mood at a glance. No accounts, no comments, no algorithm — just a word and a shared canvas.
+
+## How it works
+
+- One submission per device per day, enforced both by a unique DB index and an RLS policy.
+- Word size on the canvas scales with how many people said it.
+- The cloud refreshes every ~25 seconds and on tab focus.
+- Your own word is pinned in `localStorage` for 24 hours so it stays visible across the UTC reset.
+- A history view (last 7 days, single-day breakdown) lives behind the **History** button.
 
 ## Stack
 
-- Static `index.html` — vanilla JS, no build step. Geist + Geist Mono from Google Fonts.
-- Supabase (Postgres + RLS) for storage and aggregation.
-- Cloudflare Pages for hosting; Cloudflare Registrar for the domain.
-- `og.png` (1200×630) for link previews — regenerate from `scripts/og.html` (see below).
+| Layer | What |
+|-------|------|
+| Frontend | One static `index.html` — vanilla JS, no build step, Geist + Geist Mono via Google Fonts |
+| Storage | Supabase (Postgres + RLS, anon-key writes constrained by policy) |
+| Hosting | Cloudflare Pages |
+| Domain | Cloudflare Registrar |
 
-## Setup
+There is intentionally no framework, bundler, or backend service to run. The whole client is ~2k lines of HTML + JS.
 
-1. **Create a Supabase project** at https://supabase.com (free tier).
-2. **Run the schema.** SQL Editor → paste and run `schema.sql`.
-3. **Get your keys.** Project Settings → API → copy the Project URL and the publishable key (`sb_publishable_...`).
-4. **Wire them in.** Open `index.html` and replace `SUPABASE_URL` and `SUPABASE_ANON_KEY` near the top of the `<script>` block.
-5. **Run locally.** Any static server works:
+## Run it locally
+
+You need a Supabase project (free tier is fine).
+
+1. Create a project at https://supabase.com.
+2. SQL Editor → paste and run [`schema.sql`](schema.sql).
+3. Project Settings → API → copy the URL and the publishable key (`sb_publishable_…`).
+4. In `index.html`, replace `SUPABASE_URL` and `SUPABASE_ANON_KEY` near the top of the `<script>` block.
+5. Serve the directory:
    ```
    python3 -m http.server 8000
    ```
-   Open http://localhost:8000.
+   Open <http://localhost:8000>.
 
-## Deploy
+## Self-host
 
-Two paths.
+**Cloudflare Pages, Git-connected:** point a Pages project at your fork, production branch `main`, no build command, output directory `/`. Auto-deploys on push.
 
-**Git-connected (recommended).** Cloudflare Pages → Connect to Git → select repo. Production branch `main`, no build command, output directory `/`. Every push to `main` auto-deploys.
-
-**Direct upload via Wrangler.**
+**Direct upload:**
 ```
 npx wrangler pages deploy . --project-name=mote --branch=main
 ```
 
-Attach the domain: Pages project → Custom domains → add `mote.day`. DNS configures automatically when the domain is on Cloudflare Registrar.
+Custom domain: Pages project → Custom domains → add yours.
 
-## Notes
+## Project layout
 
-- One-word-per-device-per-day is enforced at the database level via a unique index AND an RLS policy with a `not exists` check.
-- The user's own word is kept in `localStorage` for 24 hours from submission, so it stays visible across the UTC reset.
-- Profanity filter is a small inline wordlist in `index.html` — replace with a real filter when you outgrow it.
-- Aggregation goes through the `word_counts` view to avoid the PostgREST 1000-row cap on the raw `words` table.
-- `device_id` is a localStorage UUID. Clearing it lets a user submit again. Known v1 limitation.
-- The Supabase publishable key is hard-coded in `index.html`. That is fine — it is the anon key, and RLS does the work — but treat it accordingly.
+```
+.
+├── index.html         # the entire app
+├── schema.sql         # Supabase tables, RLS, aggregation views
+├── og.png             # 1200×630 link-preview image
+├── scripts/og.html    # source for og.png — re-render with headless Chrome
+└── LICENSE
+```
 
-## Regenerate the OG image
-
-The link-preview image (`og.png`) is rendered from `scripts/og.html` via headless Chrome:
+### Regenerate the OG image
 
 ```
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
@@ -56,16 +79,54 @@ The link-preview image (`og.png`) is rendered from `scripts/og.html` via headles
   --screenshot=og.png "file://$PWD/scripts/og.html"
 ```
 
-Edit `scripts/og.html`, re-run, commit `og.png`.
+### Wipe seeded rows
 
-## Maintenance
+Any seeded data uses a `seed-` prefix on `device_id`:
 
-**Wipe seeded rows** (any `device_id` prefixed `seed-`):
 ```sql
 delete from words where device_id like 'seed-%';
 ```
 
-**Wipe all of today's words:**
-```sql
-delete from words where utc_date = (now() at time zone 'UTC')::date;
+## Design notes
+
+- One-word-per-device-per-day is enforced **at the database** (unique index + RLS `not exists` check), not just in the client. Clearing `localStorage` lets a user submit again — known v1 limitation.
+- Aggregation goes through the `word_counts` view to avoid PostgREST's 1000-row cap on the raw `words` table.
+- The Supabase publishable key is hard-coded in `index.html`. That is fine — it is the anon key, and RLS does the work.
+- The profanity filter is a small inline wordlist. Replace with a real moderation layer when traffic outgrows it.
+- Words are stored lowercase, `^[a-z]{1,20}$`, no spaces — enforced at the DB and the input.
+
+## Contributing
+
+Issues and PRs welcome. A few notes:
+
+- Please open an issue before a large change, so we can talk through scope before you spend time.
+- Keep the no-build-step, single-`index.html` constraint — adding a bundler is a non-goal.
+- Match the existing visual language (Swiss / typographic, cobalt accent `#0033CC`, Geist).
+- Don't add tracking, analytics, or third-party scripts.
+- New copy should be terse and human — read aloud before shipping.
+
+**Good first issues**
+
+- Better empty / error states.
+- Internationalization (the `^[a-z]` regex blocks non-Latin scripts).
+- Mobile keyboard polish.
+- A real moderation layer behind the inline profanity list.
+
+To run a PR:
+
 ```
+git clone https://github.com/livlign/Mote.git
+cd Mote
+# edit index.html with your Supabase keys
+python3 -m http.server 8000
+```
+
+## Acknowledgements
+
+- Typography: [Geist](https://vercel.com/font) by Vercel.
+- Hosting: [Cloudflare Pages](https://pages.cloudflare.com/).
+- Backend: [Supabase](https://supabase.com).
+
+## License
+
+[MIT](LICENSE) © 2026 linhtt
