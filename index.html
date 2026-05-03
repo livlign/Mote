@@ -315,6 +315,7 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 18px;
     font-family: var(--mono);
     font-size: 10.5px;
@@ -333,12 +334,12 @@
   .stats .num { font-weight: 600; font-variant-numeric: tabular-nums; }
   .stats .sep { color: var(--ink-faint); }
   .stats .typer {
-    flex: 1;
     color: var(--ink-soft);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: right;
+    text-align: center;
+    max-width: 360px;
   }
   .stats .typer .caret {
     display: inline-block;
@@ -366,7 +367,11 @@
     gap: 14px;
     border-bottom: 2px solid var(--ink);
     padding-bottom: 6px;
+    max-width: 720px;
+    margin: 0 auto;
   }
+  .submit-foot { max-width: 720px; margin-left: auto; margin-right: auto; }
+  .you-said { max-width: 720px; margin: 0 auto; text-align: center; }
   .submit-row .arrow {
     font-family: var(--mono);
     font-size: 18px;
@@ -1450,29 +1455,26 @@
 
   /* — Slide animation — */
   async function commitSubmission(word) {
-    // Fetch current state
-    const before = await fetchToday();
-    lastEntries = before.entries;
-    lastVoices = before.voices;
-
-    // Where the word would land
-    const matchEntry = before.entries.find(([w]) => w === word);
-    const futureCount = matchEntry ? matchEntry[1] + 1 : 1;
-    const futureMax = Math.max(matchEntry ? matchEntry[1] + 1 : 0,
-      ...before.entries.map(([, c]) => c));
-
     const inputEl = document.getElementById("word");
     const sourceRect = inputEl ? inputEl.getBoundingClientRect() : submitEl.getBoundingClientRect();
 
-    // Make API call
-    const res = await submitWord(word);
-    if (!res.ok && res.reason === "duplicate") {
-      // already submitted today — server says no
+    // Hide submit area for the entire flight (no flicker)
+    submitEl.style.visibility = "hidden";
+
+    // Fire API + compute landing position in parallel so the slide can start fast
+    const [apiRes, landing] = await Promise.all([
+      submitWord(word),
+      planLanding(word)
+    ]);
+
+    if (!apiRes.ok && apiRes.reason === "duplicate") {
       saveMine({ word, submitted_at: new Date().toISOString(), utc_date: todayUTC() });
+      submitEl.style.visibility = "";
       await refresh(word);
       return;
     }
-    if (!res.ok) {
+    if (!apiRes.ok) {
+      submitEl.style.visibility = "";
       submitEl.innerHTML = `
         <div class="submit-row">
           <span class="arrow">→</span>
@@ -1483,57 +1485,96 @@
           <div class="rules-text error">Try again in a moment.</div>
         </div>
       `;
-      document.getElementById("retry").addEventListener("click", () => { renderSubmitInput(); const i = document.getElementById("word"); if (i) { i.value = word; i.focus(); i.dispatchEvent(new Event("input")); } });
+      document.getElementById("retry").addEventListener("click", () => {
+        renderSubmitInput();
+        const i = document.getElementById("word");
+        if (i) { i.value = word; i.focus(); i.dispatchEvent(new Event("input")); }
+      });
       return;
     }
 
-    saveMine({ word: res.row.word, submitted_at: res.row.submitted_at, utc_date: res.row.utc_date });
+    saveMine({ word: apiRes.row.word, submitted_at: apiRes.row.submitted_at, utc_date: apiRes.row.utc_date });
 
-    // Compute target rect:
-    // If word exists in cloud → its current rect; we'll grow it after slide.
-    // Else → spiral-find a position for the new word at projected size.
-    let targetRect = null;
-    let resizeExisting = null;
+    // If we couldn't compute a landing, just bail to refresh
+    if (!landing) {
+      renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1);
+      submitEl.style.visibility = "";
+      await refresh(word);
+      return;
+    }
+
+    // Run slide
+    await runSlide(word, sourceRect, landing.target);
+
+    // Pin the new word to its slide target so refresh keeps it there
+    if (landing.kind === "new") {
+      const cR = canvasEl.getBoundingClientRect();
+      const x = landing.target.left - cR.left;
+      const y = landing.target.top - cR.top;
+      const el = makeWordEl(word, landing.size, true, landing.futureCount);
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.classList.add("pulse");
+      canvasEl.appendChild(el);
+      attachWordHandlers(el);
+      positions.set(word, { el, x, y, w: landing.w, h: landing.h, size: landing.size, count: landing.futureCount });
+    } else if (landing.kind === "existing") {
+      const p = positions.get(word);
+      if (p) {
+        p.el.classList.add("mine");
+        p.el.classList.remove("pulse"); void p.el.offsetWidth; p.el.classList.add("pulse");
+      }
+    }
+
+    renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1);
+    submitEl.style.visibility = "";
+
+    // Refresh in background (resize tween catches up)
+    refresh();
+  }
+
+  // Plan where the word will land in the current cloud, before the API returns.
+  async function planLanding(word) {
+    const matchEntry = lastEntries.find(([w]) => w === word);
+    const futureCount = matchEntry ? matchEntry[1] + 1 : 1;
+    const futureMax = Math.max(
+      matchEntry ? matchEntry[1] + 1 : 0,
+      ...lastEntries.map(([, c]) => c)
+    );
 
     if (matchEntry && positions.has(word)) {
       const p = positions.get(word);
       const r = p.el.getBoundingClientRect();
-      targetRect = { left: r.left, top: r.top, fontSize: p.size };
-      resizeExisting = { word, newCount: matchEntry[1] + 1, newMax: futureMax };
-    } else {
-      // try to place
-      const canvasW = canvasEl.clientWidth, canvasH = canvasEl.clientHeight;
-      const newSize = sizeFor(futureCount, futureMax, word);
-      // measure
-      const tmp = document.createElement("span");
-      tmp.className = "w";
-      tmp.style.cssText = "position:absolute; left:-9999px; top:-9999px; font-size:" + newSize + "px;";
-      tmp.textContent = word;
-      canvasEl.appendChild(tmp);
-      const w = tmp.offsetWidth, h = tmp.offsetHeight;
-      tmp.remove();
-      const others = [...positions.values()];
-      const anchor = dayAnchor(canvasW, canvasH);
-      const pos = spiralFind(w, h, others, canvasW, canvasH, anchor.x, anchor.y);
-      if (pos) {
-        const cR = canvasEl.getBoundingClientRect();
-        targetRect = { left: cR.left + pos.x, top: cR.top + pos.y, fontSize: newSize };
-      } else {
-        // can't place — just refresh
-        await refresh(word);
-        return;
-      }
+      return {
+        kind: "existing",
+        target: { left: r.left, top: r.top, fontSize: p.size },
+        size: p.size,
+        futureCount
+      };
     }
 
-    // Run slide
-    await runSlide(word, sourceRect, targetRect);
-
-    // Hide the input area immediately while sliding (already done via overwrite below)
-    // Show "you said"
-    renderYouSaid({ word: res.row.word, utc_date: res.row.utc_date }, before.voices + 1);
-
-    // Refresh cloud (will pulse the word)
-    await refresh(word);
+    const canvasW = canvasEl.clientWidth, canvasH = canvasEl.clientHeight;
+    const newSize = sizeFor(futureCount, futureMax || 1, word);
+    const tmp = document.createElement("span");
+    tmp.className = "w";
+    tmp.style.cssText = "position:absolute; left:-9999px; top:-9999px; font-size:" + newSize + "px;";
+    tmp.textContent = word;
+    canvasEl.appendChild(tmp);
+    const w = tmp.offsetWidth, h = tmp.offsetHeight;
+    tmp.remove();
+    const others = [...positions.values()];
+    const anchor = dayAnchor(canvasW, canvasH);
+    const pos = spiralFind(w, h, others, canvasW, canvasH, anchor.x, anchor.y);
+    if (!pos) return null;
+    const cR = canvasEl.getBoundingClientRect();
+    return {
+      kind: "new",
+      target: { left: cR.left + pos.x, top: cR.top + pos.y, fontSize: newSize },
+      size: newSize,
+      w,
+      h,
+      futureCount
+    };
   }
 
   function runSlide(word, sourceRect, targetRect) {
