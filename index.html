@@ -547,7 +547,26 @@
     flex-direction: column;
     align-items: center;
     gap: 14px;
+    position: relative;
   }
+  .share-close {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 16px;
+    line-height: 1;
+    color: var(--ink);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    z-index: 2;
+    transition: background 160ms ease, color 160ms ease;
+  }
+  .share-close:hover { background: var(--ink); color: var(--paper); }
   .share-card-frame {
     width: 100%;
     aspect-ratio: 1200 / 630;
@@ -602,12 +621,12 @@
   .share-btn.done { background: var(--cobalt); color: var(--paper); border-color: var(--cobalt); }
   .share-hint {
     font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-top: 2px;
-    min-height: 14px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    min-height: 16px;
+    text-align: center;
   }
   @media (max-width: 768px) {
     .share-actions { flex-direction: column; width: 100%; }
@@ -2308,7 +2327,8 @@
         <div class="word">${escapeHTML(mine.word)}</div>
         <div class="context">${context}</div>
       </div>
-      <div class="share-wrap">
+      <div class="share-wrap" id="share-wrap">
+        <button class="share-close" id="share-close" type="button" aria-label="Hide share card">×</button>
         <div class="share-card-frame" id="share-frame">
           <div class="placeholder">Generating card…</div>
         </div>
@@ -2339,10 +2359,16 @@
     const copyBtn = document.getElementById("share-copy");
     const dlBtn = document.getElementById("share-download");
     const shareBtn = document.getElementById("share-share");
+    const closeBtn = document.getElementById("share-close");
     const hint = document.getElementById("share-hint");
     shareBlobPromise = null;
     shareBlobCache = null;
     shareDataUrlCache = null;
+
+    if (closeBtn) closeBtn.addEventListener("click", () => {
+      const wrap = document.getElementById("share-wrap");
+      if (wrap) wrap.remove();
+    });
 
     const setHint = (msg, isDone) => {
       if (!hint) return;
@@ -2428,27 +2454,50 @@
       } finally { dlBtn.disabled = false; }
     });
 
+    // Web Share API on desktop Chrome is unreliable: canShare({files}) often
+    // returns true but navigator.share() either does nothing or throws. We
+    // always run the OS share where possible; otherwise (or on failure other
+    // than user-cancel) we fall back to copying the image to the clipboard.
+    const fallbackToCopy = async () => {
+      const blob = await ensureBlob();
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        flash(shareBtn, "Copied");
+        setHint("Image copied to clipboard — paste anywhere to share.", true);
+      } else {
+        doDownload(blob);
+        setHint("Saved as PNG — share from your downloads.", true);
+      }
+    };
     if (shareBtn) shareBtn.addEventListener("click", async () => {
       shareBtn.disabled = true; setHint("");
       try {
         const blob = await ensureBlob();
         const file = new File([blob], filename, { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: "Mote",
-            text: `My word for ${prettyDate(utcDate)} on mote.day`
-          });
-          flash(shareBtn, "Shared");
-          logEvent("share_card_share", { meta: { word } });
+        const canNativeShare = navigator.canShare && navigator.canShare({ files: [file] });
+        if (canNativeShare) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "Mote",
+              text: `My word for ${prettyDate(utcDate)} on mote.day`
+            });
+            flash(shareBtn, "Shared");
+            logEvent("share_card_share", { meta: { word } });
+          } catch (e) {
+            if (e && e.name === "AbortError") {
+              setHint("Share canceled.");
+            } else {
+              console.warn("[mote] native share failed, falling back", e);
+              await fallbackToCopy();
+            }
+          }
         } else {
-          setHint("Sharing not supported here.");
+          await fallbackToCopy();
         }
       } catch (e) {
-        if (e && e.name !== "AbortError") {
-          console.warn("[mote] share failed", e);
-          setHint("Share canceled.");
-        }
+        console.warn("[mote] share failed entirely", e);
+        setHint("Couldn't share. Try Copy or Download.");
       } finally { shareBtn.disabled = false; }
     });
   }
