@@ -728,11 +728,13 @@
   .history-body {
     flex: 1 1 auto;
     overflow: hidden;
-    padding: 0 32px 24px;
+    padding: 0;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
+  /* About modal still uses .history-bar and uses its own padded body. */
+  .history-body.about-body { padding: 40px 32px; overflow: auto; }
 
   .about-body {
     max-width: 640px;
@@ -1243,6 +1245,329 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* — History: Daily Edition layout — */
+  .ed-close {
+    position: absolute;
+    top: 14px;
+    right: 22px;
+    z-index: 5;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 26px;
+    line-height: 1;
+    color: var(--ink);
+    padding: 4px 8px;
+    transition: color 160ms ease, transform 160ms ease;
+  }
+  .ed-close:hover { color: var(--cobalt); transform: rotate(90deg); }
+
+  .ed-mast {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+    padding: 22px 60px 0 32px;
+    flex-shrink: 0;
+  }
+  .ed-mast-l { display: flex; flex-direction: column; gap: 4px; line-height: 1; }
+  .ed-brand {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .ed-vol {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .ed-mast-r {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: right;
+    line-height: 1;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+  .ed-mast-r:hover .ed-date { color: var(--cobalt); }
+  .ed-day {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .ed-date {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    transition: color 160ms ease;
+  }
+
+  .ed-rule {
+    margin: 14px 32px 0;
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    height: 4px;
+    flex-shrink: 0;
+  }
+
+  .ed-tabbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 32px 10px;
+    border-bottom: 1px solid var(--ink-ghost);
+    flex-shrink: 0;
+  }
+  .ed-tab {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    transition: color 160ms ease;
+  }
+  .ed-tab:hover { color: var(--ink); }
+  .ed-tab.active { color: var(--ink); }
+  .ed-tab.active::before { content: "→ "; color: var(--cobalt); margin-right: 2px; }
+  .ed-tab-sep {
+    font-family: var(--mono);
+    color: var(--ink-ghost);
+    font-size: 12px;
+  }
+
+  .ed-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 32px 16px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .ed-kicker {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    flex-shrink: 0;
+  }
+  .ed-kicker::before { content: "— "; color: var(--cobalt); margin-right: 4px; }
+  .ed-hero {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(64px, 12vw, 132px);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--cobalt);
+    margin: 0;
+    word-break: break-word;
+    flex-shrink: 0;
+  }
+  .ed-hero.muted { color: var(--ink-ghost); font-size: clamp(40px, 7vw, 72px); }
+  .ed-lede {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    margin-top: 16px;
+    flex-shrink: 0;
+  }
+  .ed-lede::before { content: "— "; color: var(--cobalt); margin-right: 4px; }
+  .ed-lede .v { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .ed-lede .muted { color: var(--ink-soft); }
+
+  .ed-divider {
+    height: 1px;
+    background: var(--ink-ghost);
+    margin: 18px 0 14px;
+    flex-shrink: 0;
+  }
+
+  .ed-section-label {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  .ed-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    align-content: flex-start;
+    gap: 4px 22px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .ed-cloud .w {
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+  .ed-cloud .w.hero { color: var(--cobalt); }
+
+  .ed-foot {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 0 0;
+    margin-top: 16px;
+    border-top: 3px solid var(--ink);
+    flex-shrink: 0;
+  }
+  .ed-foot-stats {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .ed-foot-stats span > .v {
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin-right: 4px;
+  }
+  .ed-foot-nav {
+    display: flex;
+    gap: 10px;
+    justify-self: center;
+  }
+  .ed-foot-nav button {
+    background: transparent;
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 7px 12px;
+    transition: background 160ms ease, color 160ms ease;
+    font-variant-numeric: tabular-nums;
+  }
+  .ed-foot-nav button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .ed-foot-nav button:disabled {
+    border-color: var(--ink-ghost);
+    color: var(--ink-faint);
+    cursor: not-allowed;
+  }
+  .ed-foot-brand {
+    justify-self: end;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--cobalt);
+    text-decoration: none;
+  }
+  .ed-foot-brand:hover { color: var(--ink); }
+
+  /* Archive: 7-day strip */
+  .ed-week {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    align-content: start;
+    min-height: 0;
+  }
+  .ed-week-cell {
+    background: transparent;
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 0;
+    color: inherit;
+    transition: background 160ms ease, color 160ms ease;
+    min-height: 0;
+  }
+  .ed-week-cell:hover { background: var(--ink); }
+  .ed-week-cell:hover .cap,
+  .ed-week-cell:hover .word,
+  .ed-week-cell:hover .foot { color: var(--paper); }
+  .ed-week-cell .cap {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--ink-ghost);
+    font-variant-numeric: tabular-nums;
+  }
+  .ed-week-cell .word {
+    font-family: var(--sans);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+    padding: 14px 12px;
+    color: var(--ink);
+    word-break: break-word;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+  }
+  .ed-week-cell.dominant .word { color: var(--cobalt); }
+  .ed-week-cell:hover.dominant .word { color: var(--paper); }
+  .ed-week-cell .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--ink-ghost);
+    font-variant-numeric: tabular-nums;
+  }
+  .ed-week-cell .foot .vox { font-weight: 700; color: var(--ink); }
+
   /* — Mobile — */
   @media (max-width: 768px) {
     .header { padding: 12px 18px; }
@@ -1262,18 +1587,36 @@
     .history-body { padding: 0 18px 32px; }
     .tabs { padding: 0 18px; }
     .tabs button { font-size: 11px; margin-right: 20px; padding: 14px 0; }
-    .h-day-nav { padding: 12px 0 4px; gap: 8px; }
-    .h-nav-btn { padding: 6px 10px; font-size: 11px; }
-    .h-date-label .h-date { font-size: 22px; }
-    .h-hero { padding: 10px 0 4px; }
-    .h-hero-meta { font-size: 11px; }
-    .h-hero-word { font-size: clamp(40px, 14vw, 64px); }
-    .h-stats-strip { gap: 16px; padding: 10px 0; }
-    .h-stats-strip .h-stat .n { font-size: 20px; }
-    .h-cloud { padding: 12px 0 4px; gap: 4px 14px; }
-    .h-week-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .h-week-cell { padding: 10px 10px 8px; }
-    .h-rule { margin: 10px 0; }
+    /* Editorial History — mobile */
+    .ed-close { top: 10px; right: 12px; font-size: 22px; }
+    .ed-mast { padding: 14px 48px 0 18px; gap: 12px; }
+    .ed-brand { font-size: 16px; letter-spacing: 0.18em; }
+    .ed-vol, .ed-day { font-size: 10px; letter-spacing: 0.18em; }
+    .ed-date { font-size: 16px; }
+    .ed-rule { margin: 10px 18px 0; }
+    .ed-tabbar { padding: 10px 18px 8px; gap: 12px; }
+    .ed-tab { font-size: 11px; letter-spacing: 0.18em; }
+    .ed-body { padding: 14px 18px 12px; }
+    .ed-kicker { font-size: 10.5px; margin-bottom: 8px; }
+    .ed-hero { font-size: clamp(48px, 16vw, 72px); }
+    .ed-lede { font-size: 12px; margin-top: 10px; }
+    .ed-divider { margin: 12px 0 8px; }
+    .ed-section-label { font-size: 10px; }
+    .ed-cloud { gap: 4px 14px; }
+    .ed-foot {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      padding: 10px 0 0;
+      margin-top: 10px;
+    }
+    .ed-foot-stats { font-size: 10px; gap: 10px; flex-wrap: wrap; }
+    .ed-foot-nav { justify-self: end; gap: 6px; }
+    .ed-foot-nav button { padding: 6px 9px; font-size: 10px; letter-spacing: 0.14em; }
+    .ed-foot-brand { grid-column: 1 / -1; justify-self: end; padding-top: 4px; font-size: 10px; }
+    .ed-week { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ed-week-cell .cap { padding: 6px 10px; font-size: 9.5px; }
+    .ed-week-cell .word { padding: 10px; }
+    .ed-week-cell .foot { padding: 6px 10px; font-size: 9.5px; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
     .stat-grid .cell { border-right: 1px solid var(--ink-ghost); }
     .stat-grid .cell:nth-child(2n) { border-right: none; }
@@ -1325,14 +1668,7 @@
   <div class="word-tip" id="word-tip"></div>
 
   <div class="history" id="history" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="history-bar">
-      <h2>History</h2>
-      <button class="close" id="history-close" aria-label="Close">×</button>
-    </div>
-    <div class="tabs">
-      <button class="tab active" data-tab="single">Single Day</button>
-      <button class="tab" data-tab="week">Last 7 Days</button>
-    </div>
+    <button class="ed-close" id="history-close" aria-label="Close">×</button>
     <div class="history-body" id="history-body"></div>
   </div>
 
@@ -2638,12 +2974,14 @@
       aboutEl.setAttribute("aria-hidden", "true");
     }
   });
-  document.querySelectorAll(".tabs .tab").forEach(b => {
-    b.addEventListener("click", () => {
-      historyTab = b.dataset.tab;
-      document.querySelectorAll(".tabs .tab").forEach(x => x.classList.toggle("active", x.dataset.tab === historyTab));
-      renderHistory();
-    });
+  // Tabs live inside the dynamically-rendered editorial body, so wire clicks
+  // via delegation on the shared host.
+  historyBody.addEventListener("click", (e) => {
+    const tab = e.target.closest(".ed-tab");
+    if (!tab || !tab.dataset.tab) return;
+    if (tab.dataset.tab === historyTab) return;
+    historyTab = tab.dataset.tab;
+    renderHistory();
   });
 
   function openHistory() {
@@ -2652,7 +2990,6 @@
     logEvent("history_opened");
     historyTab = "single";
     historyDate = todayUTC();
-    document.querySelectorAll(".tabs .tab").forEach(x => x.classList.toggle("active", x.dataset.tab === "single"));
     renderHistory();
   }
   function closeHistory() {
@@ -2668,6 +3005,44 @@
     }
   }
 
+  // Day-of-year for editorial edition numbers ("№123").
+  function dayOfYear(dt) {
+    const start = Date.UTC(dt.getUTCFullYear(), 0, 1);
+    return Math.floor((dt.getTime() - start) / 86400000) + 1;
+  }
+  function navMonthDay(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return `${MONTHS_SHORT[m - 1]} ${d}`;
+  }
+  function shiftDay(iso, delta) {
+    const [y, m, d] = iso.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    dt.setUTCDate(dt.getUTCDate() + delta);
+    return dt.toISOString().slice(0, 10);
+  }
+
+  function editionMast(opts) {
+    // opts: { rightDay, rightDate, editionN, archive }
+    const tabSingle = `<button class="ed-tab ${historyTab==='single'?'active':''}" data-tab="single">Edition</button>`;
+    const tabWeek = `<button class="ed-tab ${historyTab==='week'?'active':''}" data-tab="week">Archive</button>`;
+    return `
+      <div class="ed-mast">
+        <div class="ed-mast-l">
+          <div class="ed-brand">Mote</div>
+          <div class="ed-vol">${opts.editionN}</div>
+        </div>
+        <button class="ed-mast-r" id="ed-date-jump" ${opts.archive ? 'disabled style="cursor:default"' : ""}>
+          <span class="ed-day">${opts.rightDay}</span>
+          <span class="ed-date">${opts.rightDate}</span>
+        </button>
+      </div>
+      <div class="ed-rule"></div>
+      <div class="ed-tabbar">
+        ${tabSingle}<span class="ed-tab-sep">/</span>${tabWeek}
+      </div>
+    `;
+  }
+
   async function renderHistorySingle() {
     const date = historyDate;
     const data = await fetchDay(date);
@@ -2677,8 +3052,6 @@
     const isToday = date === todayUTC();
     const hasData = data.voices > 0;
 
-    // Cloud sizes scale to the top word's count. Mobile gets a tighter range
-    // so the cloud doesn't blow past the viewport on small phones.
     const cloudEntries = data.entries.slice(0, 18);
     const cloudMax = cloudEntries[0] ? cloudEntries[0][1] : 1;
     const isMobile = window.innerWidth <= 768;
@@ -2693,64 +3066,54 @@
 
     const [yy, mm, dd] = date.split("-").map(Number);
     const dt = new Date(Date.UTC(yy, mm - 1, dd));
-    const prettyDay = isToday ? "Today" : (date === isoDayBack(1) ? "Yesterday" : FULLDAYS[dt.getUTCDay()]);
-    const prettyHead = `${MONTHS[dt.getUTCMonth()]} ${dt.getUTCDate()}, ${dt.getUTCFullYear()}`;
+    const editionN = `Vol.${dt.getUTCFullYear()} · №${String(dayOfYear(dt)).padStart(3, "0")}`;
+    const rightDay = (isToday ? "Today" : (date === isoDayBack(1) ? "Yesterday" : FULLDAYS[dt.getUTCDay()])).toUpperCase();
+    const rightDate = `${MONTHS[dt.getUTCMonth()]} ${dt.getUTCDate()}, ${dt.getUTCFullYear()}`;
+
+    const prevIso = shiftDay(date, -1);
+    const nextIso = shiftDay(date, +1);
 
     historyBody.innerHTML = `
-      <div class="h-day-nav">
-        <button class="h-nav-btn" id="prev-day">‹ Prev</button>
-        <button class="h-date-label" id="date-label">
-          <span class="h-day">${prettyDay}</span>
-          <span class="h-date">${prettyHead}</span>
-        </button>
-        <button class="h-nav-btn" id="next-day" ${isToday ? "disabled" : ""}>Next ›</button>
-      </div>
-
-      <div class="h-hero">
-        <div class="h-eyebrow">Most said ${isToday ? "today" : "this day"}</div>
-        <div class="h-hero-word${hasData ? "" : " muted"}">${mostSaid || "no words yet"}</div>
-        <div class="h-hero-meta">
+      ${editionMast({ rightDay, rightDate, editionN })}
+      <div class="ed-body">
+        <div class="ed-kicker">${isToday ? "Most said today" : "Most said this day"}</div>
+        <h1 class="ed-hero${hasData ? "" : " muted"}">${mostSaid || "silence"}</h1>
+        <div class="ed-lede">
           ${hasData
-            ? `<span class="v">${mostSaidCount}×</span> — ${heroPct}% of all voices`
-            : "Nothing was said on this day."}
+            ? `<span class="v">${mostSaidCount.toLocaleString()}×</span> <span class="muted">· ${heroPct}% of all voices · ${data.voices.toLocaleString()} ${data.voices === 1 ? "voice" : "voices"} on the day</span>`
+            : `<span class="muted">No words were said on this day.</span>`}
+        </div>
+
+        <div class="ed-divider"></div>
+        <div class="ed-section-label">Also heard</div>
+        <div class="ed-cloud">${cloudHTML}</div>
+
+        <div class="ed-foot">
+          <div class="ed-foot-stats">
+            <span><span class="v">${data.voices.toLocaleString()}</span>${data.voices === 1 ? "voice" : "voices"}</span>
+            <span><span class="v">${data.unique.toLocaleString()}</span>unique</span>
+            <span><span class="v">${data.said_once.toLocaleString()}</span>once</span>
+          </div>
+          <div class="ed-foot-nav">
+            <button id="prev-day">‹ ${navMonthDay(prevIso)}</button>
+            <button id="next-day" ${isToday ? "disabled" : ""}>${navMonthDay(nextIso)} ›</button>
+          </div>
+          <a class="ed-foot-brand" href="https://mote.day" target="_blank" rel="noopener">mote.day</a>
         </div>
       </div>
-
-      ${hasData ? `
-        <div class="h-stats-strip">
-          <span class="h-stat"><span class="n">${data.voices.toLocaleString()}</span><span class="l">${data.voices === 1 ? "voice" : "voices"}</span></span>
-          <span class="h-stat"><span class="n">${data.unique.toLocaleString()}</span><span class="l">unique ${data.unique === 1 ? "word" : "words"}</span></span>
-          <span class="h-stat"><span class="n">${data.said_once.toLocaleString()}</span><span class="l">said once</span></span>
-        </div>
-
-        <div class="h-cloud">
-          ${cloudHTML}
-        </div>
-      ` : ""}
     `;
 
     document.getElementById("prev-day").addEventListener("click", () => {
-      historyDate = (() => {
-        const [y, m, d] = historyDate.split("-").map(Number);
-        const dt = new Date(Date.UTC(y, m - 1, d));
-        dt.setUTCDate(dt.getUTCDate() - 1);
-        return dt.toISOString().slice(0, 10);
-      })();
+      historyDate = shiftDay(historyDate, -1);
       renderHistorySingle();
     });
     if (!isToday) {
       document.getElementById("next-day").addEventListener("click", () => {
-        historyDate = (() => {
-          const [y, m, d] = historyDate.split("-").map(Number);
-          const dt = new Date(Date.UTC(y, m - 1, d));
-          dt.setUTCDate(dt.getUTCDate() + 1);
-          return dt.toISOString().slice(0, 10);
-        })();
+        historyDate = shiftDay(historyDate, +1);
         renderHistorySingle();
       });
     }
-    document.getElementById("date-label").addEventListener("click", () => {
-      // simple native date picker fallback
+    document.getElementById("ed-date-jump").addEventListener("click", () => {
       const inp = document.createElement("input");
       inp.type = "date";
       inp.max = todayUTC();
@@ -2776,7 +3139,6 @@
       days.push({ date, voices: d.voices, top });
     }
 
-    // Dominant word across the week and what its weekly footprint looks like.
     const winnerMap = new Map();
     let weekVoices = 0;
     for (const d of days) {
@@ -2787,63 +3149,75 @@
     const winnerWord = winner ? winner[0] : null;
     const winnerWins = winner ? winner[1] : 0;
 
-    // Sizing: top-word type-size is proportional to that day's voices.
     const maxVoices = days.reduce((m, d) => Math.max(m, d.voices), 0) || 1;
     const isMobile = window.innerWidth <= 768;
-    const minSize = isMobile ? 18 : 22;
-    const maxSize = isMobile ? 30 : 42;
+    const minSize = isMobile ? 22 : 28;
+    const maxSize = isMobile ? 36 : 56;
+
+    const todayDt = (() => {
+      const [y, m, d] = todayUTC().split("-").map(Number);
+      return new Date(Date.UTC(y, m - 1, d));
+    })();
+    const editionN = `Vol.${todayDt.getUTCFullYear()} · Archive`;
+    const rangeRight = days.length
+      ? `${navMonthDay(days[days.length - 1].date)} – ${navMonthDay(days[0].date)}`
+      : "Last 7 days";
 
     historyBody.innerHTML = `
-      <div class="h-week-hero">
-        <div class="h-eyebrow">Word of the week</div>
-        <div class="h-hero-word${winnerWord ? "" : " muted"}">${winnerWord || "no data yet"}</div>
-        <div class="h-hero-meta">
+      ${editionMast({ rightDay: "Last 7 days", rightDate: rangeRight, editionN, archive: true })}
+      <div class="ed-body">
+        <div class="ed-kicker">Word of the week</div>
+        <h1 class="ed-hero${winnerWord ? "" : " muted"}">${winnerWord || "silence"}</h1>
+        <div class="ed-lede">
           ${winnerWord
-            ? `Won <span class="v">${winnerWins}</span> of last ${days.length === 1 ? "day" : days.length + " days"}
-               · <span class="v">${weekVoices.toLocaleString()}</span> total ${weekVoices === 1 ? "voice" : "voices"}`
-            : "Nothing has been said this week."}
+            ? `<span class="v">${winnerWins}</span> <span class="muted">of ${days.length} ${days.length === 1 ? "edition" : "editions"} · </span><span class="v">${weekVoices.toLocaleString()}</span> <span class="muted">total ${weekVoices === 1 ? "voice" : "voices"}</span>`
+            : `<span class="muted">Nothing has been said this week.</span>`}
         </div>
-      </div>
 
-      ${days.length ? `
-        <div class="h-rule"></div>
-        <div class="h-eyebrow" style="margin-bottom:6px">Each day</div>
-        <div class="h-week-strip">
+        <div class="ed-divider"></div>
+        <div class="ed-section-label">Editions</div>
+        <div class="ed-week">
           ${days.map(d => {
             const t = d.voices / maxVoices;
             const size = Math.round(minSize + (maxSize - minSize) * t);
             const dominant = winnerWord && d.top && d.top[0] === winnerWord;
-            const fillPct = Math.round(t * 100);
+            const [y, m, dd] = d.date.split("-").map(Number);
+            const dt = new Date(Date.UTC(y, m - 1, dd));
             return `
-              <button class="h-week-cell${dominant ? " dominant" : ""}" data-date="${d.date}">
-                <span class="day">${dayLabel(d.date)} · ${shortDate(d.date)}</span>
+              <button class="ed-week-cell${dominant ? " dominant" : ""}" data-date="${d.date}">
+                <span class="cap">
+                  <span>${SHORTDAYS[dt.getUTCDay()].toUpperCase()} · ${MONTHS_SHORT[dt.getUTCMonth()]} ${dt.getUTCDate()}</span>
+                  <span>№${String(dayOfYear(dt)).padStart(3, "0")}</span>
+                </span>
                 <span class="word" style="font-size:${size}px">${d.top[0]}</span>
-                <span class="bar"><span class="fill" style="width:${fillPct}%"></span></span>
-                <span class="voices">${d.voices.toLocaleString()} ${d.voices === 1 ? "voice" : "voices"} · ${d.top[1]}× ${d.top[0]}</span>
+                <span class="foot">
+                  <span class="vox">${d.voices.toLocaleString()}</span>
+                  <span>${d.top[1]}× ${d.top[0]}</span>
+                </span>
               </button>
             `;
           }).join("")}
         </div>
-      ` : ""}
 
-      ${allTime ? `
-        <div class="h-rule"></div>
-        <div class="h-since">
-          Since launch:
-          <span class="v">${allTime.voices.toLocaleString()}</span> ${allTime.voices === 1 ? "voice" : "voices"} ·
-          <span class="v">${allTime.unique.toLocaleString()}</span> unique ${allTime.unique === 1 ? "word" : "words"}
+        <div class="ed-foot">
+          <div class="ed-foot-stats">
+            ${allTime ? `
+              <span><span class="v">${allTime.voices.toLocaleString()}</span>since launch</span>
+              <span><span class="v">${allTime.unique.toLocaleString()}</span>unique words</span>
+            ` : ""}
+          </div>
+          <div class="ed-foot-nav"></div>
+          <a class="ed-foot-brand" href="https://mote.day" target="_blank" rel="noopener">mote.day</a>
         </div>
-      ` : ""}
+      </div>
     `;
 
-    historyBody.querySelectorAll(".h-week-cell").forEach(cell => {
+    historyBody.querySelectorAll(".ed-week-cell").forEach(cell => {
       cell.addEventListener("click", () => {
         const date = cell.dataset.date;
         if (!date) return;
         historyDate = date;
         historyTab = "single";
-        document.querySelectorAll(".tabs .tab").forEach(x =>
-          x.classList.toggle("active", x.dataset.tab === "single"));
         renderHistorySingle();
       });
     });
