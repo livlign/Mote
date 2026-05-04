@@ -727,8 +727,11 @@
 
   .history-body {
     flex: 1 1 auto;
-    overflow: auto;
-    padding: 0 32px 40px;
+    overflow: hidden;
+    padding: 0 32px 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
   .about-body {
@@ -990,18 +993,18 @@
   /* — History redesign: shared elements — */
   .h-eyebrow {
     font-family: var(--mono);
-    font-weight: 600;
-    font-size: 10.5px;
-    letter-spacing: 0.16em;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-faint);
+    color: var(--ink-soft);
   }
   .h-rule {
     height: 1px;
     background: var(--ink-ghost);
-    margin: 32px 0;
+    margin: 14px 0;
+    flex-shrink: 0;
   }
-  .h-rule.tight { margin: 20px 0; }
 
   /* — Single Day: date hero, hero word, cloud — */
   .h-day-nav {
@@ -1009,23 +1012,28 @@
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 16px;
-    padding: 28px 0 8px;
+    padding: 18px 0 6px;
+    flex-shrink: 0;
   }
   .h-nav-btn {
     background: transparent;
-    border: none;
+    border: 1px solid var(--ink);
     cursor: pointer;
     font-family: var(--mono);
-    font-weight: 600;
-    font-size: 11px;
+    font-weight: 700;
+    font-size: 12px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--ink-soft);
-    padding: 6px 0;
-    transition: color 160ms ease;
+    color: var(--ink);
+    padding: 8px 14px;
+    transition: background 160ms ease, color 160ms ease;
   }
-  .h-nav-btn:hover:not(:disabled) { color: var(--cobalt); }
-  .h-nav-btn:disabled { color: var(--ink-ghost); cursor: not-allowed; }
+  .h-nav-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .h-nav-btn:disabled {
+    border-color: var(--ink-ghost);
+    color: var(--ink-faint);
+    cursor: not-allowed;
+  }
   .h-date-label {
     background: transparent;
     border: none;
@@ -1037,18 +1045,19 @@
   .h-date-label .h-day {
     display: block;
     font-family: var(--mono);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-bottom: 8px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
   }
   .h-date-label .h-date {
     display: block;
     font-family: var(--sans);
     font-weight: 800;
-    font-size: 36px;
+    font-size: 30px;
+    line-height: 1;
     letter-spacing: -0.025em;
     color: var(--ink);
     transition: color 160ms ease;
@@ -1056,21 +1065,22 @@
   .h-date-label:hover .h-date { color: var(--cobalt); }
 
   .h-hero {
-    padding: 36px 0 8px;
+    padding: 14px 0 6px;
     text-align: left;
+    flex-shrink: 0;
   }
-  .h-hero .h-eyebrow { margin-bottom: 14px; }
+  .h-hero .h-eyebrow { margin-bottom: 8px; }
   .h-hero-word {
     font-family: var(--sans);
     font-weight: 800;
-    font-size: clamp(64px, 14vw, 144px);
-    line-height: 0.95;
+    font-size: clamp(48px, 9vw, 96px);
+    line-height: 0.92;
     letter-spacing: -0.04em;
     color: var(--cobalt);
-    margin: 0 0 16px;
+    margin: 0 0 8px;
     word-break: break-word;
   }
-  .h-hero-word.muted { color: var(--ink-ghost); font-size: clamp(48px, 10vw, 96px); }
+  .h-hero-word.muted { color: var(--ink-ghost); font-size: clamp(36px, 6vw, 64px); }
   .h-hero-meta {
     font-family: var(--mono);
     font-size: 12px;
@@ -1078,16 +1088,17 @@
     color: var(--ink-soft);
     line-height: 1.5;
   }
-  .h-hero-meta .v { color: var(--ink); font-weight: 600; }
+  .h-hero-meta .v { color: var(--ink); font-weight: 700; }
 
   .h-stats-strip {
     display: flex;
     align-items: baseline;
-    gap: 28px;
-    padding: 18px 0;
+    gap: 24px;
+    padding: 12px 0;
     border-top: 1px solid var(--ink-ghost);
     border-bottom: 1px solid var(--ink-ghost);
     flex-wrap: wrap;
+    flex-shrink: 0;
   }
   .h-stats-strip .h-stat {
     display: flex;
@@ -1097,7 +1108,7 @@
   .h-stats-strip .h-stat .n {
     font-family: var(--sans);
     font-weight: 800;
-    font-size: 28px;
+    font-size: 26px;
     line-height: 1;
     letter-spacing: -0.025em;
     font-variant-numeric: tabular-nums;
@@ -1115,8 +1126,12 @@
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    align-content: flex-start;
     gap: 4px 22px;
-    padding: 32px 0 8px;
+    padding: 16px 0 4px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    min-height: 0;
   }
   .h-cloud .w {
     font-family: var(--sans);
@@ -1134,33 +1149,39 @@
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.04em;
-    color: var(--ink-faint);
-    padding-top: 14px;
+    color: var(--ink-soft);
+    padding-top: 10px;
+    flex-shrink: 0;
   }
 
   /* — Last 7 Days: hero + day strip — */
   .h-week-hero {
-    padding: 32px 0 8px;
+    padding: 18px 0 6px;
+    flex-shrink: 0;
   }
-  .h-week-hero .h-eyebrow { margin-bottom: 14px; }
+  .h-week-hero .h-eyebrow { margin-bottom: 8px; }
   .h-week-strip {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 14px;
-    padding: 16px 0 8px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 10px 0 4px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    align-content: start;
+    min-height: 0;
   }
   .h-week-cell {
     background: transparent;
     border: 1px solid var(--ink-ghost);
     cursor: pointer;
-    padding: 16px 14px 14px;
+    padding: 12px 12px 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
     text-align: left;
     transition: border-color 160ms ease, background 160ms ease;
-    min-height: 130px;
+    min-height: 0;
   }
   .h-week-cell:hover {
     border-color: var(--ink);
@@ -1213,7 +1234,8 @@
     letter-spacing: 0.04em;
     color: var(--ink-soft);
     border-left: 3px solid var(--cobalt);
-    padding: 8px 0 8px 14px;
+    padding: 6px 0 6px 12px;
+    flex-shrink: 0;
   }
   .h-since .v {
     color: var(--ink);
@@ -1240,15 +1262,18 @@
     .history-body { padding: 0 18px 32px; }
     .tabs { padding: 0 18px; }
     .tabs button { font-size: 11px; margin-right: 20px; padding: 14px 0; }
-    .h-day-nav { padding: 18px 0 4px; gap: 10px; }
-    .h-date-label .h-date { font-size: 24px; }
-    .h-hero { padding: 24px 0 4px; }
+    .h-day-nav { padding: 12px 0 4px; gap: 8px; }
+    .h-nav-btn { padding: 6px 10px; font-size: 11px; }
+    .h-date-label .h-date { font-size: 22px; }
+    .h-hero { padding: 10px 0 4px; }
     .h-hero-meta { font-size: 11px; }
-    .h-stats-strip { gap: 18px; padding: 14px 0; }
-    .h-stats-strip .h-stat .n { font-size: 22px; }
-    .h-cloud { padding: 22px 0 4px; gap: 4px 16px; }
+    .h-hero-word { font-size: clamp(40px, 14vw, 64px); }
+    .h-stats-strip { gap: 16px; padding: 10px 0; }
+    .h-stats-strip .h-stat .n { font-size: 20px; }
+    .h-cloud { padding: 12px 0 4px; gap: 4px 14px; }
     .h-week-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .h-week-cell { min-height: 100px; padding: 12px 12px 10px; }
+    .h-week-cell { padding: 10px 10px 8px; }
+    .h-rule { margin: 10px 0; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
     .stat-grid .cell { border-right: 1px solid var(--ink-ghost); }
     .stat-grid .cell:nth-child(2n) { border-right: none; }
@@ -1682,7 +1707,7 @@
       if (!seeAllEl) {
         seeAllEl = document.createElement("button");
         seeAllEl.className = "see-all";
-        seeAllEl.addEventListener("click", () => openHistoryAllWords(todayUTC()));
+        seeAllEl.addEventListener("click", () => openHistory());
         canvasEl.appendChild(seeAllEl);
       }
       seeAllEl.textContent = `See all ${entries.length} words →`;
@@ -2632,23 +2657,16 @@
     historyEl.classList.remove("open");
     historyEl.setAttribute("aria-hidden", "true");
   }
-  function openHistoryAllWords(date) {
-    openHistory();
-    historyDate = date;
-    historyTab = "single";
-    renderHistory(true);
-  }
-
-  async function renderHistory(showAllWords = false) {
+  async function renderHistory() {
     historyBody.innerHTML = `<div style="font-family:var(--mono); font-size:12px; padding:24px 0; color:var(--ink-soft); letter-spacing:0.06em; text-transform:uppercase;">Loading…</div>`;
     if (historyTab === "single") {
-      await renderHistorySingle(showAllWords);
+      await renderHistorySingle();
     } else {
       await renderHistoryWeek();
     }
   }
 
-  async function renderHistorySingle(showAllWords = false) {
+  async function renderHistorySingle() {
     const date = historyDate;
     const data = await fetchDay(date);
     const mostSaid = data.entries[0] ? data.entries[0][0] : null;
@@ -2657,37 +2675,19 @@
     const isToday = date === todayUTC();
     const hasData = data.voices > 0;
 
-    // Cloud: top ~18 words sized proportionally to count.
+    // Cloud sizes scale to the top word's count. Mobile gets a tighter range
+    // so the cloud doesn't blow past the viewport on small phones.
     const cloudEntries = data.entries.slice(0, 18);
     const cloudMax = cloudEntries[0] ? cloudEntries[0][1] : 1;
     const isMobile = window.innerWidth <= 768;
-    const minSize = isMobile ? 14 : 18;
-    const maxSize = isMobile ? 40 : 64;
+    const minSize = isMobile ? 13 : 16;
+    const maxSize = isMobile ? 32 : 52;
     const cloudHTML = cloudEntries.map(([w, c]) => {
       const t = cloudMax > 0 ? c / cloudMax : 0;
       const size = Math.round(minSize + (maxSize - minSize) * t);
       const heroCls = w === mostSaid ? " hero" : "";
       return `<span class="w${heroCls}" style="font-size:${size}px">${w}</span>`;
     }).join("");
-
-    // Compare to same weekday last week.
-    let insightHTML = "";
-    try {
-      const prevDate = isoDayBack(7 + Math.round((Date.parse(todayUTC()) - Date.parse(date)) / (24*60*60*1000)));
-      const prev = await fetchDay(prevDate);
-      if (prev.voices > 0 && hasData) {
-        const pct = Math.round(((data.voices - prev.voices) / prev.voices) * 100);
-        const dir = pct >= 0 ? "Up" : "Down";
-        const [y, m, d] = prevDate.split("-").map(Number);
-        const dt = new Date(Date.UTC(y, m - 1, d));
-        insightHTML = `
-          <div class="h-since" style="margin-top:24px">
-            ${dir} <span class="v">${Math.abs(pct)}%</span> from last ${FULLDAYS[dt.getUTCDay()]}
-            · ${prev.voices.toLocaleString()} ${prev.voices === 1 ? "voice" : "voices"} that day
-          </div>
-        `;
-      }
-    } catch {}
 
     const [yy, mm, dd] = date.split("-").map(Number);
     const dt = new Date(Date.UTC(yy, mm - 1, dd));
@@ -2718,25 +2718,11 @@
         <div class="h-stats-strip">
           <span class="h-stat"><span class="n">${data.voices.toLocaleString()}</span><span class="l">${data.voices === 1 ? "voice" : "voices"}</span></span>
           <span class="h-stat"><span class="n">${data.unique.toLocaleString()}</span><span class="l">unique ${data.unique === 1 ? "word" : "words"}</span></span>
+          <span class="h-stat"><span class="n">${data.said_once.toLocaleString()}</span><span class="l">said once</span></span>
         </div>
 
         <div class="h-cloud">
           ${cloudHTML}
-        </div>
-
-        <div class="h-footnote">
-          ${data.said_once.toLocaleString()} said only once
-          ${data.entries.length > cloudEntries.length ? ` · <button class="see-all-link" id="see-all" style="display:inline; margin:0">see all ${data.entries.length} words →</button>` : ""}
-        </div>
-      ` : ""}
-
-      ${insightHTML}
-
-      ${showAllWords && hasData ? `
-        <div class="h-rule"></div>
-        <div class="h-eyebrow" style="margin-bottom:14px">All ${data.entries.length} words</div>
-        <div class="all-words">
-          ${data.entries.map(([w, c]) => `<div class="row"><span class="w">${w}</span><span class="n">${c}×</span></div>`).join("")}
         </div>
       ` : ""}
     `;
@@ -2775,8 +2761,6 @@
       });
       inp.click();
     });
-    const seeAllBtn = document.getElementById("see-all");
-    if (seeAllBtn) seeAllBtn.addEventListener("click", () => renderHistorySingle(true));
   }
 
   async function renderHistoryWeek() {
