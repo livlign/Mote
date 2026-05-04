@@ -777,40 +777,32 @@
     width: 100%;
     margin: 0 auto;
   }
-  /* About modal still uses .history-bar and uses its own padded body. */
-  .history-body.about-body { padding: 40px 32px; overflow: auto; max-width: none; }
-
-  .about-body {
-    max-width: 640px;
-    margin: 0 auto;
-    padding-top: 40px;
+  /* About uses the same editorial language as History. */
+  .ed-hero.ed-hero-about {
+    color: var(--ink);
+    font-size: clamp(48px, 7.5vw, 96px);
+    line-height: 1;
+    margin: 0 0 28px;
+    max-width: 14em;
   }
-  .about-body p {
-    font-family: var(--serif);
-    font-size: 18px;
-    line-height: 1.6;
+  .ed-hero.ed-hero-about em {
+    font-style: normal;
+    color: var(--cobalt);
+  }
+  .about-essay {
+    flex: 1 1 auto;
+    overflow: auto;
+    max-width: 760px;
+  }
+  .about-essay p {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: clamp(17px, 1.5vw, 22px);
+    line-height: 1.55;
     color: var(--ink);
     margin: 0 0 18px;
   }
-  .about-body .about-lede {
-    font-size: 26px;
-    line-height: 1.35;
-    font-weight: 500;
-    margin-bottom: 28px;
-  }
-  .about-body .about-meta {
-    margin-top: 32px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-  .about-body .about-meta a {
-    color: var(--cobalt);
-    text-decoration: none;
-  }
-  .about-body .about-meta a:hover { text-decoration: underline; }
+  .about-essay p:last-child { margin-bottom: 0; }
 
   .date-nav {
     display: grid;
@@ -1344,7 +1336,7 @@
     cursor: pointer;
     font-variant-numeric: tabular-nums;
   }
-  .ed-mast-r:hover .ed-date { color: var(--cobalt); }
+  button.ed-mast-r:hover .ed-date { color: var(--cobalt); }
   .ed-day {
     font-family: var(--mono);
     font-weight: 700;
@@ -1720,15 +1712,32 @@
   </div>
 
   <div class="history about" id="about" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="history-bar">
-      <h2>About</h2>
-      <button class="close" id="about-close" aria-label="Close">×</button>
-    </div>
-    <div class="history-body about-body">
-      <p class="about-lede">One word per person, per day. The world's words, set big.</p>
-      <p>Each day at 00:00 UTC, the canvas resets. Everyone gets one word — whatever's on your mind, in your language of feeling. The more people who say a word, the larger it lands.</p>
-      <p>It's a quiet snapshot of a planet's mood, drawn one mote at a time.</p>
-      <p class="about-meta">Made with care · <a href="https://github.com/livlign/Mote" target="_blank" rel="noopener">source</a></p>
+    <button class="ed-close" id="about-close" aria-label="Close">×</button>
+    <div class="history-body">
+      <div class="ed-mast">
+        <div class="ed-mast-l">
+          <div class="ed-brand">Mote</div>
+          <div class="ed-vol">A note · Vol.2026</div>
+        </div>
+        <div class="ed-mast-r" style="cursor:default">
+          <span class="ed-day">From the editor</span>
+          <span class="ed-date">About</span>
+        </div>
+      </div>
+      <div class="ed-rule"></div>
+      <div class="ed-body">
+        <div class="ed-kicker">What is this</div>
+        <h1 class="ed-hero ed-hero-about">One word per <em>person</em>, per day.</h1>
+        <div class="about-essay">
+          <p>Each day at 00:00 UTC, the canvas resets. Everyone gets one word — whatever's on your mind, in your language of feeling. The more people who say a word, the larger it lands.</p>
+          <p>It's a quiet snapshot of a planet's mood, drawn one mote at a time.</p>
+        </div>
+        <div class="ed-foot">
+          <div class="ed-foot-stats"><span>Made with care</span></div>
+          <div class="ed-foot-nav"></div>
+          <a class="ed-foot-brand" href="https://github.com/livlign/Mote" target="_blank" rel="noopener">github</a>
+        </div>
+      </div>
     </div>
   </div>
 
