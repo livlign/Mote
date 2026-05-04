@@ -6,6 +6,14 @@
 <title>Mote — Today, in a Word. What's the world thinking?</title>
 <meta name="description" content="One word per person, per day. The world's words gather into a live cloud — bigger when more people say the same thing. Resets at 00:00 UTC.">
 <link rel="canonical" href="https://mote.day">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0033CC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mote">
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mote.day">
@@ -77,7 +85,7 @@
   .logo .mark {
     width: 11px;
     height: 11px;
-    background: var(--cobalt);
+    display: block;
   }
   .logo .word {
     font-family: var(--sans);
@@ -531,6 +539,81 @@
     text-transform: uppercase;
   }
 
+  /* — Share card — */
+  .share-wrap {
+    margin: 22px auto 0;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .share-card-frame {
+    width: 100%;
+    aspect-ratio: 1200 / 630;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    overflow: hidden;
+    position: relative;
+  }
+  .share-card-frame canvas,
+  .share-card-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .share-card-frame .placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .share-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .share-btn {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+    min-width: 130px;
+  }
+  .share-btn:hover { background: var(--ink); color: var(--paper); }
+  .share-btn.primary { background: var(--ink); color: var(--paper); }
+  .share-btn.primary:hover { background: var(--paper); color: var(--ink); }
+  .share-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .share-btn.done { background: var(--cobalt); color: var(--paper); border-color: var(--cobalt); }
+  .share-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    min-height: 14px;
+  }
+  @media (max-width: 768px) {
+    .share-actions { flex-direction: column; width: 100%; }
+    .share-btn { width: 100%; }
+  }
+
   /* — Slide animation element — */
   .slide-ghost {
     position: fixed;
@@ -597,8 +680,8 @@
     margin: 0;
     font-family: var(--mono);
     font-weight: 800;
-    font-size: 14px;
-    letter-spacing: 0.18em;
+    font-size: 18px;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
   }
   .history-bar .close {
@@ -623,20 +706,23 @@
   .tabs button {
     background: transparent;
     border: none;
+    border-bottom: 2px solid transparent;
     cursor: pointer;
     font-family: var(--mono);
-    font-weight: 600;
-    font-size: 11px;
-    letter-spacing: 0.16em;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-soft);
-    padding: 14px 18px;
-    transition: color 160ms ease, background 160ms ease;
+    color: var(--ink-faint);
+    padding: 18px 0;
+    margin-right: 28px;
+    margin-bottom: -1px;
+    transition: color 160ms ease, border-color 160ms ease;
   }
   .tabs button:hover { color: var(--ink); }
   .tabs button.active {
-    background: var(--ink);
-    color: var(--paper);
+    color: var(--ink);
+    border-bottom-color: var(--ink);
   }
 
   .history-body {
@@ -901,24 +987,268 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* — History redesign: shared elements — */
+  .h-eyebrow {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .h-rule {
+    height: 1px;
+    background: var(--ink-ghost);
+    margin: 32px 0;
+  }
+  .h-rule.tight { margin: 20px 0; }
+
+  /* — Single Day: date hero, hero word, cloud — */
+  .h-day-nav {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 28px 0 8px;
+  }
+  .h-nav-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 6px 0;
+    transition: color 160ms ease;
+  }
+  .h-nav-btn:hover:not(:disabled) { color: var(--cobalt); }
+  .h-nav-btn:disabled { color: var(--ink-ghost); cursor: not-allowed; }
+  .h-date-label {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    padding: 0;
+    line-height: 1;
+  }
+  .h-date-label .h-day {
+    display: block;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .h-date-label .h-date {
+    display: block;
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 36px;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    transition: color 160ms ease;
+  }
+  .h-date-label:hover .h-date { color: var(--cobalt); }
+
+  .h-hero {
+    padding: 36px 0 8px;
+    text-align: left;
+  }
+  .h-hero .h-eyebrow { margin-bottom: 14px; }
+  .h-hero-word {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(64px, 14vw, 144px);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--cobalt);
+    margin: 0 0 16px;
+    word-break: break-word;
+  }
+  .h-hero-word.muted { color: var(--ink-ghost); font-size: clamp(48px, 10vw, 96px); }
+  .h-hero-meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .h-hero-meta .v { color: var(--ink); font-weight: 600; }
+
+  .h-stats-strip {
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+    padding: 18px 0;
+    border-top: 1px solid var(--ink-ghost);
+    border-bottom: 1px solid var(--ink-ghost);
+    flex-wrap: wrap;
+  }
+  .h-stats-strip .h-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .h-stats-strip .h-stat .n {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .h-stats-strip .h-stat .l {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .h-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 22px;
+    padding: 32px 0 8px;
+  }
+  .h-cloud .w {
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    cursor: default;
+    transition: color 160ms ease;
+  }
+  .h-cloud .w:hover { color: var(--cobalt); }
+  .h-cloud .w.hero { color: var(--cobalt); }
+
+  .h-footnote {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    padding-top: 14px;
+  }
+
+  /* — Last 7 Days: hero + day strip — */
+  .h-week-hero {
+    padding: 32px 0 8px;
+  }
+  .h-week-hero .h-eyebrow { margin-bottom: 14px; }
+  .h-week-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    padding: 16px 0 8px;
+  }
+  .h-week-cell {
+    background: transparent;
+    border: 1px solid var(--ink-ghost);
+    cursor: pointer;
+    padding: 16px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+    transition: border-color 160ms ease, background 160ms ease;
+    min-height: 130px;
+  }
+  .h-week-cell:hover {
+    border-color: var(--ink);
+    background: rgba(0,0,0,0.02);
+  }
+  .h-week-cell .day {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .h-week-cell .word {
+    font-family: var(--sans);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    word-break: break-word;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: flex-end;
+  }
+  .h-week-cell.dominant .word { color: var(--cobalt); }
+  .h-week-cell .bar {
+    width: 100%;
+    height: 2px;
+    background: var(--ink-ghost);
+    position: relative;
+    overflow: hidden;
+  }
+  .h-week-cell .bar .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--ink);
+  }
+  .h-week-cell.dominant .bar .fill { background: var(--cobalt); }
+  .h-week-cell .voices {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .h-since {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--cobalt);
+    padding: 8px 0 8px 14px;
+  }
+  .h-since .v {
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
   /* — Mobile — */
   @media (max-width: 768px) {
     .header { padding: 12px 18px; }
     .nav { gap: 14px; }
-    .nav button:not(.more) { display: none; }
+    .nav button { font-size: 10px; letter-spacing: 0.14em; padding: 4px 0; }
     .description { padding: 22px 18px 18px; }
     .title { font-size: 30px; letter-spacing: -0.035em; }
     .canvas-wrap { padding: 18px 18px; }
-    .stats { padding: 8px 18px; gap: 10px; font-size: 10px; }
-    .stats .item:nth-child(n+3) { display: none; }
+    .stats { padding: 8px 18px; gap: 8px; font-size: 10px; flex-wrap: wrap; }
     .submit { padding: 14px 18px 18px; }
     .submit-row { gap: 8px; }
     .submit-row input[type="text"] { font-size: 18px; }
     .send { padding: 8px 14px; font-size: 10px; }
     .new-day { padding: 8px 18px; font-size: 10px; }
     .history-bar { padding: 12px 18px; }
+    .history-bar h2 { font-size: 14px; letter-spacing: 0.18em; }
     .history-body { padding: 0 18px 32px; }
     .tabs { padding: 0 18px; }
+    .tabs button { font-size: 11px; margin-right: 20px; padding: 14px 0; }
+    .h-day-nav { padding: 18px 0 4px; gap: 10px; }
+    .h-date-label .h-date { font-size: 24px; }
+    .h-hero { padding: 24px 0 4px; }
+    .h-hero-meta { font-size: 11px; }
+    .h-stats-strip { gap: 18px; padding: 14px 0; }
+    .h-stats-strip .h-stat .n { font-size: 22px; }
+    .h-cloud { padding: 22px 0 4px; gap: 4px 16px; }
+    .h-week-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .h-week-cell { min-height: 100px; padding: 12px 12px 10px; }
     .stat-grid { grid-template-columns: 1fr 1fr; }
     .stat-grid .cell { border-right: 1px solid var(--ink-ghost); }
     .stat-grid .cell:nth-child(2n) { border-right: none; }
@@ -938,7 +1268,7 @@
 
   <header class="header">
     <div class="logo">
-      <div class="mark"></div>
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#0033CC"/><circle cx="22" cy="22" r="3.4" fill="#FFFFFF"/></svg>
       <div class="word">Mote</div>
     </div>
     <div class="head-title">
@@ -959,6 +1289,8 @@
     <span class="item"><span class="num" id="s-voices">—</span> <span id="s-voices-label">voices</span></span>
     <span class="sep" id="s-words-sep">·</span>
     <span class="item" id="s-words-item"><span class="num" id="s-words">—</span> <span id="s-words-label">words</span></span>
+    <span class="sep" id="s-last-sep">·</span>
+    <span class="item" id="s-last-item"><span id="s-last">—</span></span>
     <span class="sep">·</span>
     <span class="typer" id="typer"></span>
   </section>
@@ -1001,7 +1333,9 @@
     "slut","whore","fag","nigger","retard"
   ]);
 
-  const POLL_INTERVAL_MS = 25000;
+  // Realtime is the primary live-update channel; polling is a fallback for
+  // missed events / dropped sockets, so the interval is loose.
+  const POLL_INTERVAL_MS = 60000;
   const EARLY_THRESHOLD = 30;
   const TOP_N = 42;
   const COLLIDE_PAD = 16;
@@ -1126,6 +1460,23 @@
     return { entries, voices, unique, said_once };
   }
 
+  async function fetchAllTime() {
+    try {
+      const [totalsRes, wordsRes] = await Promise.all([
+        api(`day_totals?select=voices`),
+        api(`word_counts?select=word`)
+      ]);
+      if (!totalsRes.ok || !wordsRes.ok) return null;
+      const totals = await totalsRes.json();
+      const words = await wordsRes.json();
+      const voices = totals.reduce((s, r) => s + (r.voices || 0), 0);
+      const unique = new Set(words.map(w => w.word)).size;
+      return { voices, unique };
+    } catch {
+      return null;
+    }
+  }
+
   async function fetchLastDays(n) {
     const start = isoDayBack(n - 1);
     const res = await api(`word_counts?utc_date=gte.${start}&select=word,utc_date,count`);
@@ -1242,9 +1593,8 @@
     const wrap = document.createElement("div");
     wrap.className = "early";
     wrap.innerHTML = `
-      <div class="narrative">Today is just beginning. The first words are arriving.</div>
       <div class="big">${voices}</div>
-      <div class="label">${voices === 1 ? "voice" : "voices"} so far</div>
+      <div class="label">${voices === 1 ? "voice" : "voices"} today</div>
       <div class="divider"></div>
       <div class="words"></div>
     `;
@@ -1446,10 +1796,11 @@
     return raw.toLowerCase().replace(/[^a-z ]/g, "").slice(0, 120);
   }
 
-  const lastLoggedByKind = new Map();
+  const loggedAttempts = new Set();
   async function logAttempt(kind, inputText) {
-    if (lastLoggedByKind.get(kind) === inputText) return;
-    lastLoggedByKind.set(kind, inputText);
+    const key = kind + "|" + inputText;
+    if (loggedAttempts.has(key)) return;
+    loggedAttempts.add(key);
     try {
       await fetch(`${SUPABASE_URL}/rest/v1/attempts`, {
         method: "POST",
@@ -1467,6 +1818,47 @@
     }
   }
 
+  /* — Product analytics events — */
+  // Skip events on localhost or when the user has opted out via a flag in
+  // localStorage (mote.no_track). Keeps internal traffic out of the funnel.
+  const noTrack = (() => {
+    try {
+      const h = location.hostname;
+      if (h === "localhost" || h === "127.0.0.1" || h.endsWith(".local")) return true;
+      if (localStorage.getItem("mote.no_track") === "1") return true;
+    } catch {}
+    return false;
+  })();
+  const loggedEventsOnce = new Set();
+  async function logEvent(kind, opts = {}) {
+    if (noTrack) return;
+    if (opts.once) {
+      const key = kind + "|" + (opts.dedupe || "");
+      if (loggedEventsOnce.has(key)) return;
+      loggedEventsOnce.add(key);
+    }
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/events`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({
+          kind,
+          device_id: deviceId,
+          referrer: (document.referrer || "").slice(0, 500) || null,
+          user_agent: (navigator.userAgent || "").slice(0, 500) || null,
+          meta: opts.meta ?? null
+        })
+      });
+    } catch (e) {
+      console.warn("[mote] event log failed:", e);
+    }
+  }
+
   /* — Submit region: input / confirm / you-said — */
   let lastEntries = [];
   let lastVoices = 0;
@@ -1479,7 +1871,7 @@
         <button class="send" id="send" disabled>Send</button>
       </div>
       <div class="submit-foot">
-        <div class="rules-text" id="rules">One word per person, per day. The more times a word is mentioned, the bigger it is. Reset 00:00 UTC.</div>
+        <div class="rules-text" id="rules">One word per person, per day. The more times a word is mentioned, the bigger it is. <span id="reset-countdown">${formatResetCountdown()}</span>.</div>
       </div>
     `;
     const input = document.getElementById("word");
@@ -1504,7 +1896,7 @@
       if (trimmed && match) {
         rules.innerHTML = `One word per person, per day. <span class="match">${match[1]} other${match[1] === 1 ? "" : "s"} said this.</span>`;
       } else {
-        rules.textContent = "One word per person, per day. The more times a word is mentioned, the bigger it is. Reset 00:00 UTC.";
+        rules.innerHTML = `One word per person, per day. The more times a word is mentioned, the bigger it is. <span id="reset-countdown">${formatResetCountdown()}</span>.`;
       }
     });
     async function go() {
@@ -1535,13 +1927,342 @@
     const context = others === 0
       ? "You're the only one who said this today."
       : `${others.toLocaleString()} other ${others === 1 ? "person" : "people"} said this today`;
+    const canShareFiles = (() => {
+      try {
+        const probe = new File([new Blob([""], { type: "image/png" })], "x.png", { type: "image/png" });
+        return !!(navigator.canShare && navigator.canShare({ files: [probe] }));
+      } catch { return false; }
+    })();
     submitEl.innerHTML = `
       <div class="you-said">
         <div class="label">You said</div>
-        <div class="word">${mine.word}</div>
+        <div class="word">${escapeHTML(mine.word)}</div>
         <div class="context">${context}</div>
       </div>
+      <div class="share-wrap">
+        <div class="share-card-frame" id="share-frame">
+          <div class="placeholder">Generating card…</div>
+        </div>
+        <div class="share-actions">
+          <button class="share-btn primary" id="share-copy" type="button">Copy image</button>
+          <button class="share-btn" id="share-download" type="button">Download</button>
+          ${canShareFiles ? `<button class="share-btn" id="share-share" type="button">Share</button>` : ""}
+        </div>
+        <div class="share-hint" id="share-hint" aria-live="polite"></div>
+      </div>
     `;
+    initShareCard(mine.word, mine.utc_date);
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  /* — Share card — */
+  // Lazily generated 1200x630 PNG drawn on a canvas. Cached after first build
+  // so re-clicking action buttons doesn't re-render.
+  let shareBlobPromise = null;
+  let shareBlobCache = null;
+  let shareDataUrlCache = null;
+
+  function initShareCard(word, utcDate) {
+    const frame = document.getElementById("share-frame");
+    const copyBtn = document.getElementById("share-copy");
+    const dlBtn = document.getElementById("share-download");
+    const shareBtn = document.getElementById("share-share");
+    const hint = document.getElementById("share-hint");
+    shareBlobPromise = null;
+    shareBlobCache = null;
+    shareDataUrlCache = null;
+
+    const setHint = (msg, isDone) => {
+      if (!hint) return;
+      hint.textContent = msg || "";
+      hint.style.color = isDone ? "var(--cobalt)" : "";
+    };
+    const flash = (btn, label) => {
+      if (!btn) return;
+      const orig = btn.textContent;
+      btn.classList.add("done");
+      btn.textContent = label;
+      setTimeout(() => { btn.classList.remove("done"); btn.textContent = orig; }, 1500);
+    };
+
+    const ensureBlob = () => {
+      if (shareBlobCache) return Promise.resolve(shareBlobCache);
+      if (shareBlobPromise) return shareBlobPromise;
+      shareBlobPromise = buildShareCardBlob(word, utcDate).then(b => { shareBlobCache = b; return b; });
+      return shareBlobPromise;
+    };
+
+    // Defer to next idle frame so we don't compete with the slide animation.
+    const startBuild = () => {
+      buildShareCardOnto(frame, word, utcDate).then(({ canvas, dataUrl }) => {
+        shareDataUrlCache = dataUrl;
+        // Replace placeholder with the canvas itself for crisp display.
+        frame.innerHTML = "";
+        frame.appendChild(canvas);
+        // Kick off blob conversion in background for fast button response.
+        ensureBlob().catch(() => {});
+      }).catch(err => {
+        console.warn("[mote] share card build failed", err);
+        frame.innerHTML = `<div class="placeholder">Couldn't render card</div>`;
+      });
+    };
+    if ("requestIdleCallback" in window) requestIdleCallback(startBuild, { timeout: 600 });
+    else setTimeout(startBuild, 80);
+
+    const filename = `mote-${utcDate}.png`;
+
+    const doDownload = (blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    };
+
+    if (copyBtn) copyBtn.addEventListener("click", async () => {
+      copyBtn.disabled = true; setHint("");
+      try {
+        const blob = await ensureBlob();
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          flash(copyBtn, "Copied");
+          setHint("Image copied to clipboard.", true);
+          logEvent("share_card_copy", { meta: { word } });
+        } else {
+          doDownload(blob);
+          setHint("Clipboard unavailable — downloaded instead.", true);
+        }
+      } catch (e) {
+        console.warn("[mote] copy failed", e);
+        try {
+          const blob = await ensureBlob();
+          doDownload(blob);
+          setHint("Clipboard blocked — downloaded instead.", true);
+        } catch {
+          setHint("Couldn't copy image.");
+        }
+      } finally { copyBtn.disabled = false; }
+    });
+
+    if (dlBtn) dlBtn.addEventListener("click", async () => {
+      dlBtn.disabled = true; setHint("");
+      try {
+        const blob = await ensureBlob();
+        doDownload(blob);
+        flash(dlBtn, "Saved");
+        logEvent("share_card_download", { meta: { word } });
+      } catch {
+        setHint("Couldn't download.");
+      } finally { dlBtn.disabled = false; }
+    });
+
+    if (shareBtn) shareBtn.addEventListener("click", async () => {
+      shareBtn.disabled = true; setHint("");
+      try {
+        const blob = await ensureBlob();
+        const file = new File([blob], filename, { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: "Mote",
+            text: `My word for ${prettyDate(utcDate)} on mote.day`
+          });
+          flash(shareBtn, "Shared");
+          logEvent("share_card_share", { meta: { word } });
+        } else {
+          setHint("Sharing not supported here.");
+        }
+      } catch (e) {
+        if (e && e.name !== "AbortError") {
+          console.warn("[mote] share failed", e);
+          setHint("Share canceled.");
+        }
+      } finally { shareBtn.disabled = false; }
+    });
+  }
+
+  function buildShareCardBlob(word, utcDate) {
+    return buildShareCardOnto(null, word, utcDate).then(({ canvas }) => new Promise((resolve, reject) => {
+      canvas.toBlob(b => b ? resolve(b) : reject(new Error("toBlob null")), "image/png");
+    }));
+  }
+
+  // Draws a 1200x630 share card to a freshly-created canvas. If `mountFrame`
+  // is supplied, the canvas is sized for hi-DPI display; otherwise it's a
+  // 1:1 pixel canvas suitable for export.
+  async function buildShareCardOnto(mountFrame, word, utcDate) {
+    const W = 1200, H = 630;
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+
+    // Wait for fonts so the card matches the live UI.
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch {}
+
+    const COBALT = "#0033CC";
+    const INK = "#000000";
+    const PAPER = "#FFFFFF";
+    const INK_SOFT = "rgba(0,0,0,0.55)";
+    const INK_FAINT = "rgba(0,0,0,0.32)";
+    const SANS = '"Geist", system-ui, sans-serif';
+    const MONO = '"Geist Mono", ui-monospace, monospace';
+
+    ctx.fillStyle = PAPER;
+    ctx.fillRect(0, 0, W, H);
+
+    // Top hairline + brand
+    ctx.fillStyle = INK;
+    ctx.fillRect(0, 0, W, 2);
+
+    const PAD = 64;
+
+    // Brand mark (matches favicon: cobalt square with white dot)
+    ctx.fillStyle = COBALT;
+    ctx.fillRect(PAD, PAD, 28, 28);
+    ctx.fillStyle = PAPER;
+    ctx.beginPath();
+    ctx.arc(PAD + 28 - 9, PAD + 28 - 9, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = INK;
+    ctx.font = `800 22px ${SANS}`;
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "left";
+    ctx.fillText("MOTE", PAD + 44, PAD + 22);
+
+    // Date, top-right
+    ctx.fillStyle = INK_SOFT;
+    ctx.font = `600 16px ${MONO}`;
+    ctx.textAlign = "right";
+    ctx.fillText(prettyDate(utcDate).toUpperCase(), W - PAD, PAD + 20);
+
+    // Cloud (right column) — render before the hero so we know its bounds
+    const cloudBox = { x: 630, y: 150, w: W - 630 - PAD, h: 360 };
+    drawCardCloud(ctx, cloudBox, word, SANS);
+
+    // Hero label
+    ctx.textAlign = "left";
+    ctx.fillStyle = INK_FAINT;
+    ctx.font = `600 13px ${MONO}`;
+    ctx.fillText("YOU SAID", PAD, 200);
+
+    // Hero word — cobalt, large, fit to ~520px
+    const heroMax = 560;
+    let heroSize = 180;
+    ctx.font = `800 ${heroSize}px ${SANS}`;
+    let metrics = ctx.measureText(word);
+    while (metrics.width > heroMax && heroSize > 56) {
+      heroSize -= 6;
+      ctx.font = `800 ${heroSize}px ${SANS}`;
+      metrics = ctx.measureText(word);
+    }
+    ctx.fillStyle = COBALT;
+    ctx.font = `800 ${heroSize}px ${SANS}`;
+    // Manual letter-spacing approximation (-0.025em ≈ -heroSize*0.025)
+    drawTextTracked(ctx, word, PAD, 200 + 30 + heroSize * 0.85, -heroSize * 0.025);
+
+    // Sub: voice count line
+    const voices = lastVoices || 0;
+    const voiceStr = `${voices.toLocaleString()} ${voices === 1 ? "voice" : "voices"} today`;
+    ctx.fillStyle = INK;
+    ctx.font = `500 28px ${SANS}`;
+    ctx.fillText(voiceStr, PAD, 200 + 30 + heroSize * 0.85 + 56);
+
+    // Footer rule + url + cta
+    ctx.fillStyle = INK;
+    ctx.fillRect(0, H - 2, W, 2);
+
+    ctx.fillStyle = INK_SOFT;
+    ctx.font = `600 18px ${MONO}`;
+    ctx.textAlign = "left";
+    ctx.fillText("MOTE.DAY", PAD, H - PAD + 4);
+
+    // CTA pill, bottom-right
+    const ctaText = "ONE WORD A DAY";
+    ctx.font = `700 18px ${SANS}`;
+    const ctaW = ctx.measureText(ctaText).width + 36;
+    const ctaH = 44;
+    const ctaX = W - PAD - ctaW;
+    const ctaY = H - PAD - ctaH + 6;
+    ctx.fillStyle = COBALT;
+    ctx.fillRect(ctaX, ctaY, ctaW, ctaH);
+    ctx.fillStyle = PAPER;
+    ctx.textAlign = "left";
+    ctx.fillText(ctaText, ctaX + 18, ctaY + ctaH / 2 + 6);
+
+    let dataUrl = null;
+    if (mountFrame) {
+      try { dataUrl = canvas.toDataURL("image/png"); } catch {}
+    }
+    return { canvas, dataUrl };
+  }
+
+  function drawTextTracked(ctx, text, x, y, letterSpacing) {
+    if (!letterSpacing) { ctx.fillText(text, x, y); return; }
+    let cx = x;
+    for (const ch of text) {
+      ctx.fillText(ch, cx, y);
+      cx += ctx.measureText(ch).width + letterSpacing;
+    }
+  }
+
+  function drawCardCloud(ctx, box, mineWord, SANS) {
+    const entries = (lastEntries || []).slice(0, 18);
+    if (!entries.length) return;
+    const max = entries[0][1];
+    const placed = [];
+    const pad = 6;
+    const sized = entries.map(([w, c]) => {
+      const t = max === 0 ? 0 : c / max;
+      const size = Math.round(18 + (64 - 18) * t);
+      return { word: w, count: c, size, isMine: w === mineWord };
+    }).sort((a, b) => b.size - a.size);
+
+    const cx = box.x + box.w / 2;
+    const cy = box.y + box.h / 2;
+
+    for (const item of sized) {
+      ctx.font = `${item.size >= 36 ? 800 : 700} ${item.size}px ${SANS}`;
+      const m = ctx.measureText(item.word);
+      const w = m.width;
+      const h = item.size * 1.05;
+      let placedRect = null;
+      // Try center, then spiral outward.
+      const attempts = [];
+      attempts.push({ x: cx - w / 2, y: cy - h / 2 });
+      for (let r = 14; r < Math.max(box.w, box.h); r += 4) {
+        const steps = Math.max(8, Math.floor(r * 0.5));
+        for (let s = 0; s < steps; s++) {
+          const a = (s / steps) * Math.PI * 2;
+          attempts.push({ x: cx + Math.cos(a) * r - w / 2, y: cy + Math.sin(a) * r - h / 2 });
+        }
+        if (attempts.length > 800) break;
+      }
+      for (const a of attempts) {
+        const rect = { x: a.x, y: a.y, w, h };
+        if (rect.x < box.x || rect.y < box.y) continue;
+        if (rect.x + rect.w > box.x + box.w) continue;
+        if (rect.y + rect.h > box.y + box.h) continue;
+        let collide = false;
+        for (const p of placed) {
+          if (!(rect.x + rect.w + pad < p.x || p.x + p.w + pad < rect.x ||
+                rect.y + rect.h + pad < p.y || p.y + p.h + pad < rect.y)) {
+            collide = true; break;
+          }
+        }
+        if (!collide) { placedRect = rect; break; }
+      }
+      if (!placedRect) continue;
+      placed.push(placedRect);
+      ctx.fillStyle = item.isMine ? "#0033CC" : "#000000";
+      // Tracking -0.025em
+      ctx.textBaseline = "alphabetic";
+      ctx.textAlign = "left";
+      drawTextTracked(ctx, item.word, placedRect.x, placedRect.y + item.size * 0.85, -item.size * 0.025);
+    }
   }
 
   /* — Slide animation — */
@@ -1587,6 +2308,7 @@
     }
 
     saveMine({ word: apiRes.row.word, submitted_at: apiRes.row.submitted_at, utc_date: apiRes.row.utc_date });
+    logEvent("word_submitted", { meta: { word: apiRes.row.word } });
 
     // If we couldn't compute a landing, just bail to refresh
     if (!landing) {
@@ -1778,6 +2500,48 @@
     return Math.round(m / 60) + "h ago";
   }
 
+  function msUntilUTCMidnight() {
+    const now = new Date();
+    const next = new Date(Date.UTC(
+      now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0
+    ));
+    return next.getTime() - now.getTime();
+  }
+  function formatResetCountdown() {
+    const ms = msUntilUTCMidnight();
+    const totalS = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(totalS / 3600);
+    const m = Math.floor((totalS % 3600) / 60);
+    const s = totalS % 60;
+    if (totalS < 5 * 60) return `resets in ${m}m ${String(s).padStart(2, "0")}s`;
+    if (h < 1) return `resets in ${m}m`;
+    if (h < 3) return `resets in ${h}h ${m}m`;
+    return `resets in ${h}h`;
+  }
+  function formatLastWord() {
+    if (!lastWordInfo) return "";
+    return `last: ${lastWordInfo.word}, ${timeAgo(lastWordInfo.at)}`;
+  }
+
+  /* — 1s ticker for countdown + last-word — */
+  const sLastEl = document.getElementById("s-last");
+  const sLastItem = document.getElementById("s-last-item");
+  const sLastSep = document.getElementById("s-last-sep");
+  function tick() {
+    const last = formatLastWord();
+    if (last) {
+      sLastEl.textContent = last;
+      sLastItem.style.display = "";
+      sLastSep.style.display = "";
+    } else {
+      sLastItem.style.display = "none";
+      sLastSep.style.display = "none";
+    }
+    const cd = document.getElementById("reset-countdown");
+    if (cd) cd.textContent = formatResetCountdown();
+  }
+  setInterval(tick, 1000);
+
   function pickLine() {
     const mine = loadMine();
     const submitted = mine && mine.utc_date === todayUTC();
@@ -1858,6 +2622,7 @@
   function openHistory() {
     historyEl.classList.add("open");
     historyEl.setAttribute("aria-hidden", "false");
+    logEvent("history_opened");
     historyTab = "single";
     historyDate = todayUTC();
     document.querySelectorAll(".tabs .tab").forEach(x => x.classList.toggle("active", x.dataset.tab === "single"));
@@ -1888,60 +2653,88 @@
     const data = await fetchDay(date);
     const mostSaid = data.entries[0] ? data.entries[0][0] : null;
     const mostSaidCount = data.entries[0] ? data.entries[0][1] : 0;
-    const top10 = data.entries.slice(0, 10);
-    const max = top10[0] ? top10[0][1] : 1;
+    const heroPct = data.voices > 0 ? Math.round((mostSaidCount / data.voices) * 100) : 0;
     const isToday = date === todayUTC();
+    const hasData = data.voices > 0;
 
-    // Compare to same weekday last week
+    // Cloud: top ~18 words sized proportionally to count.
+    const cloudEntries = data.entries.slice(0, 18);
+    const cloudMax = cloudEntries[0] ? cloudEntries[0][1] : 1;
+    const isMobile = window.innerWidth <= 768;
+    const minSize = isMobile ? 14 : 18;
+    const maxSize = isMobile ? 40 : 64;
+    const cloudHTML = cloudEntries.map(([w, c]) => {
+      const t = cloudMax > 0 ? c / cloudMax : 0;
+      const size = Math.round(minSize + (maxSize - minSize) * t);
+      const heroCls = w === mostSaid ? " hero" : "";
+      return `<span class="w${heroCls}" style="font-size:${size}px">${w}</span>`;
+    }).join("");
+
+    // Compare to same weekday last week.
     let insightHTML = "";
     try {
       const prevDate = isoDayBack(7 + Math.round((Date.parse(todayUTC()) - Date.parse(date)) / (24*60*60*1000)));
       const prev = await fetchDay(prevDate);
-      if (prev.voices > 0) {
+      if (prev.voices > 0 && hasData) {
         const pct = Math.round(((data.voices - prev.voices) / prev.voices) * 100);
         const dir = pct >= 0 ? "Up" : "Down";
         const [y, m, d] = prevDate.split("-").map(Number);
         const dt = new Date(Date.UTC(y, m - 1, d));
         insightHTML = `
-          <div class="insight">
-            <div class="text">${dir} <span class="v">${Math.abs(pct)}%</span> from last ${FULLDAYS[dt.getUTCDay()]}.</div>
-            <div class="meta">${data.voices.toLocaleString()} ${data.voices === 1 ? "voice" : "voices"} ${isToday ? "today" : "this day"} · ${prev.voices.toLocaleString()} last ${SHORTDAYS[dt.getUTCDay()]}</div>
+          <div class="h-since" style="margin-top:24px">
+            ${dir} <span class="v">${Math.abs(pct)}%</span> from last ${FULLDAYS[dt.getUTCDay()]}
+            · ${prev.voices.toLocaleString()} ${prev.voices === 1 ? "voice" : "voices"} that day
           </div>
         `;
       }
     } catch {}
 
+    const [yy, mm, dd] = date.split("-").map(Number);
+    const dt = new Date(Date.UTC(yy, mm - 1, dd));
+    const prettyDay = isToday ? "Today" : (date === isoDayBack(1) ? "Yesterday" : FULLDAYS[dt.getUTCDay()]);
+    const prettyHead = `${MONTHS[dt.getUTCMonth()]} ${dt.getUTCDate()}, ${dt.getUTCFullYear()}`;
+
     historyBody.innerHTML = `
-      <div class="date-nav">
-        <button id="prev-day">‹ ${isToday ? "Yesterday" : "Earlier"}</button>
-        <button class="label" id="date-label">${prettyDate(date)}<span class="chev">⌄</span></button>
-        <button id="next-day" ${isToday ? "disabled" : ""}>Tomorrow ›</button>
+      <div class="h-day-nav">
+        <button class="h-nav-btn" id="prev-day">‹ Prev</button>
+        <button class="h-date-label" id="date-label">
+          <span class="h-day">${prettyDay}</span>
+          <span class="h-date">${prettyHead}</span>
+        </button>
+        <button class="h-nav-btn" id="next-day" ${isToday ? "disabled" : ""}>Next ›</button>
       </div>
 
-      <div class="section-label">Stats</div>
-      <div class="stat-grid">
-        <div class="cell"><div class="v">${data.voices.toLocaleString()}</div><div class="l">Voices</div></div>
-        <div class="cell"><div class="v">${data.unique.toLocaleString()}</div><div class="l">Unique words</div></div>
-        <div class="cell"><div class="v">${data.said_once.toLocaleString()}</div><div class="l">Said only once</div></div>
-        <div class="cell"><div class="v cobalt">${mostSaid || "—"}</div><div class="l">Most-said${mostSaidCount ? " · " + mostSaidCount + "×" : ""}</div></div>
+      <div class="h-hero">
+        <div class="h-eyebrow">Most said ${isToday ? "today" : "this day"}</div>
+        <div class="h-hero-word${hasData ? "" : " muted"}">${mostSaid || "no words yet"}</div>
+        <div class="h-hero-meta">
+          ${hasData
+            ? `<span class="v">${mostSaidCount}×</span> — ${heroPct}% of all voices`
+            : "Nothing was said on this day."}
+        </div>
       </div>
 
-      <div class="section-label">Top 10</div>
-      <ul class="top-list">
-        ${top10.map(([w, c], i) => `
-          <li>
-            <span class="rank">${String(i + 1).padStart(2, "0")}</span>
-            <span class="word">${w}</span>
-            <span class="n">${c}<span class="x">×</span></span>
-          </li>
-        `).join("")}
-      </ul>
-      <button class="see-all-link" id="see-all">See all ${data.entries.length} words →</button>
+      ${hasData ? `
+        <div class="h-stats-strip">
+          <span class="h-stat"><span class="n">${data.voices.toLocaleString()}</span><span class="l">${data.voices === 1 ? "voice" : "voices"}</span></span>
+          <span class="h-stat"><span class="n">${data.unique.toLocaleString()}</span><span class="l">unique ${data.unique === 1 ? "word" : "words"}</span></span>
+        </div>
 
-      ${insightHTML ? '<div class="section-label">Insight</div>' + insightHTML : ""}
+        <div class="h-cloud">
+          ${cloudHTML}
+        </div>
 
-      ${showAllWords ? `
-        <div class="section-label" style="margin-top:32px">All ${data.entries.length} words</div>
+        <div class="h-footnote">
+          ${data.said_once.toLocaleString()} said only once
+          ${data.entries.length > cloudEntries.length ? ` · <button class="see-all-link" id="see-all" style="display:inline; margin:0">see all ${data.entries.length} words →</button>` : ""}
+        </div>
+      ` : ""}
+
+      ${insightHTML}
+
+      ${showAllWords && hasData ? `
+        <div class="h-rule"></div>
+        <div class="h-eyebrow" style="margin-bottom:14px">All ${data.entries.length} words</div>
         <div class="all-words">
           ${data.entries.map(([w, c]) => `<div class="row"><span class="w">${w}</span><span class="n">${c}×</span></div>`).join("")}
         </div>
@@ -1982,41 +2775,92 @@
       });
       inp.click();
     });
-    document.getElementById("see-all").addEventListener("click", () => renderHistorySingle(true));
+    const seeAllBtn = document.getElementById("see-all");
+    if (seeAllBtn) seeAllBtn.addEventListener("click", () => renderHistorySingle(true));
   }
 
   async function renderHistoryWeek() {
-    const { byDay } = await fetchLastDays(7);
+    const [{ byDay }, allTime] = await Promise.all([fetchLastDays(7), fetchAllTime()]);
     const days = [];
     for (let i = 0; i < 7; i++) {
       const date = isoDayBack(i);
       const d = byDay.get(date);
-      const top = d ? [...d.counts.entries()].sort((a, b) => b[1] - a[1])[0] : null;
-      days.push({ date, voices: d ? d.voices : 0, top });
+      if (!d || d.voices === 0) continue;
+      const top = [...d.counts.entries()].sort((a, b) => b[1] - a[1])[0];
+      days.push({ date, voices: d.voices, top });
     }
-    // most frequent top word across days
+
+    // Dominant word across the week and what its weekly footprint looks like.
     const winnerMap = new Map();
-    for (const d of days) if (d.top) winnerMap.set(d.top[0], (winnerMap.get(d.top[0]) || 0) + 1);
+    let weekVoices = 0;
+    for (const d of days) {
+      weekVoices += d.voices;
+      if (d.top) winnerMap.set(d.top[0], (winnerMap.get(d.top[0]) || 0) + 1);
+    }
     const winner = [...winnerMap.entries()].sort((a, b) => b[1] - a[1])[0];
+    const winnerWord = winner ? winner[0] : null;
+    const winnerWins = winner ? winner[1] : 0;
+
+    // Sizing: top-word type-size is proportional to that day's voices.
+    const maxVoices = days.reduce((m, d) => Math.max(m, d.voices), 0) || 1;
+    const isMobile = window.innerWidth <= 768;
+    const minSize = isMobile ? 18 : 22;
+    const maxSize = isMobile ? 30 : 42;
 
     historyBody.innerHTML = `
-      <div class="section-label" style="margin-top:24px">Top word, each day</div>
-      <ul class="day-list">
-        ${days.map(d => `
-          <li>
-            <span class="day">${dayLabel(d.date)}</span>
-            <span class="date">${shortDate(d.date)}</span>
-            <span class="word">${d.top ? d.top[0] : "—"}</span>
-            <span class="n">${d.top ? d.top[1] : 0}<span class="x">×</span></span>
-          </li>
-        `).join("")}
-      </ul>
-      ${winner ? `
-        <div class="insight" style="margin-top:24px">
-          <div class="text"><span class="v">${winner[0]}</span> won ${winner[1]} of the last 7 days.</div>
+      <div class="h-week-hero">
+        <div class="h-eyebrow">Word of the week</div>
+        <div class="h-hero-word${winnerWord ? "" : " muted"}">${winnerWord || "no data yet"}</div>
+        <div class="h-hero-meta">
+          ${winnerWord
+            ? `Won <span class="v">${winnerWins}</span> of last ${days.length === 1 ? "day" : days.length + " days"}
+               · <span class="v">${weekVoices.toLocaleString()}</span> total ${weekVoices === 1 ? "voice" : "voices"}`
+            : "Nothing has been said this week."}
+        </div>
+      </div>
+
+      ${days.length ? `
+        <div class="h-rule"></div>
+        <div class="h-eyebrow" style="margin-bottom:6px">Each day</div>
+        <div class="h-week-strip">
+          ${days.map(d => {
+            const t = d.voices / maxVoices;
+            const size = Math.round(minSize + (maxSize - minSize) * t);
+            const dominant = winnerWord && d.top && d.top[0] === winnerWord;
+            const fillPct = Math.round(t * 100);
+            return `
+              <button class="h-week-cell${dominant ? " dominant" : ""}" data-date="${d.date}">
+                <span class="day">${dayLabel(d.date)} · ${shortDate(d.date)}</span>
+                <span class="word" style="font-size:${size}px">${d.top[0]}</span>
+                <span class="bar"><span class="fill" style="width:${fillPct}%"></span></span>
+                <span class="voices">${d.voices.toLocaleString()} ${d.voices === 1 ? "voice" : "voices"} · ${d.top[1]}× ${d.top[0]}</span>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      ` : ""}
+
+      ${allTime ? `
+        <div class="h-rule"></div>
+        <div class="h-since">
+          Since launch:
+          <span class="v">${allTime.voices.toLocaleString()}</span> ${allTime.voices === 1 ? "voice" : "voices"} ·
+          <span class="v">${allTime.unique.toLocaleString()}</span> unique ${allTime.unique === 1 ? "word" : "words"}
         </div>
       ` : ""}
     `;
+
+    historyBody.querySelectorAll(".h-week-cell").forEach(cell => {
+      cell.addEventListener("click", () => {
+        const date = cell.dataset.date;
+        if (!date) return;
+        historyDate = date;
+        historyTab = "single";
+        document.querySelectorAll(".tabs .tab").forEach(x =>
+          x.classList.toggle("active", x.dataset.tab === "single"));
+        renderHistorySingle();
+      });
+    });
   }
 
   /* — New-day — */
@@ -2028,11 +2872,65 @@
     if (pollT) return;
     pollT = setInterval(() => { if (!document.hidden) refresh(); }, POLL_INTERVAL_MS);
   }
+
+  /* — Realtime: subscribe to INSERTs on words for today.
+     Coalesces bursts of events into a single refresh, and ignores echoes
+     of our own submission so the local animation isn't fired twice. — */
+  let realtimeChannel = null;
+  let pendingRefreshT = null;
+  let pendingPopWord = null;
+  function scheduleRealtimeRefresh(word) {
+    pendingPopWord = word;
+    if (pendingRefreshT) return;
+    pendingRefreshT = setTimeout(() => {
+      const w = pendingPopWord;
+      pendingRefreshT = null;
+      pendingPopWord = null;
+      if (!document.hidden) refresh(w);
+    }, 200);
+  }
+  async function startRealtime() {
+    try {
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        realtime: { params: { eventsPerSecond: 10 } }
+      });
+      const subscribe = () => {
+        const today = todayUTC();
+        if (realtimeChannel) {
+          try { client.removeChannel(realtimeChannel); } catch {}
+        }
+        realtimeChannel = client
+          .channel(`words-${today}`)
+          .on("postgres_changes", {
+            event: "INSERT",
+            schema: "public",
+            table: "words",
+            filter: `utc_date=eq.${today}`
+          }, (payload) => {
+            const row = payload && payload.new;
+            if (!row || !row.word) return;
+            if (row.device_id === deviceId) return;
+            scheduleRealtimeRefresh(row.word);
+          })
+          .subscribe();
+      };
+      subscribe();
+      // Re-subscribe at the new UTC day boundary so the filter tracks today.
+      setInterval(() => {
+        if (todayUTC() !== lastTodayKey) subscribe();
+      }, 60_000);
+    } catch (e) {
+      console.warn("[mote] realtime init failed; relying on polling", e);
+    }
+  }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
   /* — Boot — */
   refresh().then(() => runTyperCycle());
   startPolling();
+  startRealtime();
+  logEvent("page_view", { once: true });
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => { clearCanvas(); refresh(); });
   }
@@ -2041,6 +2939,76 @@
     clearTimeout(resizeT);
     resizeT = setTimeout(() => { clearCanvas(); refresh(); }, 250);
   });
+
+  /* — Pull-to-refresh (touch only; body has overflow:hidden so native PTR is unavailable) — */
+  (function setupPullToRefresh() {
+    // 10% of viewport height, clamped to [60, 140] px. Recomputed at touchstart so it tracks rotation.
+    const threshold = () => Math.max(60, Math.min(140, window.innerHeight * 0.1));
+    let y0 = null, pulled = 0, t = 0, refreshing = false;
+    let indicator = null;
+    function ensureIndicator() {
+      if (indicator) return indicator;
+      indicator = document.createElement("div");
+      indicator.id = "ptr-indicator";
+      Object.assign(indicator.style, {
+        position: "fixed", top: "0", left: "0", right: "0",
+        textAlign: "center", padding: "10px 0",
+        fontFamily: "var(--mono)", fontSize: "11px",
+        letterSpacing: "0.14em", textTransform: "uppercase",
+        color: "rgba(0,0,0,0.55)", background: "#fff",
+        borderBottom: "1px solid rgba(0,0,0,0.1)",
+        transform: "translateY(-100%)",
+        transition: "transform 200ms ease",
+        zIndex: "200", pointerEvents: "none"
+      });
+      document.body.appendChild(indicator);
+      return indicator;
+    }
+    function inOverlay() {
+      return historyEl.classList.contains("open") || aboutEl.classList.contains("open");
+    }
+    document.addEventListener("touchstart", (e) => {
+      if (inOverlay() || refreshing || e.touches.length !== 1) { y0 = null; return; }
+      y0 = e.touches[0].clientY;
+      pulled = 0;
+      t = threshold();
+    }, { passive: true });
+    document.addEventListener("touchmove", (e) => {
+      if (y0 == null) return;
+      const dy = e.touches[0].clientY - y0;
+      if (dy <= 0) { pulled = 0; if (indicator) indicator.style.transform = "translateY(-100%)"; return; }
+      pulled = dy;
+      const ind = ensureIndicator();
+      const pct = Math.min(1, dy / t);
+      ind.style.transform = `translateY(${(pct - 1) * 100}%)`;
+      ind.textContent = pct >= 1 ? "↑ release to refresh" : "↓ pull to refresh";
+    }, { passive: true });
+    document.addEventListener("touchend", async () => {
+      if (y0 == null) return;
+      const triggered = pulled >= t;
+      y0 = null; pulled = 0;
+      if (!indicator) return;
+      if (!triggered) {
+        indicator.style.transform = "translateY(-100%)";
+        return;
+      }
+      refreshing = true;
+      indicator.textContent = "refreshing…";
+      indicator.style.transform = "translateY(0)";
+      try { await refresh(); } catch {}
+      setTimeout(() => {
+        indicator.style.transform = "translateY(-100%)";
+        refreshing = false;
+      }, 400);
+    });
+  })();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
 </script>
 </body>
 </html>

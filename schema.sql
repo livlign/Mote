@@ -12,6 +12,15 @@ create unique index if not exists words_one_per_device_per_day on words (device_
 create index if not exists words_by_date on words (utc_date);
 create index if not exists words_by_word_date on words (utc_date, word);
 
+-- Realtime: stream INSERTs to subscribed clients so the cloud updates live
+-- without polling. Idempotent — adding an already-published table errors,
+-- which is why we guard with a DO block.
+do $$
+begin
+  alter publication supabase_realtime add table words;
+exception when duplicate_object then null;
+end$$;
+
 alter table words enable row level security;
 
 drop policy if exists "anyone can read" on words;
@@ -77,4 +86,37 @@ create policy "anyone can insert attempt"
     kind in ('multi_word','non_letters','too_long','profanity')
     and length(input_text) between 1 and 200
     and length(device_id) between 8 and 64
+  );
+
+-- Product analytics: discrete user-action events.
+-- Insert-only from anon. Read via service key for funnels in SQL.
+create table if not exists events (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null check (kind in (
+    'page_view','word_submitted','history_opened','share_card_copy',
+    'share_card_download','share_card_share'
+  )),
+  device_id text not null check (length(device_id) between 8 and 64),
+  referrer text check (referrer is null or length(referrer) <= 500),
+  user_agent text check (user_agent is null or length(user_agent) <= 500),
+  meta jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists events_by_kind_at on events (kind, created_at desc);
+create index if not exists events_by_device_at on events (device_id, created_at desc);
+
+alter table events enable row level security;
+
+drop policy if exists "anyone can insert event" on events;
+create policy "anyone can insert event"
+  on events for insert
+  with check (
+    kind in (
+      'page_view','word_submitted','history_opened','share_card_copy',
+      'share_card_download','share_card_share'
+    )
+    and length(device_id) between 8 and 64
+    and (referrer is null or length(referrer) <= 500)
+    and (user_agent is null or length(user_agent) <= 500)
   );
