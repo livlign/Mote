@@ -1361,7 +1361,9 @@
   // Realtime is the primary live-update channel; polling is a fallback for
   // missed events / dropped sockets, so the interval is loose.
   const POLL_INTERVAL_MS = 60000;
-  const EARLY_THRESHOLD = 30;
+  // Use the spiral cloud as soon as there's any data; the centered "early"
+  // layout only shows when the day has zero voices.
+  const EARLY_THRESHOLD = 1;
   const TOP_N = 42;
   const COLLIDE_PAD = 16;
 
