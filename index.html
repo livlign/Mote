@@ -2271,17 +2271,12 @@
       const cleaned = sanitize(input.value);
       if (cleaned !== input.value) input.value = cleaned;
       const trimmed = cleaned.trim();
-      const hasSpace = /\s/.test(trimmed);
       send.disabled = trimmed.length < 1;
+      // Errors are only surfaced on Send. While typing, just show the
+      // neutral helper or the "N others said this" match note.
       rules.classList.remove("error");
-      if (hasSpace) {
-        rules.textContent = "Just one word for now — multi-word coming soon.";
-        rules.classList.add("error");
-        return;
-      }
-      // match note (single-word path)
-      const match = lastEntries.find(([w]) => w === trimmed);
-      if (trimmed && match) {
+      const match = trimmed && !/\s/.test(trimmed) ? lastEntries.find(([w]) => w === trimmed) : null;
+      if (match) {
         rules.innerHTML = `One word per person, per day. <span class="match">${match[1]} other${match[1] === 1 ? "" : "s"} said this.</span>`;
       } else {
         rules.innerHTML = `One word per person, per day. The more times a word is mentioned, the bigger it is. <span id="reset-countdown">${formatResetCountdown()}</span>.`;
