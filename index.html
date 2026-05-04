@@ -516,12 +516,14 @@
   }
   .you-said .label {
     font-family: var(--mono);
-    font-size: 10.5px;
-    color: var(--ink-faint);
-    letter-spacing: 0.06em;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ink);
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
+  .you-said .label::before { content: "— "; color: var(--cobalt); }
   .you-said .word {
     font-family: var(--sans);
     font-weight: 800;
@@ -539,20 +541,37 @@
     text-transform: uppercase;
   }
 
-  /* — Share card — */
+  /* — Share card overlay — */
   .share-wrap {
-    margin: 22px auto 0;
-    max-width: 720px;
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: share-fade 180ms ease-out;
+  }
+  @keyframes share-fade { from { opacity: 0; } to { opacity: 1; } }
+  .share-panel {
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 24px 24px 20px;
+    width: 100%;
+    max-width: 760px;
+    max-height: calc(100dvh - 48px);
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 14px;
+    align-items: center;
     position: relative;
+    overflow: hidden;
   }
   .share-close {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: 10px;
+    right: 10px;
     background: var(--paper);
     border: 1px solid var(--ink);
     cursor: pointer;
@@ -560,16 +579,19 @@
     font-size: 16px;
     line-height: 1;
     color: var(--ink);
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     z-index: 2;
     transition: background 160ms ease, color 160ms ease;
   }
   .share-close:hover { background: var(--ink); color: var(--paper); }
   .share-card-frame {
-    width: 100%;
+    /* Width caps so card's derived height never exceeds the viewport
+       (panel padding 44px + buttons row ~50px + hint 24px + breathing room). */
+    width: min(100%, calc((100dvh - 240px) * 1200 / 630));
     aspect-ratio: 1200 / 630;
+    align-self: center;
     border: 1px solid var(--ink);
     background: var(--paper);
     overflow: hidden;
@@ -2322,17 +2344,19 @@
         <div class="word">${escapeHTML(mine.word)}</div>
         <div class="context">${context}</div>
       </div>
-      <div class="share-wrap" id="share-wrap">
-        <button class="share-close" id="share-close" type="button" aria-label="Hide share card">×</button>
-        <div class="share-card-frame" id="share-frame">
-          <div class="placeholder">Generating card…</div>
+      <div class="share-wrap" id="share-wrap" role="dialog" aria-modal="true" aria-label="Share your word">
+        <div class="share-panel">
+          <button class="share-close" id="share-close" type="button" aria-label="Close">×</button>
+          <div class="share-card-frame" id="share-frame">
+            <div class="placeholder">Generating card…</div>
+          </div>
+          <div class="share-actions">
+            <button class="share-btn primary" id="share-copy" type="button">Copy image</button>
+            <button class="share-btn" id="share-download" type="button">Download</button>
+            ${canShareFiles ? `<button class="share-btn" id="share-share" type="button">Share</button>` : ""}
+          </div>
+          <div class="share-hint" id="share-hint" aria-live="polite"></div>
         </div>
-        <div class="share-actions">
-          <button class="share-btn primary" id="share-copy" type="button">Copy image</button>
-          <button class="share-btn" id="share-download" type="button">Download</button>
-          ${canShareFiles ? `<button class="share-btn" id="share-share" type="button">Share</button>` : ""}
-        </div>
-        <div class="share-hint" id="share-hint" aria-live="polite"></div>
       </div>
     `;
     initShareCard(mine.word, mine.utc_date);
@@ -2360,10 +2384,18 @@
     shareBlobCache = null;
     shareDataUrlCache = null;
 
-    if (closeBtn) closeBtn.addEventListener("click", () => {
-      const wrap = document.getElementById("share-wrap");
-      if (wrap) wrap.remove();
+    const wrapEl = document.getElementById("share-wrap");
+    const dismiss = () => {
+      if (wrapEl) wrapEl.remove();
+      document.removeEventListener("keydown", onEsc);
+    };
+    const onEsc = (e) => { if (e.key === "Escape") dismiss(); };
+    if (closeBtn) closeBtn.addEventListener("click", dismiss);
+    if (wrapEl) wrapEl.addEventListener("click", (e) => {
+      // Click on the dim backdrop (outside the panel) closes.
+      if (e.target === wrapEl) dismiss();
     });
+    document.addEventListener("keydown", onEsc);
 
     const setHint = (msg, isDone) => {
       if (!hint) return;
