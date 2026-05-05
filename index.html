@@ -1518,7 +1518,8 @@
     flex-wrap: wrap;
     align-items: baseline;
     align-content: flex-start;
-    gap: 6px 30px;
+    gap: 8px 24px;
+    padding-bottom: 12px;
     flex: 1 1 auto;
     overflow-y: auto;
     min-height: 0;
@@ -3283,8 +3284,8 @@
     const cloudMax = cloudEntries[0] ? cloudEntries[0][1] : 1;
     const isMobile = window.innerWidth <= 768;
     const sparse = cloudEntries.length <= 6;
-    const minSize = isMobile ? (sparse ? 22 : 14) : (sparse ? 36 : 22);
-    const maxSize = isMobile ? (sparse ? 44 : 34) : (sparse ? 88 : 64);
+    const minSize = isMobile ? (sparse ? 22 : 13) : (sparse ? 36 : 18);
+    const maxSize = isMobile ? (sparse ? 44 : 26) : (sparse ? 88 : 40);
     const cloudHTML = cloudEntries.map(([w, c]) => {
       const t = cloudMax > 0 ? c / cloudMax : 0;
       const size = Math.round(minSize + (maxSize - minSize) * t);
