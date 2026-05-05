@@ -8,6 +8,7 @@
 //
 // Optional flags:
 //   --days=14         number of days back (excluding today) to seed
+//   --future          seed today + N future days instead of past days
 //   --dry-run         print plan, don't write
 //   --seed=42         deterministic seed
 //
@@ -29,6 +30,7 @@ const args = Object.fromEntries(
 );
 const DAYS = Number(args.days ?? 14);
 const DRY = !!args["dry-run"];
+const FUTURE = !!args.future;
 let SEED = Number(args.seed ?? 1337);
 
 function rng() {
@@ -46,25 +48,74 @@ function pickWeighted(pairs) {
 }
 
 const POOL = [
-  ["tired", 14], ["happy", 10], ["anxious", 9], ["hopeful", 7], ["calm", 8],
-  ["stressed", 9], ["sad", 7], ["okay", 12], ["fine", 10], ["bored", 6],
-  ["excited", 6], ["lonely", 5], ["grateful", 5], ["angry", 4], ["nervous", 5],
-  ["content", 4], ["overwhelmed", 5], ["restless", 4], ["peaceful", 4], ["empty", 3],
-  ["rainy", 6], ["sunny", 6], ["cold", 7], ["hot", 5], ["cloudy", 4],
-  ["foggy", 3], ["snow", 3], ["windy", 3], ["storm", 2], ["warm", 4],
-  ["monday", 4], ["friday", 4], ["weekend", 5], ["morning", 5], ["late", 6],
-  ["spring", 3], ["winter", 3], ["sunday", 3], ["midweek", 2],
-  ["busy", 8], ["focused", 5], ["lost", 5], ["ready", 4], ["stuck", 5],
-  ["alive", 3], ["slow", 4], ["fast", 3], ["quiet", 5], ["loud", 3],
-  ["coffee", 9], ["tea", 4], ["dog", 3], ["cat", 3], ["work", 10],
-  ["home", 7], ["music", 5], ["family", 5], ["love", 6], ["money", 5],
-  ["sleep", 8], ["food", 4], ["run", 3], ["walk", 3], ["rain", 4],
-  ["sun", 4], ["book", 3], ["movie", 2], ["news", 4], ["phone", 3],
-  ["hope", 6], ["fear", 4], ["dream", 4], ["change", 4], ["time", 6],
-  ["coffee", 4], ["meeting", 4], ["deadline", 4], ["holiday", 3], ["sick", 3],
-  ["healthy", 3], ["broken", 3], ["new", 4], ["old", 3], ["alone", 4],
-  ["together", 3], ["maybe", 4], ["soon", 3], ["wait", 3], ["done", 4],
-  ["beginning", 2], ["ending", 2], ["lucky", 2], ["unlucky", 2], ["fog", 2],
+  // feelings (kept lighter — these dominated before)
+  ["tired", 9], ["happy", 7], ["anxious", 6], ["hopeful", 5], ["calm", 5],
+  ["stressed", 6], ["sad", 5], ["okay", 7], ["fine", 6], ["bored", 4],
+  ["excited", 4], ["lonely", 3], ["grateful", 4], ["nervous", 3], ["content", 3],
+  ["overwhelmed", 3], ["restless", 3], ["peaceful", 3], ["curious", 3],
+  // weather / season (referenced by planDay bumps — keep)
+  ["rainy", 5], ["sunny", 5], ["cold", 5], ["hot", 4], ["cloudy", 3],
+  ["foggy", 2], ["snow", 2], ["windy", 2], ["storm", 2], ["warm", 3],
+  ["spring", 2], ["winter", 2], ["autumn", 2], ["summer", 3],
+  // weekdays (referenced by planDay bumps — keep)
+  ["monday", 3], ["friday", 3], ["weekend", 4], ["sunday", 2],
+  // music
+  ["music", 5], ["song", 5], ["album", 3], ["concert", 3], ["vinyl", 2],
+  ["jazz", 3], ["pop", 2], ["rock", 3], ["indie", 2], ["techno", 2],
+  ["lyrics", 2], ["melody", 2], ["beats", 2], ["playlist", 4], ["spotify", 3],
+  ["radio", 2], ["chorus", 2], ["bass", 2], ["piano", 3], ["guitar", 3],
+  ["singing", 2], ["dancing", 3], ["rhythm", 2], ["headphones", 2],
+  // film / books / stories
+  ["movie", 4], ["cinema", 2], ["film", 3], ["popcorn", 2], ["oscar", 1],
+  ["actor", 2], ["scene", 2], ["plot", 2], ["sequel", 2], ["trailer", 2],
+  ["book", 5], ["novel", 3], ["chapter", 2], ["poetry", 2], ["library", 2],
+  ["story", 4], ["author", 2], ["fiction", 2], ["memoir", 2],
+  // food / drink
+  ["coffee", 7], ["tea", 4], ["matcha", 2], ["wine", 3], ["beer", 3],
+  ["pasta", 3], ["pizza", 4], ["ramen", 3], ["sushi", 2], ["bread", 3],
+  ["cheese", 2], ["chocolate", 4], ["cake", 3], ["brunch", 3], ["dinner", 4],
+  ["lunch", 3], ["breakfast", 3], ["cooking", 3], ["recipe", 2], ["spicy", 2],
+  ["sweet", 2], ["hungry", 4], ["snack", 2],
+  // life / milestones / people
+  ["family", 5], ["love", 6], ["friends", 4], ["mom", 3], ["dad", 3],
+  ["partner", 2], ["kids", 3], ["birthday", 3], ["wedding", 2], ["funeral", 1],
+  ["reunion", 1], ["date", 3], ["crush", 2], ["breakup", 2], ["therapy", 3],
+  // work / study
+  ["work", 8], ["meeting", 4], ["deadline", 4], ["project", 3], ["email", 4],
+  ["slack", 3], ["zoom", 3], ["interview", 2], ["promotion", 1], ["raise", 1],
+  ["resume", 1], ["startup", 2], ["code", 4], ["debug", 2], ["bug", 3],
+  ["launch", 2], ["demo", 2], ["school", 3], ["exam", 3], ["essay", 2],
+  ["thesis", 1], ["studying", 3], ["lecture", 2], ["homework", 2],
+  // body / health / sport
+  ["sleep", 6], ["nap", 3], ["yoga", 3], ["gym", 3], ["running", 3],
+  ["walking", 3], ["hiking", 2], ["swimming", 2], ["cycling", 2], ["climbing", 1],
+  ["soccer", 2], ["tennis", 1], ["chess", 2], ["meditation", 2], ["sick", 3],
+  ["headache", 2], ["fever", 1], ["healthy", 2], ["broken", 2], ["sober", 2],
+  // travel / places
+  ["travel", 3], ["flight", 3], ["airport", 2], ["train", 3], ["beach", 3],
+  ["mountains", 2], ["paris", 2], ["tokyo", 2], ["lisbon", 1], ["berlin", 1],
+  ["roadtrip", 1], ["camping", 2], ["hotel", 2], ["holiday", 3], ["vacation", 3],
+  ["jetlag", 2], ["packing", 2],
+  // home / things / nature
+  ["home", 6], ["garden", 3], ["plants", 3], ["dog", 3], ["cat", 3],
+  ["bike", 3], ["car", 3], ["keys", 2], ["laundry", 3], ["dishes", 2],
+  ["cleaning", 2], ["moving", 2], ["rent", 3], ["mortgage", 1],
+  // creative / digital
+  ["art", 3], ["painting", 2], ["drawing", 2], ["photo", 3], ["camera", 2],
+  ["writing", 3], ["journal", 2], ["podcast", 3], ["youtube", 3], ["tiktok", 3],
+  ["instagram", 3], ["news", 4], ["election", 2], ["protest", 1], ["market", 2],
+  ["crypto", 2], ["taxes", 2],
+  // money
+  ["money", 5], ["bills", 2], ["broke", 2], ["payday", 2], ["bonus", 1],
+  // qualities / states
+  ["busy", 6], ["focused", 4], ["lost", 4], ["ready", 3], ["stuck", 4],
+  ["slow", 3], ["fast", 3], ["quiet", 4], ["loud", 3], ["alive", 3],
+  ["new", 3], ["old", 3], ["alone", 3], ["together", 3], ["lucky", 2],
+  // time / abstractions
+  ["morning", 4], ["late", 5], ["midnight", 2], ["dawn", 1], ["weekend", 0],
+  ["hope", 5], ["fear", 3], ["dream", 4], ["change", 3], ["time", 5],
+  ["maybe", 3], ["soon", 3], ["wait", 3], ["done", 3], ["beginning", 2],
+  ["ending", 2], ["future", 2], ["past", 2],
 ];
 const baseWeights = new Map();
 for (const [w, wt] of POOL) baseWeights.set(w, (baseWeights.get(w) || 0) + wt);
@@ -74,6 +125,12 @@ function utcDayBack(n) {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
   d.setUTCDate(d.getUTCDate() - n);
+  return d;
+}
+function utcDayForward(n) {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + n);
   return d;
 }
 function dayOfWeek(d) { return d.getUTCDay(); }
@@ -158,7 +215,7 @@ function timestampsForDay(date, n) {
   return out;
 }
 
-const weather = buildWeatherClusters(DAYS);
+const weather = buildWeatherClusters(FUTURE ? DAYS + 1 : DAYS);
 const allRows = [];
 let deviceCounter = 0;
 function nextDevice(date) {
@@ -166,10 +223,13 @@ function nextDevice(date) {
   return `seed-${date}-${deviceCounter.toString(36).padStart(6, "0")}`;
 }
 
-for (let i = 1; i <= DAYS; i++) {
-  const dateObj = utcDayBack(i);
+const startI = FUTURE ? 0 : 1;
+const endI = FUTURE ? DAYS : DAYS;
+for (let i = startI; i <= endI; i++) {
+  const dateObj = FUTURE ? utcDayForward(i) : utcDayBack(i);
   const dateStr = isoDate(dateObj);
-  const plan = planDay(dateObj, i - 1, weather[i - 1]);
+  const idx = FUTURE ? i : i - 1;
+  const plan = planDay(dateObj, idx, weather[idx] ?? "normal");
   const ts = timestampsForDay(dateObj, plan.submissions.length);
   for (let j = 0; j < plan.submissions.length; j++) {
     allRows.push({
