@@ -1448,7 +1448,7 @@
   .ed-hero {
     font-family: var(--sans);
     font-weight: 800;
-    font-size: clamp(88px, 15vw, 220px);
+    font-size: clamp(64px, 10vw, 140px);
     line-height: 0.88;
     letter-spacing: -0.045em;
     color: var(--cobalt);
@@ -1722,7 +1722,7 @@
     .ed-tab { font-size: 12px; letter-spacing: 0.18em; }
     .ed-body { padding: 18px 18px 14px; }
     .ed-kicker { font-size: 13px; margin-bottom: 12px; letter-spacing: 0.18em; }
-    .ed-hero { font-size: clamp(56px, 18vw, 88px); }
+    .ed-hero { font-size: clamp(48px, 14vw, 72px); }
     .ed-hero.muted { font-size: clamp(36px, 10vw, 60px); }
     .ed-lede { font-size: 13px; margin-top: 12px; }
     .ed-divider { margin: 14px 0 10px; }
@@ -3284,8 +3284,8 @@
     const cloudMax = cloudEntries[0] ? cloudEntries[0][1] : 1;
     const isMobile = window.innerWidth <= 768;
     const sparse = cloudEntries.length <= 6;
-    const minSize = isMobile ? (sparse ? 22 : 13) : (sparse ? 36 : 18);
-    const maxSize = isMobile ? (sparse ? 44 : 26) : (sparse ? 88 : 40);
+    const minSize = isMobile ? (sparse ? 22 : 16) : (sparse ? 36 : 22);
+    const maxSize = isMobile ? (sparse ? 44 : 32) : (sparse ? 88 : 52);
     const cloudHTML = cloudEntries.map(([w, c]) => {
       const t = cloudMax > 0 ? c / cloudMax : 0;
       const size = Math.round(minSize + (maxSize - minSize) * t);
