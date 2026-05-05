@@ -76,7 +76,37 @@
     flex-shrink: 0;
   }
   .header .logo { justify-self: start; }
-  .header .nav  { justify-self: end; }
+  .header .nav-host { justify-self: end; position: relative; }
+  .nav-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--ink);
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    transition: background 160ms ease, color 160ms ease;
+  }
+  .nav-toggle:hover { background: var(--ink); }
+  .nav-toggle:hover .nav-toggle-dots,
+  .nav-toggle:hover .nav-toggle-dots::before,
+  .nav-toggle:hover .nav-toggle-dots::after { background: var(--paper); }
+  .nav-toggle-dots,
+  .nav-toggle-dots::before,
+  .nav-toggle-dots::after {
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .nav-toggle-dots { position: relative; }
+  .nav-toggle-dots::before,
+  .nav-toggle-dots::after { content: ""; position: absolute; top: 0; }
+  .nav-toggle-dots::before { left: -7px; }
+  .nav-toggle-dots::after  { left: 7px; }
   .logo {
     display: flex;
     align-items: center;
@@ -377,6 +407,8 @@
     animation: blink 800ms steps(2, jump-none) infinite;
   }
   .stats .typer .caret.hidden { display: none; }
+  .stats .typer.clickable { cursor: pointer; color: var(--cobalt); }
+  .stats .typer.clickable:hover { text-decoration: underline; }
   @keyframes blink {
     50% { opacity: 0; }
   }
@@ -1608,23 +1640,36 @@
 
   /* — Mobile — */
   @media (max-width: 768px) {
-    .header {
-      grid-template-columns: auto 1fr auto;
-      grid-template-rows: auto auto;
-      grid-template-areas:
-        "logo .   nav"
-        "title title title";
-      padding: 10px 18px 12px;
-      gap: 10px 12px;
+    .header { padding: 10px 14px; gap: 10px; }
+    .nav-toggle { display: inline-flex; }
+    .header .nav {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 4px 0;
+      min-width: 140px;
+      z-index: 50;
+      box-shadow: 4px 4px 0 var(--ink);
     }
-    .header .logo { grid-area: logo; }
-    .header .nav  { grid-area: nav; }
-    .head-title   { grid-area: title; gap: 4px; }
-    .nav { gap: 18px; }
-    .nav button { font-size: 10px; letter-spacing: 0.14em; padding: 4px 0; }
+    .header .nav.open { display: flex; }
+    .header .nav button {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+    }
+    .header .nav button:hover { background: var(--ink); color: var(--paper); }
     .description { padding: 22px 18px 18px; }
-    .head-title .title { font-size: 18px; letter-spacing: -0.02em; }
-    .head-title .headline { font-size: 11px; }
+    .head-title .title { font-size: 14px; letter-spacing: -0.01em; }
+    .head-title .headline { font-size: 9px; letter-spacing: 0.02em; }
+    .head-title { gap: 3px; }
+    .logo .word { font-size: 12px; }
     .canvas-wrap { padding: 18px 18px; }
     .stats { padding: 8px 18px; gap: 8px; font-size: 10px; flex-wrap: wrap; }
     .submit { padding: 14px 18px 18px; }
@@ -1695,10 +1740,15 @@
       <h1 class="title">Today, in a Word</h1>
       <p class="headline">What's the world thinking today?</p>
     </div>
-    <nav class="nav">
-      <button id="open-history">History</button>
-      <button id="open-about">About</button>
-    </nav>
+    <div class="nav-host">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-menu">
+        <span class="nav-toggle-dots" aria-hidden="true"></span>
+      </button>
+      <nav class="nav" id="nav-menu">
+        <button id="open-history">History</button>
+        <button id="open-about">About</button>
+      </nav>
+    </div>
   </header>
 
   <section class="canvas-wrap">
@@ -3016,17 +3066,19 @@
     const lines = [];
     if (submitted) {
       const match = lastEntries.find(([w]) => w === mine.word);
-      if (match && match[1] > 1) lines.push(`"${mine.word}" said by ${match[1] - 1} others today`);
+      if (match && match[1] > 1) lines.push({ text: `"${mine.word}" said by ${match[1] - 1} others today` });
     } else {
       const prompts = ["what's one word for today?", "if you had to choose one", "a word, briefly"];
-      lines.push(prompts[Math.floor(Math.random() * prompts.length)]);
+      lines.push({ text: prompts[Math.floor(Math.random() * prompts.length)] });
     }
     if (new Date().getUTCHours() >= 21) {
-      lines.push("the day ends in a few hours");
-      lines.push("today's words clear at midnight UTC");
-      lines.push("a new day soon");
+      lines.push({ text: "the day ends in a few hours" });
+      lines.push({ text: "today's words clear at midnight UTC" });
     }
-    return lines[Math.floor(Math.random() * lines.length)] || "";
+    // History prompts — clickable shortcut to the History overlay
+    lines.push({ text: "see yesterday's words →", action: "history" });
+    lines.push({ text: "the past seven days →", action: "history" });
+    return lines[Math.floor(Math.random() * lines.length)] || { text: "" };
   }
 
   const typerSepEl = document.getElementById("s-typer-sep");
@@ -3035,8 +3087,12 @@
     typerEl.style.display = visible ? "" : "none";
   }
 
-  async function typeLine(text) {
+  async function typeLine(line) {
+    const text = typeof line === "string" ? line : (line && line.text) || "";
+    const action = typeof line === "object" && line ? line.action : null;
     setTyperVisible(true);
+    typerEl.classList.toggle("clickable", !!action);
+    typerEl.dataset.action = action || "";
     typerEl.innerHTML = `<span class="t"></span><span class="caret"></span>`;
     const t = typerEl.querySelector(".t");
     const caret = typerEl.querySelector(".caret");
@@ -3055,7 +3111,8 @@
     typerActive = true;
     while (typerActive) {
       const line = pickLine();
-      if (line) {
+      const text = line && (typeof line === "string" ? line : line.text);
+      if (text) {
         await typeLine(line);
       } else {
         setTyperVisible(false);
@@ -3069,10 +3126,35 @@
   let historyTab = "single";
   let historyDate = todayUTC();
 
-  document.getElementById("open-history").addEventListener("click", () => openHistory());
+  // Mobile collapsible nav menu
+  const navToggle = document.getElementById("nav-toggle");
+  const navMenu = document.getElementById("nav-menu");
+  function closeNavMenu() {
+    navMenu.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }
+  function toggleNavMenu() {
+    const open = navMenu.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  navToggle.addEventListener("click", (e) => { e.stopPropagation(); toggleNavMenu(); });
+  document.addEventListener("click", (e) => {
+    if (!navMenu.classList.contains("open")) return;
+    if (e.target.closest("#nav-menu") || e.target.closest("#nav-toggle")) return;
+    closeNavMenu();
+  });
+
+  // Typer is clickable when the active line has an action (e.g. "see yesterday's words")
+  typerEl.addEventListener("click", () => {
+    const action = typerEl.dataset.action;
+    if (action === "history") openHistory();
+  });
+
+  document.getElementById("open-history").addEventListener("click", () => { closeNavMenu(); openHistory(); });
   document.getElementById("history-close").addEventListener("click", () => closeHistory());
   const aboutEl = document.getElementById("about");
   document.getElementById("open-about").addEventListener("click", () => {
+    closeNavMenu();
     aboutEl.classList.add("open");
     aboutEl.setAttribute("aria-hidden", "false");
   });
