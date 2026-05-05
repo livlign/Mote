@@ -1574,9 +1574,10 @@
   .ed-week {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-auto-rows: 1fr;
     gap: 12px;
     flex: 1 1 auto;
-    overflow: hidden;
+    overflow-y: auto;
     align-content: start;
     min-height: 0;
   }
@@ -1616,10 +1617,13 @@
     line-height: 0.95;
     padding: 14px 12px;
     color: var(--ink);
-    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     flex: 1 1 auto;
     display: flex;
     align-items: center;
+    min-width: 0;
   }
   .ed-week-cell.dominant .word { color: var(--cobalt); }
   .ed-week-cell:hover.dominant .word { color: var(--paper); }
@@ -3350,10 +3354,8 @@
     const winnerWord = winner ? winner[0] : null;
     const winnerWins = winner ? winner[1] : 0;
 
-    const maxVoices = days.reduce((m, d) => Math.max(m, d.voices), 0) || 1;
     const isMobile = window.innerWidth <= 768;
-    const minSize = isMobile ? 22 : 28;
-    const maxSize = isMobile ? 36 : 56;
+    const wordSize = isMobile ? 28 : 36;
 
     const todayDt = (() => {
       const [y, m, d] = todayUTC().split("-").map(Number);
@@ -3379,8 +3381,6 @@
         <div class="ed-section-label">Editions</div>
         <div class="ed-week">
           ${days.map(d => {
-            const t = d.voices / maxVoices;
-            const size = Math.round(minSize + (maxSize - minSize) * t);
             const dominant = winnerWord && d.top && d.top[0] === winnerWord;
             const [y, m, dd] = d.date.split("-").map(Number);
             const dt = new Date(Date.UTC(y, m - 1, dd));
@@ -3390,7 +3390,7 @@
                   <span>${SHORTDAYS[dt.getUTCDay()].toUpperCase()} · ${MONTHS_SHORT[dt.getUTCMonth()]} ${dt.getUTCDate()}</span>
                   <span>№${String(dayOfYear(dt)).padStart(3, "0")}</span>
                 </span>
-                <span class="word" style="font-size:${size}px">${d.top[0]}</span>
+                <span class="word" style="font-size:${wordSize}px">${d.top[0]}</span>
                 <span class="foot">
                   <span class="vox">${d.voices.toLocaleString()}</span>
                   <span>${d.top[1]}× ${d.top[0]}</span>
