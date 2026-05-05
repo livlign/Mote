@@ -1916,7 +1916,7 @@
     const date = todayUTC();
     const [countsRes, lastRes] = await Promise.all([
       api(`word_counts?utc_date=eq.${date}&select=word,count&order=count.desc`),
-      api(`words?utc_date=eq.${date}&select=word,submitted_at&order=submitted_at.desc&limit=1`)
+      api(`words?utc_date=eq.${date}&submitted_at=lte.${encodeURIComponent(new Date().toISOString())}&select=word,submitted_at&order=submitted_at.desc&limit=1`)
     ]);
     if (!countsRes.ok) throw new Error("today counts failed");
     const rows = await countsRes.json();
@@ -3251,7 +3251,7 @@
     // The hero word is shown above; the cloud is everything else, sized
     // proportionally. Sparse days use a larger size range so the cloud still
     // fills the visual block instead of looking like a half-rendered list.
-    const cloudEntries = data.entries.filter(([w]) => w !== mostSaid).slice(0, 18);
+    const cloudEntries = data.entries.filter(([w]) => w !== mostSaid);
     const cloudMax = cloudEntries[0] ? cloudEntries[0][1] : 1;
     const isMobile = window.innerWidth <= 768;
     const sparse = cloudEntries.length <= 6;
