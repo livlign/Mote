@@ -1488,6 +1488,14 @@
     flex-shrink: 0;
   }
   .ed-section-label::before { content: "— "; color: var(--cobalt); margin-right: 6px; }
+  .ed-section-count { color: var(--ink-soft); font-weight: 400; letter-spacing: 0.08em; margin-left: 4px; }
+
+  .ed-cloud, .ed-week { scrollbar-width: thin; scrollbar-color: var(--ink-ghost) transparent; }
+  .ed-cloud::-webkit-scrollbar, .ed-week::-webkit-scrollbar { width: 6px; }
+  .ed-cloud::-webkit-scrollbar-thumb, .ed-week::-webkit-scrollbar-thumb {
+    background: var(--ink-ghost); border-radius: 3px;
+  }
+  .ed-cloud::-webkit-scrollbar-track, .ed-week::-webkit-scrollbar-track { background: transparent; }
 
   .ed-cloud {
     display: flex;
@@ -3289,7 +3297,7 @@
 
         ${cloudEntries.length ? `
           <div class="ed-divider"></div>
-          <div class="ed-section-label">Also heard</div>
+          <div class="ed-section-label">Also heard <span class="ed-section-count">· ${cloudEntries.length}</span></div>
           <div class="ed-cloud">${cloudHTML}</div>
         ` : `<div class="ed-cloud" style="flex:1 1 auto"></div>`}
 
