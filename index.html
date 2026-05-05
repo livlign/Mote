@@ -1489,6 +1489,22 @@
   }
   .ed-section-label::before { content: "— "; color: var(--cobalt); margin-right: 6px; }
   .ed-section-count { color: var(--ink-soft); font-weight: 400; letter-spacing: 0.08em; margin-left: 4px; }
+  .ed-scroll-hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 8px 0 4px;
+    flex-shrink: 0;
+    animation: hintBob 1.6s ease-in-out infinite;
+  }
+  @keyframes hintBob {
+    0%, 100% { transform: translateY(0); opacity: 0.7; }
+    50% { transform: translateY(2px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ed-scroll-hint { animation: none; } }
 
   .ed-cloud, .ed-week { scrollbar-width: thin; scrollbar-color: var(--ink-ghost) transparent; }
   .ed-cloud::-webkit-scrollbar, .ed-week::-webkit-scrollbar { width: 6px; }
@@ -3299,6 +3315,7 @@
           <div class="ed-divider"></div>
           <div class="ed-section-label">Also heard <span class="ed-section-count">· ${cloudEntries.length}</span></div>
           <div class="ed-cloud">${cloudHTML}</div>
+          <div class="ed-scroll-hint" hidden>↓ scroll for more</div>
         ` : `<div class="ed-cloud" style="flex:1 1 auto"></div>`}
 
         <div class="ed-foot">
@@ -3315,6 +3332,21 @@
         </div>
       </div>
     `;
+
+    requestAnimationFrame(() => {
+      const cloud = historyBody.querySelector(".ed-cloud");
+      const hint = historyBody.querySelector(".ed-scroll-hint");
+      if (cloud && hint) {
+        const overflows = cloud.scrollHeight > cloud.clientHeight + 2;
+        hint.hidden = !overflows;
+        if (overflows) {
+          cloud.addEventListener("scroll", () => {
+            const atBottom = cloud.scrollTop + cloud.clientHeight >= cloud.scrollHeight - 4;
+            hint.hidden = atBottom;
+          }, { passive: true });
+        }
+      }
+    });
 
     document.getElementById("prev-day").addEventListener("click", () => {
       historyDate = shiftDay(historyDate, -1);
@@ -3386,7 +3418,7 @@
         </div>
 
         <div class="ed-divider"></div>
-        <div class="ed-section-label">Editions</div>
+        <div class="ed-section-label">Editions <span class="ed-section-count">· ${days.length}</span></div>
         <div class="ed-week">
           ${days.map(d => {
             const dominant = winnerWord && d.top && d.top[0] === winnerWord;
@@ -3407,6 +3439,7 @@
             `;
           }).join("")}
         </div>
+        <div class="ed-scroll-hint" hidden>↓ scroll for more</div>
 
         <div class="ed-foot">
           <div class="ed-foot-stats">
@@ -3420,6 +3453,21 @@
         </div>
       </div>
     `;
+
+    requestAnimationFrame(() => {
+      const grid = historyBody.querySelector(".ed-week");
+      const hint = historyBody.querySelector(".ed-scroll-hint");
+      if (grid && hint) {
+        const overflows = grid.scrollHeight > grid.clientHeight + 2;
+        hint.hidden = !overflows;
+        if (overflows) {
+          grid.addEventListener("scroll", () => {
+            const atBottom = grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 4;
+            hint.hidden = atBottom;
+          }, { passive: true });
+        }
+      }
+    });
 
     historyBody.querySelectorAll(".ed-week-cell").forEach(cell => {
       cell.addEventListener("click", () => {
