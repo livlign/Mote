@@ -109,6 +109,7 @@
     letter-spacing: -0.025em;
     text-transform: uppercase;
     margin: 0;
+    white-space: nowrap;
   }
   .head-title .headline {
     font-family: var(--sans);
@@ -1607,11 +1608,13 @@
 
   /* — Mobile — */
   @media (max-width: 768px) {
-    .header { padding: 12px 18px; }
-    .nav { gap: 14px; }
+    .header { padding: 10px 14px; gap: 10px; }
+    .nav { gap: 12px; }
     .nav button { font-size: 10px; letter-spacing: 0.14em; padding: 4px 0; }
+    .logo .word { font-size: 12px; }
     .description { padding: 22px 18px 18px; }
-    .title { font-size: 30px; letter-spacing: -0.035em; }
+    .head-title .title { font-size: 13px; letter-spacing: -0.01em; }
+    .head-title .headline { font-size: 9px; }
     .canvas-wrap { padding: 18px 18px; }
     .stats { padding: 8px 18px; gap: 8px; font-size: 10px; flex-wrap: wrap; }
     .submit { padding: 14px 18px 18px; }
@@ -1698,8 +1701,8 @@
     <span class="item" id="s-words-item"><span class="num" id="s-words">—</span> <span id="s-words-label">words</span></span>
     <span class="sep" id="s-last-sep">·</span>
     <span class="item" id="s-last-item"><span id="s-last">—</span></span>
-    <span class="sep">·</span>
-    <span class="typer" id="typer"></span>
+    <span class="sep" id="s-typer-sep" style="display:none">·</span>
+    <span class="typer" id="typer" style="display:none"></span>
   </section>
 
   <section class="submit" id="submit-region"></section>
@@ -2336,7 +2339,7 @@
   }
 
 
-  function renderYouSaid(mine, sameWordCount) {
+  function renderYouSaid(mine, sameWordCount, { showShare = false } = {}) {
     const others = Math.max(0, sameWordCount - 1);
     const context = others === 0
       ? "You're the only one who said this today."
@@ -2353,6 +2356,7 @@
         <div class="word">${escapeHTML(mine.word)}</div>
         <div class="context">${context}</div>
       </div>
+      ${showShare ? `
       <div class="share-wrap" id="share-wrap" role="dialog" aria-modal="true" aria-label="Share your word">
         <div class="share-panel">
           <button class="share-close" id="share-close" type="button" aria-label="Close">×</button>
@@ -2366,9 +2370,9 @@
           </div>
           <div class="share-hint" id="share-hint" aria-live="polite"></div>
         </div>
-      </div>
+      </div>` : ""}
     `;
-    initShareCard(mine.word, mine.utc_date);
+    if (showShare) initShareCard(mine.word, mine.utc_date);
   }
 
   function escapeHTML(s) {
@@ -2766,7 +2770,7 @@
 
     // If we couldn't compute a landing, just bail to refresh
     if (!landing) {
-      renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, ((lastEntries.find(([w]) => w === apiRes.row.word)?.[1]) ?? 0) + 1);
+      renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, ((lastEntries.find(([w]) => w === apiRes.row.word)?.[1]) ?? 0) + 1, { showShare: true });
       submitEl.style.visibility = "";
       await refresh(word);
       return;
@@ -2795,7 +2799,7 @@
       }
     }
 
-    renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1);
+    renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1, { showShare: true });
     submitEl.style.visibility = "";
     submitEl.classList.add("fade-in");
     setTimeout(() => submitEl.classList.remove("fade-in"), 500);
@@ -3000,9 +3004,6 @@
     const mine = loadMine();
     const submitted = mine && mine.utc_date === todayUTC();
     const lines = [];
-    if (lastVoiceCount > 0 && lastWordInfo) {
-      lines.push(`last: ${lastWordInfo.word}, ${timeAgo(lastWordInfo.at)}`);
-    }
     if (submitted) {
       const match = lastEntries.find(([w]) => w === mine.word);
       if (match && match[1] > 1) lines.push(`"${mine.word}" said by ${match[1] - 1} others today`);
@@ -3018,7 +3019,14 @@
     return lines[Math.floor(Math.random() * lines.length)] || "";
   }
 
+  const typerSepEl = document.getElementById("s-typer-sep");
+  function setTyperVisible(visible) {
+    if (typerSepEl) typerSepEl.style.display = visible ? "" : "none";
+    typerEl.style.display = visible ? "" : "none";
+  }
+
   async function typeLine(text) {
+    setTyperVisible(true);
     typerEl.innerHTML = `<span class="t"></span><span class="caret"></span>`;
     const t = typerEl.querySelector(".t");
     const caret = typerEl.querySelector(".caret");
@@ -3037,8 +3045,13 @@
     typerActive = true;
     while (typerActive) {
       const line = pickLine();
-      if (line) await typeLine(line);
+      if (line) {
+        await typeLine(line);
+      } else {
+        setTyperVisible(false);
+      }
       await new Promise(r => setTimeout(r, 17000)); // ~25s total cycle (≈3s typing + 14-17s wait)
+      setTyperVisible(false);
     }
   }
 
