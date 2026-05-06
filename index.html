@@ -1943,20 +1943,18 @@
 
   async function fetchToday() {
     const date = todayUTC();
-    const [countsRes, lastRes] = await Promise.all([
-      api(`word_counts?utc_date=eq.${date}&select=word,count&order=count.desc`),
-      api(`words?utc_date=eq.${date}&submitted_at=lte.${encodeURIComponent(new Date().toISOString())}&select=word,submitted_at&order=submitted_at.desc&limit=1`)
-    ]);
-    if (!countsRes.ok) throw new Error("today counts failed");
-    const rows = await countsRes.json();
-    const entries = rows.map(r => [r.word, r.count]);
-    const voices = entries.reduce((s, [, c]) => s + c, 0);
+    // Aggregate raw rows on the client so we can exclude submissions
+    // dated in the future (the backfill script can pre-seed today/future).
+    const nowIso = new Date().toISOString();
+    const res = await api(`words?utc_date=eq.${date}&submitted_at=lte.${encodeURIComponent(nowIso)}&select=word,submitted_at&order=submitted_at.desc`);
+    if (!res.ok) throw new Error("today words failed");
+    const rows = await res.json();
+    const counts = new Map();
+    for (const r of rows) counts.set(r.word, (counts.get(r.word) || 0) + 1);
+    const entries = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    const voices = rows.length;
     const unique = entries.length;
-    let last = null;
-    if (lastRes.ok) {
-      const [row] = await lastRes.json();
-      if (row) last = { word: row.word, at: new Date(row.submitted_at) };
-    }
+    const last = rows.length ? { word: rows[0].word, at: new Date(rows[0].submitted_at) } : null;
     return { entries, voices, unique, last };
   }
 
@@ -2132,7 +2130,11 @@
     const max = visible.length ? visible[0][1] : 0;
     const targetSet = new Set(visible.map(([w]) => w));
     const canvasW = canvasEl.clientWidth;
-    const canvasH = canvasEl.clientHeight;
+    // Reserve a strip at the bottom for the "See all …" link so words
+    // packed near the floor don't overlap it on small screens.
+    const showSeeAll = entries.length > visible.length;
+    const SEE_ALL_RESERVE = showSeeAll ? 28 : 0;
+    const canvasH = canvasEl.clientHeight - SEE_ALL_RESERVE;
     const anchor = dayAnchor(canvasW, canvasH);
 
     // Update or queue place
@@ -2189,7 +2191,7 @@
 
     // See-all link if more words exist than rendered
     let seeAllEl = canvasEl.querySelector(".see-all");
-    if (entries.length > visible.length) {
+    if (showSeeAll) {
       if (!seeAllEl) {
         seeAllEl = document.createElement("button");
         seeAllEl.className = "see-all";
@@ -2917,7 +2919,9 @@
       };
     }
 
-    const canvasW = canvasEl.clientWidth, canvasH = canvasEl.clientHeight;
+    const canvasW = canvasEl.clientWidth;
+    const seeAllReserve = canvasEl.querySelector(".see-all") ? 28 : 0;
+    const canvasH = canvasEl.clientHeight - seeAllReserve;
     const newSize = sizeFor(futureCount, futureMax || 1, word);
     const tmp = document.createElement("span");
     tmp.className = "w";
