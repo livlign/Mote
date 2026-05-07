@@ -6,7 +6,7 @@ A daily word ritual. Each visitor types one word about their day, and the world'
 
 🌐 [mote.day](https://mote.day) · 📜 [MIT](LICENSE)
 
-![Mote — Today, in a Word](og.png)
+![Mote — a daily one-word ritual. Type one word about your day; the world's words gather into a live cloud, bigger when more people say the same.](hero.gif)
 
 ## Why
 
