@@ -31,7 +31,7 @@
 <meta name="twitter:image" content="https://mote.day/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper:      #ffffff;
@@ -44,6 +44,7 @@
 
     --sans: "Geist", system-ui, sans-serif;
     --mono: "Geist Mono", ui-monospace, monospace;
+    --serif: "Fraunces", Georgia, serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -109,20 +110,34 @@
   .nav-toggle-dots::after  { left: 7px; }
   .logo {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: baseline;
+    gap: 9px;
+    text-decoration: none;
+    color: inherit;
   }
   .logo .mark {
-    width: 11px;
-    height: 11px;
+    width: 22px;
+    height: 16px;
     display: block;
+    flex-shrink: 0;
+    transform: translateY(2px);
+  }
+  .logo .mark circle { transition: opacity 320ms ease; }
+  .logo:hover .mark circle:nth-child(1) { animation: mote-blink 1.6s ease-in-out infinite; }
+  .logo:hover .mark circle:nth-child(2) { animation: mote-blink 1.6s ease-in-out 0.4s infinite; }
+  .logo:hover .mark circle:nth-child(3) { animation: mote-blink 1.6s ease-in-out 0.8s infinite; }
+  @keyframes mote-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
   }
   .logo .word {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 14px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 500;
+    font-weight: 500;
+    font-size: 26px;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    color: var(--ink);
   }
   .head-title {
     display: flex;
@@ -1342,11 +1357,27 @@
   }
   .ed-mast-l { display: flex; flex-direction: column; gap: 6px; line-height: 1; }
   .ed-brand {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 30px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+    font-family: var(--serif);
+    font-variation-settings: "opsz" 144, "wght" 500;
+    font-weight: 500;
+    font-size: 44px;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .ed-brand::before {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 22px;
+    flex-shrink: 0;
+    transform: translateY(3px);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 16'><circle cx='11' cy='3.6' r='2.6' fill='%230033CC'/><circle cx='4.6' cy='12.4' r='2.6' fill='%230033CC'/><circle cx='17.4' cy='12.4' r='2.6' fill='%230033CC'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
   }
   .ed-vol {
     font-family: var(--mono);
@@ -1698,7 +1729,8 @@
     .head-title .title { font-size: 14px; letter-spacing: -0.01em; }
     .head-title .headline { font-size: 9px; letter-spacing: 0.02em; }
     .head-title { gap: 3px; }
-    .logo .word { font-size: 12px; }
+    .logo .word { font-size: 22px; }
+    .logo .mark { width: 19px; height: 14px; }
     .canvas-wrap { padding: 18px 18px; }
     .stats { padding: 8px 18px; gap: 8px; font-size: 10px; flex-wrap: wrap; }
     .submit { padding: 14px 18px 18px; }
@@ -1714,7 +1746,8 @@
     /* Editorial History — mobile */
     .ed-close { top: 10px; right: 12px; font-size: 22px; }
     .ed-mast { padding: 16px 48px 0 18px; gap: 12px; }
-    .ed-brand { font-size: 22px; letter-spacing: 0.20em; }
+    .ed-brand { font-size: 32px; letter-spacing: -0.04em; gap: 10px; }
+    .ed-brand::before { width: 24px; height: 16px; transform: translateY(2px); }
     .ed-vol, .ed-day { font-size: 11px; letter-spacing: 0.18em; }
     .ed-date { font-size: 20px; }
     .ed-rule { margin: 12px 18px 0; height: 4px; border-top-width: 3px; }
@@ -1761,10 +1794,14 @@
   </div>
 
   <header class="header">
-    <div class="logo">
-      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#0033CC"/><circle cx="22" cy="22" r="3.4" fill="#FFFFFF"/></svg>
-      <div class="word">Mote</div>
-    </div>
+    <a class="logo" href="/" aria-label="Mote — home">
+      <svg class="mark" viewBox="0 0 22 16" aria-hidden="true">
+        <circle cx="11" cy="3.6"  r="2.6" fill="#0033CC"/>
+        <circle cx="4.6" cy="12.4" r="2.6" fill="#0033CC"/>
+        <circle cx="17.4" cy="12.4" r="2.6" fill="#0033CC"/>
+      </svg>
+      <span class="word">mote</span>
+    </a>
     <div class="head-title">
       <h1 class="title">Today, in a Word</h1>
       <p class="headline">What's the world thinking today?</p>
@@ -1808,7 +1845,7 @@
     <div class="history-body">
       <div class="ed-mast">
         <div class="ed-mast-l">
-          <div class="ed-brand">Mote</div>
+          <div class="ed-brand">mote</div>
           <div class="ed-vol">A note · Vol.2026</div>
         </div>
         <div class="ed-mast-r" style="cursor:default">
@@ -2293,20 +2330,31 @@
   }
 
   /* — Validation — */
+  // Layout-break guards: total visible length, and longest unbreakable run.
+  // A long contiguous token (no spaces/hyphens) blows out the word cloud width.
+  const MAX_TOTAL_LEN = 30;
+  const MAX_TOKEN_LEN = 20;
   function validate(raw) {
-    const trimmed = raw.trim();
-    if (!trimmed) return { ok: false, kind: "empty", msg: "Type one word." };
-    if (/\s/.test(trimmed)) return { ok: false, kind: "multi_word", msg: "Just one word for now — multi-word coming soon." };
-    const word = trimmed.toLowerCase();
-    if (!/^[a-z]+$/.test(word)) return { ok: false, kind: "non_letters", msg: "Letters only." };
-    if (word.length > 20) return { ok: false, kind: "too_long", msg: "Twenty letters or fewer." };
+    const word = sanitize(raw).replace(/\s+/g, " ").trim();
+    if (!word) return { ok: false, kind: "empty", msg: "Type something." };
+    if (word.length > MAX_TOTAL_LEN) {
+      return { ok: false, kind: "too_long", msg: `${MAX_TOTAL_LEN} characters or fewer.` };
+    }
+    const longestRun = word.split(/[\s\-_]+/).reduce((m, t) => Math.max(m, t.length), 0);
+    if (longestRun > MAX_TOKEN_LEN) {
+      return { ok: false, kind: "too_long", msg: `Break it up — ${MAX_TOKEN_LEN} letters max in a row.` };
+    }
     if (PROFANITY.has(word)) return { ok: false, kind: "profanity", msg: "Try a different word." };
     return { ok: true, word };
   }
-  // Lightly clean as the user types: lowercase + drop control chars,
-  // but PRESERVE spaces so multi-word intent stays visible.
+  // Lightly clean as the user types: lowercase + strip control/bidi/
+  // zero-width chars (those break layout invisibly). Everything else —
+  // numbers, punctuation, spaces, unicode letters — is kept.
   function sanitize(raw) {
-    return raw.toLowerCase().replace(/[^a-z ]/g, "").slice(0, 120);
+    return raw
+      .toLowerCase()
+      .replace(/[\x00-\x1F\x7F-\x9F\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, "")
+      .slice(0, 120);
   }
 
   const loggedAttempts = new Set();
@@ -2658,6 +2706,7 @@
     const INK_FAINT = "rgba(0,0,0,0.32)";
     const SANS = '"Geist", system-ui, sans-serif';
     const MONO = '"Geist Mono", ui-monospace, monospace';
+    const SERIF = '"Fraunces", Georgia, serif';
 
     ctx.fillStyle = PAPER;
     ctx.fillRect(0, 0, W, H);
@@ -2668,19 +2717,20 @@
 
     const PAD = 64;
 
-    // Brand mark (matches favicon: cobalt square with white dot)
+    // Brand mark — asterism (three blue discs in a triangle)
     ctx.fillStyle = COBALT;
-    ctx.fillRect(PAD, PAD, 28, 28);
-    ctx.fillStyle = PAPER;
-    ctx.beginPath();
-    ctx.arc(PAD + 28 - 9, PAD + 28 - 9, 3, 0, Math.PI * 2);
-    ctx.fill();
+    const markCx = PAD + 16, markCy = PAD + 14;
+    const r = 4.2, dx = 9, dy = 9;
+    ctx.beginPath(); ctx.arc(markCx,      markCy - dy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(markCx - dx, markCy + dy - 3, r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(markCx + dx, markCy + dy - 3, r, 0, Math.PI * 2); ctx.fill();
 
+    // Wordmark — Fraunces, lowercase
     ctx.fillStyle = INK;
-    ctx.font = `800 22px ${SANS}`;
+    ctx.font = `500 38px ${SERIF}`;
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = "left";
-    ctx.fillText("MOTE", PAD + 44, PAD + 22);
+    ctx.fillText("mote", PAD + 44, PAD + 28);
 
     // Date, top-right
     ctx.fillStyle = INK_SOFT;
@@ -2725,9 +2775,9 @@
     ctx.fillRect(0, H - 2, W, 2);
 
     ctx.fillStyle = INK_SOFT;
-    ctx.font = `600 18px ${MONO}`;
+    ctx.font = `500 26px ${SERIF}`;
     ctx.textAlign = "left";
-    ctx.fillText("MOTE.DAY", PAD, H - PAD + 4);
+    ctx.fillText("mote.day", PAD, H - PAD + 6);
 
     // CTA pill, bottom-right
     const ctaText = "ONE WORD A DAY";
@@ -3257,7 +3307,7 @@
     return `
       <div class="ed-mast">
         <div class="ed-mast-l">
-          <div class="ed-brand">Mote</div>
+          <div class="ed-brand">mote</div>
           <div class="ed-vol">${opts.editionN}</div>
         </div>
         <button class="ed-mast-r" id="ed-date-jump" ${opts.archive ? 'disabled style="cursor:default"' : ""}>
@@ -3547,6 +3597,91 @@
     }
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+
+  /* — Dev mode (?dev=1): synthesize 159 voices / 57 words across 15s, "awesome" wins.
+     Overrides fetchToday and disables polling/realtime so real backend data
+     can't bleed in during the demo. — */
+  if (new URLSearchParams(location.search).get("dev") === "1") {
+    const DEV_WORDS = [
+      "awesome",
+      "tired","calm","grateful","hopeful","anxious","curious","content","peaceful",
+      "happy","sad","lonely","excited","loved","focused","grumpy","blessed","weary",
+      "soft","steady","alive","quiet","ready","thoughtful","restless","present","light",
+      "heavy","gentle","brave","sleepy","stressed","kind","still","warm","blue","fine",
+      "okay","cozy","wired","wistful","fierce","melty","bright","drained","silly","spent",
+      "buoyant","mellow","sharp","fuzzy","crisp","loose","fragile","bold","numb","seen"
+    ];
+    // Tier shape: 1+2+3+5+8+13+25 = 57 words; 21+22+21+20+24+26+25 = 159 voices.
+    const TIERS = [
+      { count: 21, n: 1 },
+      { count: 11, n: 2 },
+      { count: 7,  n: 3 },
+      { count: 4,  n: 5 },
+      { count: 3,  n: 8 },
+      { count: 2,  n: 13 },
+      { count: 1,  n: 25 }
+    ];
+    const targetCounts = new Map();
+    {
+      let i = 0;
+      for (const t of TIERS) {
+        for (let k = 0; k < t.n; k++) targetCounts.set(DEV_WORDS[i++], t.count);
+      }
+    }
+    const arrivals = [];
+    for (const [w, c] of targetCounts) for (let k = 0; k < c; k++) arrivals.push(w);
+    for (let j = arrivals.length - 1; j > 0; j--) {
+      const r = Math.floor(Math.random() * (j + 1));
+      [arrivals[j], arrivals[r]] = [arrivals[r], arrivals[j]];
+    }
+
+    const liveCounts = new Map();
+    let liveTotal = 0;
+    let liveLast = null;
+
+    fetchToday = async function devFetchToday() {
+      const entries = [...liveCounts.entries()].sort((a, b) => b[1] - a[1]);
+      return { entries, voices: liveTotal, unique: entries.length, last: liveLast };
+    };
+    fetchAllTime = async function devFetchAllTime() {
+      return { voices: liveTotal, unique: liveCounts.size };
+    };
+    startPolling = function() {};
+    startRealtime = async function() {};
+
+    const TOTAL_MS = 15000;
+    const STEPS = 30;
+    const STEP_MS = TOTAL_MS / STEPS;
+    const perStep = arrivals.length / STEPS;
+    let added = 0;
+    let step = 0;
+    function devTick() {
+      step++;
+      const target = Math.min(arrivals.length, Math.round(step * perStep));
+      let popWord = null;
+      while (added < target) {
+        const w = arrivals[added++];
+        liveCounts.set(w, (liveCounts.get(w) || 0) + 1);
+        liveTotal++;
+        liveLast = { word: w, at: new Date() };
+        popWord = w;
+      }
+      refresh(popWord);
+      if (added < arrivals.length) setTimeout(devTick, STEP_MS);
+    }
+    setTimeout(devTick, STEP_MS);
+
+    const badge = document.createElement("div");
+    badge.textContent = "DEV";
+    Object.assign(badge.style, {
+      position: "fixed", top: "8px", right: "8px",
+      fontFamily: "var(--mono)", fontSize: "10px",
+      letterSpacing: "0.18em", padding: "4px 8px",
+      background: "#000", color: "#fff", zIndex: "300",
+      pointerEvents: "none", borderRadius: "2px"
+    });
+    document.body.appendChild(badge);
+  }
 
   /* — Boot — */
   refresh().then(() => runTyperCycle());

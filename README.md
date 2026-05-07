@@ -37,4 +37,4 @@ Issues and PRs welcome. Open an issue before a large change so we can talk throu
 
 ---
 
-[MIT](LICENSE) © 2026 linhtt. Type by [Geist](https://vercel.com/font). Hosted on [Cloudflare Pages](https://pages.cloudflare.com/), backed by [Supabase](https://supabase.com).
+[MIT](LICENSE) © 2026 linhtt. Wordmark in [Fraunces](https://fonts.google.com/specimen/Fraunces); UI in [Geist](https://vercel.com/font). Hosted on [Cloudflare Pages](https://pages.cloudflare.com/), backed by [Supabase](https://supabase.com).
