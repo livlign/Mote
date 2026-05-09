@@ -117,8 +117,8 @@ const POOL = [
   ["maybe", 3], ["soon", 3], ["wait", 3], ["done", 3], ["beginning", 2],
   ["ending", 2], ["future", 2], ["past", 2],
   // arbitrary / diverse — exercises the relaxed validation:
-  // numbers, hyphens, underscores, multi-word, contractions, punctuation
-  ["404", 2], ["42", 1], ["100%", 2], ["2026", 2], ["3am", 3], ["5pm", 2],
+  // digits, hyphens, underscores, apostrophes, multi-word
+  ["404", 2], ["42", 1], ["2026", 2], ["3am", 3], ["5pm", 2],
   ["wfh", 4], ["ooo", 2], ["irl", 2], ["tbh", 3], ["imo", 1], ["fomo", 2],
   ["side-project", 3], ["stand-up", 3], ["deep-work", 3], ["burn-out", 3],
   ["check-in", 2], ["one-on-one", 2], ["game-night", 2], ["self-care", 3],

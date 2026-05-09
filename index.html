@@ -2344,6 +2344,11 @@
     if (longestRun > MAX_TOKEN_LEN) {
       return { ok: false, kind: "too_long", msg: `Break it up — ${MAX_TOKEN_LEN} letters max in a row.` };
     }
+    // Mirror the server CHECK so unsupported characters get a clear message
+    // rather than a generic "Couldn't send" from a rejected insert.
+    if (!/^[a-z0-9][a-z0-9'_-]{0,19}( [a-z0-9][a-z0-9'_-]{0,19})*$/.test(word)) {
+      return { ok: false, kind: "non_letters", msg: "Letters, digits, ' - _ and spaces only." };
+    }
     if (PROFANITY.has(word)) return { ok: false, kind: "profanity", msg: "Try a different word." };
     return { ok: true, word };
   }

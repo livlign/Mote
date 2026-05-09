@@ -8,9 +8,10 @@ create table if not exists words (
   utc_date date generated always as ((submitted_at at time zone 'UTC')::date) stored
 );
 
--- Word format: lowercase letters with single spaces between tokens.
--- Each token ≤ 20 chars; total length ≤ 30. Loosened from `^[a-z]{1,20}$`
--- so short multi-word phrases ("good vibes", "in love") can be submitted.
+-- Word format: each token starts with an alphanumeric and may contain
+-- lowercase letters, digits, apostrophes, hyphens, underscores. Tokens
+-- are separated by single spaces. Each token ≤ 20 chars; total ≤ 30.
+-- Loosened progressively from `^[a-z]{1,20}$` → multi-word → here.
 -- Drops any pre-existing anonymous CHECK on `word` so this migration is
 -- safe to re-run on existing databases.
 do $$
@@ -30,7 +31,7 @@ alter table words drop constraint if exists words_word_format;
 -- predate this format). New inserts are still enforced; the RLS policy
 -- below applies the same regex on the write path.
 alter table words add constraint words_word_format
-  check (word ~ '^[a-z]{1,20}( [a-z]{1,20})*$' and length(word) <= 30) not valid;
+  check (word ~ '^[a-z0-9][a-z0-9''_-]{0,19}( [a-z0-9][a-z0-9''_-]{0,19})*$' and length(word) <= 30) not valid;
 
 create unique index if not exists words_one_per_device_per_day on words (device_id, utc_date);
 create index if not exists words_by_date on words (utc_date);
@@ -56,7 +57,7 @@ drop policy if exists "anyone can insert their own daily word" on words;
 create policy "anyone can insert their own daily word"
   on words for insert
   with check (
-    word ~ '^[a-z]{1,20}( [a-z]{1,20})*$'
+    word ~ '^[a-z0-9][a-z0-9''_-]{0,19}( [a-z0-9][a-z0-9''_-]{0,19})*$'
     and length(word) <= 30
     and length(device_id) between 8 and 64
     and not exists (
