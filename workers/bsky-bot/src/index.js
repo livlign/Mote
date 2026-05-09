@@ -53,8 +53,48 @@ async function run(env) {
 
   const text = composePost({ topWord, topCount, voices, date: yesterday });
   const session = await createSession(env);
-  const postRes = await createPost(session, text);
+
+  // Upload the OG image as a blob so the link card has a thumbnail.
+  // Static og.png because Bluesky's blob handler rejects SVG (security).
+  let thumb = null;
+  try {
+    const imgRes = await fetch(`${SITE_URL}/og.png`);
+    if (imgRes.ok) {
+      const bytes = await imgRes.arrayBuffer();
+      thumb = await uploadBlob(session, bytes, "image/png");
+    }
+  } catch (e) {
+    // Non-fatal — post without thumbnail rather than skipping.
+  }
+
+  const embed = {
+    $type: "app.bsky.embed.external",
+    external: {
+      uri: SITE_URL,
+      title: `Mote — ${topWord}`,
+      description: `${voices.toLocaleString()} voices yesterday · today's word resets at 00:00 UTC`,
+      ...(thumb ? { thumb } : {}),
+    },
+  };
+
+  const postRes = await createPost(session, text, embed);
   return { posted: true, date: yesterday, topWord, voices, uri: postRes.uri };
+}
+
+async function uploadBlob(session, bytes, mimeType) {
+  const res = await fetch(`${BSKY_PDS}/xrpc/com.atproto.repo.uploadBlob`, {
+    method: "POST",
+    headers: {
+      "content-type": mimeType,
+      authorization: `Bearer ${session.accessJwt}`,
+    },
+    body: bytes,
+  });
+  if (!res.ok) {
+    throw new Error(`uploadBlob failed: ${res.status} ${await res.text()}`);
+  }
+  const json = await res.json(); // { blob: { $type, ref, mimeType, size } }
+  return json.blob;
 }
 
 function utcDateOffset(deltaDays) {
@@ -123,7 +163,7 @@ async function createSession(env) {
   return res.json(); // { accessJwt, did, ... }
 }
 
-async function createPost(session, text) {
+async function createPost(session, text, embed) {
   const facets = buildFacets(text);
   const record = {
     $type: "app.bsky.feed.post",
@@ -131,6 +171,7 @@ async function createPost(session, text) {
     createdAt: new Date().toISOString(),
     langs: ["en"],
     ...(facets.length ? { facets } : {}),
+    ...(embed ? { embed } : {}),
   };
   const res = await fetch(`${BSKY_PDS}/xrpc/com.atproto.repo.createRecord`, {
     method: "POST",
