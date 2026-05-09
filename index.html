@@ -2945,7 +2945,8 @@
       }
     }
 
-    renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, lastVoices + 1, { showShare: true });
+    const sameWord = (lastEntries.find(([w]) => w === apiRes.row.word)?.[1] ?? 0) + 1;
+    renderYouSaid({ word: apiRes.row.word, utc_date: apiRes.row.utc_date }, sameWord, { showShare: true });
     submitEl.style.visibility = "";
     submitEl.classList.add("fade-in");
     setTimeout(() => submitEl.classList.remove("fade-in"), 500);
