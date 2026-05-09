@@ -6,3 +6,4 @@ node_modules/
 .idea/
 *.log
 .wrangler/
+docs/marketing.md

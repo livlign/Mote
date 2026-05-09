@@ -23,8 +23,9 @@
 // Manual trigger for testing:
 //   curl "https://mote-bsky-bot.<sub>.workers.dev/run?token=<RUN_TOKEN>"
 
-import initWasm, { Resvg } from "@resvg/resvg-wasm";
+import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import resvgWasm from "@resvg/resvg-wasm/index_bg.wasm";
+import interBold from "../fonts/Inter-Bold.ttf";
 
 const SUPABASE_URL = "https://mhtutulyduovxubzpnvd.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_uP6fxaX0sr5Msc3a507uwA_2rtT_E1J";
@@ -229,7 +230,13 @@ async function renderPNG({ topWord, topCount, voices }) {
   const svg = renderSVG({ topWord, topCount, voices });
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: 1200 },
-    font: { loadSystemFonts: false },
+    font: {
+      // Single bold font keeps the worker under the 1MB free-tier limit.
+      // Sub/url copy reads slightly heavier than designed but stays legible.
+      fontBuffers: [new Uint8Array(interBold)],
+      defaultFontFamily: "Inter",
+      loadSystemFonts: false,
+    },
   });
   return resvg.render().asPng();
 }
@@ -249,7 +256,7 @@ function renderSVG({ topWord, topCount, voices }) {
   const headlineSvg = lines
     .map(
       (line, i) =>
-        `<text x="80" y="${startY + i * lineHeight}" font-family="sans-serif" font-weight="800" font-size="${wordSize}" letter-spacing="-0.04em" fill="#000">${escapeXML(line)}</text>`
+        `<text x="80" y="${startY + i * lineHeight}" font-family="Inter" font-weight="800" font-size="${wordSize}" letter-spacing="-0.04em" fill="#000">${escapeXML(line)}</text>`
     )
     .join("");
 
@@ -260,14 +267,14 @@ function renderSVG({ topWord, topCount, voices }) {
     <circle cx="19" cy="6" r="4" fill="#0033CC"/>
     <circle cx="11" cy="20" r="4" fill="#0033CC"/>
     <circle cx="27" cy="20" r="4" fill="#0033CC"/>
-    <text x="54" y="26" font-family="serif" font-weight="500" font-size="44" letter-spacing="-0.04em" fill="#000">mote</text>
+    <text x="54" y="26" font-family="Inter" font-weight="500" font-size="44" letter-spacing="-0.04em" fill="#000">mote</text>
   </g>
   ${headlineSvg}
-  <text x="80" y="${startY + (lines.length - 1) * lineHeight + 90}" font-family="sans-serif" font-weight="500" font-size="30" fill="rgba(0,0,0,0.55)">${escapeXML(sub)}</text>
-  <text x="80" y="542" font-family="serif" font-weight="500" font-size="30" letter-spacing="-0.025em" fill="rgba(0,0,0,0.55)">mote.day</text>
+  <text x="80" y="${startY + (lines.length - 1) * lineHeight + 90}" font-family="Inter" font-weight="500" font-size="30" fill="rgba(0,0,0,0.55)">${escapeXML(sub)}</text>
+  <text x="80" y="542" font-family="Inter" font-weight="500" font-size="30" letter-spacing="-0.025em" fill="rgba(0,0,0,0.55)">mote.day</text>
   <g transform="translate(820,510)">
     <rect width="300" height="48" fill="#0033CC"/>
-    <text x="20" y="32" font-family="sans-serif" font-weight="700" font-size="20" letter-spacing="0.14em" fill="#FFFFFF">SAY YOURS  →</text>
+    <text x="20" y="32" font-family="Inter" font-weight="700" font-size="20" letter-spacing="0.14em" fill="#FFFFFF">SAY YOURS  →</text>
   </g>
   <rect x="0" y="628" width="1200" height="2" fill="#000"/>
 </svg>`;

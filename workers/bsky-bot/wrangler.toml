@@ -2,6 +2,12 @@ name = "mote-bsky-bot"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
 
+# Bundle .ttf files as binary so they can be imported as ArrayBuffer.
+[[rules]]
+type = "Data"
+globs = ["**/*.ttf"]
+fallthrough = true
+
 # Runs at 00:05 UTC daily — five minutes after the day rollover so word_counts
 # has the previous day's final tallies cleanly partitioned.
 [triggers]

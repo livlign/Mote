@@ -29,7 +29,7 @@ The whole site is one static `index.html` plus a Supabase schema. No bundler, no
 3. Serve the directory: `python3 -m http.server 8000`.
 4. Deploy by uploading the folder to any static host. The live site uses Cloudflare Pages: `npx wrangler pages deploy . --project-name=mote --branch=main`.
 
-A few things worth knowing: the `^[a-z]{1,20}$` constraint blocks non-Latin scripts and is a real limitation. The profanity filter is a small inline wordlist. Aggregation goes through the `word_counts` view to dodge PostgREST's 1000-row cap. The publishable key in the source is the anon key — RLS does the work.
+A few things worth knowing: the word format is `^[a-z0-9][a-z0-9'_-]{0,19}( [a-z0-9][a-z0-9'_-]{0,19})*$` with a 30-char total cap — short multi-word phrases (`"good vibes"`), digits, hyphens, underscores, and apostrophes are allowed; non-Latin scripts and most punctuation are not. The profanity filter is a small inline wordlist. Aggregation goes through the `word_counts` view to dodge PostgREST's 1000-row cap. The publishable key in the source is the anon key — RLS does the work.
 
 ## Contributing
 
