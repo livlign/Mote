@@ -1,4 +1,4 @@
-const VERSION = 'mote-v1';
+const VERSION = 'mote-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

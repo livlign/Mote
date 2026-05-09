@@ -2,11 +2,35 @@ create extension if not exists "pgcrypto";
 
 create table if not exists words (
   id uuid primary key default gen_random_uuid(),
-  word text not null check (word ~ '^[a-z]{1,20}$'),
+  word text not null,
   device_id text not null,
   submitted_at timestamptz not null default now(),
   utc_date date generated always as ((submitted_at at time zone 'UTC')::date) stored
 );
+
+-- Word format: lowercase letters with single spaces between tokens.
+-- Each token ≤ 20 chars; total length ≤ 30. Loosened from `^[a-z]{1,20}$`
+-- so short multi-word phrases ("good vibes", "in love") can be submitted.
+-- Drops any pre-existing anonymous CHECK on `word` so this migration is
+-- safe to re-run on existing databases.
+do $$
+declare c_name text;
+begin
+  for c_name in
+    select conname from pg_constraint
+    where conrelid = 'words'::regclass and contype = 'c'
+      and conname <> 'words_word_format'
+      and pg_get_constraintdef(oid) ilike '%word %~%'
+  loop
+    execute format('alter table words drop constraint %I', c_name);
+  end loop;
+end$$;
+alter table words drop constraint if exists words_word_format;
+-- `not valid`: pre-existing rows are grandfathered (some backfilled rows
+-- predate this format). New inserts are still enforced; the RLS policy
+-- below applies the same regex on the write path.
+alter table words add constraint words_word_format
+  check (word ~ '^[a-z]{1,20}( [a-z]{1,20})*$' and length(word) <= 30) not valid;
 
 create unique index if not exists words_one_per_device_per_day on words (device_id, utc_date);
 create index if not exists words_by_date on words (utc_date);
@@ -32,7 +56,8 @@ drop policy if exists "anyone can insert their own daily word" on words;
 create policy "anyone can insert their own daily word"
   on words for insert
   with check (
-    word ~ '^[a-z]{1,20}$'
+    word ~ '^[a-z]{1,20}( [a-z]{1,20})*$'
+    and length(word) <= 30
     and length(device_id) between 8 and 64
     and not exists (
       select 1 from words w

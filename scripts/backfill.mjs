@@ -116,6 +116,20 @@ const POOL = [
   ["hope", 5], ["fear", 3], ["dream", 4], ["change", 3], ["time", 5],
   ["maybe", 3], ["soon", 3], ["wait", 3], ["done", 3], ["beginning", 2],
   ["ending", 2], ["future", 2], ["past", 2],
+  // arbitrary / diverse — exercises the relaxed validation:
+  // numbers, hyphens, underscores, multi-word, contractions, punctuation
+  ["404", 2], ["42", 1], ["100%", 2], ["2026", 2], ["3am", 3], ["5pm", 2],
+  ["wfh", 4], ["ooo", 2], ["irl", 2], ["tbh", 3], ["imo", 1], ["fomo", 2],
+  ["side-project", 3], ["stand-up", 3], ["deep-work", 3], ["burn-out", 3],
+  ["check-in", 2], ["one-on-one", 2], ["game-night", 2], ["self-care", 3],
+  ["jet-lagged", 2], ["over-it", 3], ["half-asleep", 3], ["all-nighter", 2],
+  ["good day", 4], ["bad day", 4], ["long day", 5], ["slow day", 3],
+  ["rough morning", 3], ["quiet sunday", 2], ["lazy afternoon", 2],
+  ["new chapter", 2], ["mixed feelings", 3], ["small wins", 3],
+  ["low key", 3], ["high key", 2], ["full circle", 2], ["barely there", 2],
+  ["meh", 5], ["ugh", 4], ["yay", 3], ["oof", 4], ["welp", 3],
+  ["c'est la vie", 1], ["here we go", 2], ["who knows", 2],
+  ["deep_focus", 2], ["zero_inbox", 1], ["pr_review", 2],
 ];
 const baseWeights = new Map();
 for (const [w, wt] of POOL) baseWeights.set(w, (baseWeights.get(w) || 0) + wt);

@@ -6,10 +6,10 @@
 <title>Mote — Today, in a Word. What's the world thinking?</title>
 <meta name="description" content="One word per person, per day. The world's words gather into a live cloud — bigger when more people say the same thing. Resets at 00:00 UTC.">
 <link rel="canonical" href="https://mote.day">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=2">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
+<link rel="manifest" href="/manifest.webmanifest?v=2">
 <meta name="theme-color" content="#0033CC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -3597,91 +3597,6 @@
     }
   }
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
-
-  /* — Dev mode (?dev=1): synthesize 159 voices / 57 words across 15s, "awesome" wins.
-     Overrides fetchToday and disables polling/realtime so real backend data
-     can't bleed in during the demo. — */
-  if (new URLSearchParams(location.search).get("dev") === "1") {
-    const DEV_WORDS = [
-      "awesome",
-      "tired","calm","grateful","hopeful","anxious","curious","content","peaceful",
-      "happy","sad","lonely","excited","loved","focused","grumpy","blessed","weary",
-      "soft","steady","alive","quiet","ready","thoughtful","restless","present","light",
-      "heavy","gentle","brave","sleepy","stressed","kind","still","warm","blue","fine",
-      "okay","cozy","wired","wistful","fierce","melty","bright","drained","silly","spent",
-      "buoyant","mellow","sharp","fuzzy","crisp","loose","fragile","bold","numb","seen"
-    ];
-    // Tier shape: 1+2+3+5+8+13+25 = 57 words; 21+22+21+20+24+26+25 = 159 voices.
-    const TIERS = [
-      { count: 21, n: 1 },
-      { count: 11, n: 2 },
-      { count: 7,  n: 3 },
-      { count: 4,  n: 5 },
-      { count: 3,  n: 8 },
-      { count: 2,  n: 13 },
-      { count: 1,  n: 25 }
-    ];
-    const targetCounts = new Map();
-    {
-      let i = 0;
-      for (const t of TIERS) {
-        for (let k = 0; k < t.n; k++) targetCounts.set(DEV_WORDS[i++], t.count);
-      }
-    }
-    const arrivals = [];
-    for (const [w, c] of targetCounts) for (let k = 0; k < c; k++) arrivals.push(w);
-    for (let j = arrivals.length - 1; j > 0; j--) {
-      const r = Math.floor(Math.random() * (j + 1));
-      [arrivals[j], arrivals[r]] = [arrivals[r], arrivals[j]];
-    }
-
-    const liveCounts = new Map();
-    let liveTotal = 0;
-    let liveLast = null;
-
-    fetchToday = async function devFetchToday() {
-      const entries = [...liveCounts.entries()].sort((a, b) => b[1] - a[1]);
-      return { entries, voices: liveTotal, unique: entries.length, last: liveLast };
-    };
-    fetchAllTime = async function devFetchAllTime() {
-      return { voices: liveTotal, unique: liveCounts.size };
-    };
-    startPolling = function() {};
-    startRealtime = async function() {};
-
-    const TOTAL_MS = 15000;
-    const STEPS = 30;
-    const STEP_MS = TOTAL_MS / STEPS;
-    const perStep = arrivals.length / STEPS;
-    let added = 0;
-    let step = 0;
-    function devTick() {
-      step++;
-      const target = Math.min(arrivals.length, Math.round(step * perStep));
-      let popWord = null;
-      while (added < target) {
-        const w = arrivals[added++];
-        liveCounts.set(w, (liveCounts.get(w) || 0) + 1);
-        liveTotal++;
-        liveLast = { word: w, at: new Date() };
-        popWord = w;
-      }
-      refresh(popWord);
-      if (added < arrivals.length) setTimeout(devTick, STEP_MS);
-    }
-    setTimeout(devTick, STEP_MS);
-
-    const badge = document.createElement("div");
-    badge.textContent = "DEV";
-    Object.assign(badge.style, {
-      position: "fixed", top: "8px", right: "8px",
-      fontFamily: "var(--mono)", fontSize: "10px",
-      letterSpacing: "0.18em", padding: "4px 8px",
-      background: "#000", color: "#fff", zIndex: "300",
-      pointerEvents: "none", borderRadius: "2px"
-    });
-    document.body.appendChild(badge);
-  }
 
   /* — Boot — */
   refresh().then(() => runTyperCycle());
