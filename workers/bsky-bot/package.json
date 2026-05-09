@@ -1,0 +1,7 @@
+{
+  "name": "mote-bsky-bot",
+  "private": true,
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2"
+  }
+}
