@@ -108,7 +108,7 @@ function render({ topWord, topCount, voices, date }) {
   ${headlineSvg}
 
   <!-- sub -->
-  <text x="80" y="${startY + totalH + 56}" font-family="Geist, system-ui, sans-serif" font-weight="500" font-size="32" fill="rgba(0,0,0,0.55)">${escapeXML(sub)}</text>
+  <text x="80" y="${startY + (lines.length - 1) * lineHeight + 90}" font-family="Geist, system-ui, sans-serif" font-weight="500" font-size="30" fill="rgba(0,0,0,0.55)">${escapeXML(sub)}</text>
 
   <!-- url -->
   <text x="80" y="542" font-family="Fraunces, Georgia, serif" font-weight="500" font-size="30" letter-spacing="-0.025em" fill="rgba(0,0,0,0.55)">mote.day</text>
