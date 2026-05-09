@@ -1,0 +1,14 @@
+name = "mote-bsky-bot"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Runs at 00:05 UTC daily — five minutes after the day rollover so word_counts
+# has the previous day's final tallies cleanly partitioned.
+[triggers]
+crons = ["5 0 * * *"]
+
+# Required secrets (set via `wrangler secret put`):
+#   BSKY_HANDLE      e.g. mote.day  (the bot's account handle)
+#   BSKY_APP_PASSWORD  app password from bsky.app → Settings → App Passwords
+#
+# Optional vars: none.
