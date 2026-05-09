@@ -1,0 +1,8 @@
+{
+  "name": "mote",
+  "private": true,
+  "description": "mote.day — runtime deps for Pages Functions (static site otherwise has no build).",
+  "dependencies": {
+    "@resvg/resvg-wasm": "^2.6.2"
+  }
+}
