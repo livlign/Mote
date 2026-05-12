@@ -31,9 +31,33 @@
 <meta name="twitter:title" content="Mote — Today, in a Word. What's the world thinking?">
 <meta name="twitter:description" content="One word per person, per day. The world's words gather into a live cloud — bigger when more people say the same thing. Resets at 00:00 UTC.">
 <meta name="twitter:image" content="https://mote.day/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  /* Self-hosted fonts: latin subset only (UI is English, word inputs are ASCII).
+     Geist + Geist Mono woff2 files are variable — one file covers 400–800.
+     Fraunces is used at a single weight (500), variable opsz axis preserved. */
+  @font-face {
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('/fonts/geist.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Geist Mono';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('/fonts/geist-mono.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Fraunces';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('/fonts/fraunces-500.woff2') format('woff2');
+  }
+</style>
 <style>
   :root {
     --paper:      #ffffff;
