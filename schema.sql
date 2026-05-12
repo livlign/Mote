@@ -67,12 +67,12 @@ create policy "anyone can insert their own daily word"
     word ~ '^[a-z0-9][a-z0-9''_-]{0,19}( [a-z0-9][a-z0-9''_-]{0,19})*$'
     and length(word) <= 30
     and length(device_id) between 8 and 64
-    and not exists (
-      select 1 from words w
-      where w.device_id = words.device_id
-        and w.utc_date = (now() at time zone 'UTC')::date
-    )
   );
+-- One-word-per-device-per-day is enforced by the unique index
+-- `words_one_per_device_per_day` above. We deliberately don't repeat that
+-- check in the policy because doing so requires SELECT on device_id, which
+-- anon no longer has (see column-grants block above). On duplicate the
+-- unique index returns 23505 → PostgREST 409, which the client handles.
 
 -- Aggregated views: one row per (word, utc_date) — avoids the PostgREST 1000-row cap.
 drop view if exists word_counts;
