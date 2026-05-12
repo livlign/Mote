@@ -2065,15 +2065,22 @@
   }
 
   async function submitWord(word) {
-    // ?select= scopes RETURNING to columns anon can SELECT (device_id is hidden by column grants).
-    const res = await api("words?select=word,submitted_at,utc_date", { method: "POST", body: JSON.stringify({ word, device_id: deviceId }) });
+    // return=minimal: PostgREST's default return=representation re-reads the
+    // inserted row via SELECT *, which trips the device_id column grant.
+    // We synthesize the row locally — no info is lost: word is the input,
+    // submitted_at ≈ now, utc_date is today.
+    const res = await api("words", {
+      method: "POST",
+      headers: { "Prefer": "return=minimal" },
+      body: JSON.stringify({ word, device_id: deviceId })
+    });
     if (res.status === 409) return { ok: false, reason: "duplicate" };
     if (!res.ok) {
       const txt = await res.text();
       if (txt.includes("words_one_per_device_per_day") || txt.includes("duplicate") || res.status === 403) return { ok: false, reason: "duplicate" };
       return { ok: false, reason: "error", detail: txt };
     }
-    const [row] = await res.json();
+    const row = { word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
     return { ok: true, row };
   }
 
