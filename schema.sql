@@ -53,6 +53,13 @@ create policy "anyone can read"
   on words for select
   using (true);
 
+-- Hide device_id from anon REST reads. The row-level policy above still
+-- allows SELECT, but column-level grants restrict which columns come back.
+-- Without this, /rest/v1/words?select=device_id leaks a per-device
+-- fingerprint joined with word+timestamp.
+revoke select on words from anon;
+grant select (word, submitted_at, utc_date) on words to anon;
+
 drop policy if exists "anyone can insert their own daily word" on words;
 create policy "anyone can insert their own daily word"
   on words for insert
