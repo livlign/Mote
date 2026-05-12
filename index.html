@@ -2065,7 +2065,8 @@
   }
 
   async function submitWord(word) {
-    const res = await api("words", { method: "POST", body: JSON.stringify({ word, device_id: deviceId }) });
+    // ?select= scopes RETURNING to columns anon can SELECT (device_id is hidden by column grants).
+    const res = await api("words?select=word,submitted_at,utc_date", { method: "POST", body: JSON.stringify({ word, device_id: deviceId }) });
     if (res.status === 409) return { ok: false, reason: "duplicate" };
     if (!res.ok) {
       const txt = await res.text();
