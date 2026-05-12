@@ -1762,7 +1762,7 @@
     .submit { padding: 14px 18px 18px; }
     .submit-row { gap: 8px; }
     .submit-row input[type="text"] { font-size: 18px; }
-    .send { padding: 8px 14px; font-size: 10px; }
+    .send { padding: 12px 18px; font-size: 11px; }
     .new-day { padding: 8px 18px; font-size: 10px; }
     .history-bar { padding: 12px 18px; }
     .history-bar h2 { font-size: 14px; letter-spacing: 0.18em; }
@@ -2467,7 +2467,7 @@
     submitEl.innerHTML = `
       <div class="submit-row">
         <span class="arrow">→</span>
-        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="120" placeholder="type one word…" />
+        <input id="word" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="120" placeholder="tired? coffee? hopeful? type yours…" />
         <button class="send" id="send" disabled>Send</button>
       </div>
       <div class="submit-foot">
@@ -2477,7 +2477,8 @@
     const input = document.getElementById("word");
     const send = document.getElementById("send");
     const rules = document.getElementById("rules");
-    setTimeout(() => input.focus(), 40);
+    // Skip auto-focus on touch devices — pops the soft keyboard immediately and feels aggressive on first impression.
+    if (!matchMedia("(hover: none)").matches) setTimeout(() => input.focus(), 40);
 
     input.addEventListener("input", () => {
       const cleaned = sanitize(input.value);
@@ -3639,6 +3640,14 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 
   /* — Boot — */
+  // Render the input immediately for new visitors, before the Supabase fetch
+  // resolves. Otherwise the bottom of the page is empty for 400–800ms and
+  // visitors who decide quickly can miss the CTA entirely. Returning users
+  // (mine in localStorage) wait for refresh to show the correct "you said" count.
+  {
+    const mine = loadMine();
+    if (!mine || mine.utc_date !== todayUTC()) renderSubmitInput();
+  }
   refresh().then(() => runTyperCycle());
   startPolling();
   startRealtime();
