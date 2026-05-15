@@ -72,7 +72,7 @@ create policy "anyone can insert their own daily word"
     word ~ '^[a-z0-9][a-z0-9''_-]{0,19}( [a-z0-9][a-z0-9''_-]{0,19})*$'
     and length(word) <= 30
     and length(device_id) between 8 and 64
-    and word !~ '(^|[^a-z])(fuck(ing|er|ers)?|motherfucker|shit|bitch|cunt|dick|cock|pussy|asshole|bastard|slut|whore|fag|faggots?|nig+(a|as|az|ah|er|ers)|retard(ed)?|kike|chink|spic|gook|coon|tranny|wetback)([^a-z]|$)'
+    and word !~ '\y(fuck|fucking|fucker|fuckers|motherfucker|motherfuckers|shit|bitch|bitches|cunt|cunts|dick|dicks|cock|cocks|pussy|asshole|assholes|bastard|bastards|slut|sluts|whore|whores|fag|fags|faggot|faggots|fagot|fagots|nigga|niggas|niggaz|niggah|nigger|niggers|retard|retards|retarded|kike|kikes|chink|chinks|spic|spics|gook|gooks|coon|coons|tranny|trannies|wetback|wetbacks)\y'
   );
 -- One-word-per-device-per-day is enforced by the unique index
 -- `words_one_per_device_per_day` above. We deliberately don't repeat that

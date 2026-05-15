@@ -2082,9 +2082,10 @@
     if (!res.ok) {
       const txt = await res.text();
       if (txt.includes("words_one_per_device_per_day") || txt.includes("duplicate")) return { ok: false, reason: "duplicate" };
-      // 403 from RLS WITH CHECK. Format and length are already validated
-      // client-side, so the remaining reason is the profanity backstop.
-      if (res.status === 403) return { ok: false, reason: "profanity" };
+      // 401/403 from RLS WITH CHECK (PostgREST maps code 42501 to 401).
+      // Format and length are already validated client-side, so the
+      // remaining reason is the profanity backstop.
+      if (res.status === 401 || res.status === 403) return { ok: false, reason: "profanity" };
       return { ok: false, reason: "error", detail: txt };
     }
     const row = { word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
