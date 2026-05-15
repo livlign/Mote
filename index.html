@@ -1900,13 +1900,18 @@
   const SUPABASE_URL = "https://mhtutulyduovxubzpnvd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_uP6fxaX0sr5Msc3a507uwA_2rtT_E1J";
 
+  // Kept in sync with the server-side blocklist in schema.sql. The client
+  // list is friendly first-pass UX; the policy is the actual enforcement.
   const PROFANITY = new Set([
-    "fuck","shit","bitch","cunt","dick","cock","pussy","asshole","bastard",
-    "slut","whore",
-    "fag","faggot","faggots",
-    "nigger","niggers","nigga","niggas","niggaz",
-    "retard","retarded",
-    "kike","chink","spic","gook","coon","tranny","wetback"
+    "fuck","fucking","fucker","fuckers","motherfucker","motherfuckers",
+    "shit","bitch","bitches","cunt","cunts","dick","dicks","cock","cocks",
+    "pussy","asshole","assholes","bastard","bastards",
+    "slut","sluts","whore","whores",
+    "fag","fags","faggot","faggots","fagot","fagots",
+    "nigga","niggas","niggaz","niggah","nigger","niggers",
+    "retard","retards","retarded",
+    "kike","kikes","chink","chinks","spic","spics",
+    "gook","gooks","coon","coons","tranny","trannies","wetback","wetbacks"
   ]);
 
   // Realtime is the primary live-update channel; polling is a fallback for
