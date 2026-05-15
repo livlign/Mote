@@ -60,6 +60,11 @@ create policy "anyone can read"
 revoke select on words from anon;
 grant select (word, submitted_at, utc_date) on words to anon;
 
+-- Server-side profanity backstop. The client list in index.html is the
+-- friendly first gate; this regex is the actual enforcement and catches
+-- common variants (plurals, -az, -ah, faggot, motherfucker, etc.). On
+-- match the insert is rejected with 403 and the client maps that to the
+-- same "Try a different word." message used for the client-side reject.
 drop policy if exists "anyone can insert their own daily word" on words;
 create policy "anyone can insert their own daily word"
   on words for insert
@@ -67,6 +72,7 @@ create policy "anyone can insert their own daily word"
     word ~ '^[a-z0-9][a-z0-9''_-]{0,19}( [a-z0-9][a-z0-9''_-]{0,19})*$'
     and length(word) <= 30
     and length(device_id) between 8 and 64
+    and word !~ '(^|[^a-z])(fuck(ing|er|ers)?|motherfucker|shit|bitch|cunt|dick|cock|pussy|asshole|bastard|slut|whore|fag|faggots?|nig+(a|as|az|ah|er|ers)|retard(ed)?|kike|chink|spic|gook|coon|tranny|wetback)([^a-z]|$)'
   );
 -- One-word-per-device-per-day is enforced by the unique index
 -- `words_one_per_device_per_day` above. We deliberately don't repeat that

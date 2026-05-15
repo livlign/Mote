@@ -1902,7 +1902,11 @@
 
   const PROFANITY = new Set([
     "fuck","shit","bitch","cunt","dick","cock","pussy","asshole","bastard",
-    "slut","whore","fag","nigger","retard"
+    "slut","whore",
+    "fag","faggot","faggots",
+    "nigger","niggers","nigga","niggas","niggaz",
+    "retard","retarded",
+    "kike","chink","spic","gook","coon","tranny","wetback"
   ]);
 
   // Realtime is the primary live-update channel; polling is a fallback for
@@ -2077,7 +2081,10 @@
     if (res.status === 409) return { ok: false, reason: "duplicate" };
     if (!res.ok) {
       const txt = await res.text();
-      if (txt.includes("words_one_per_device_per_day") || txt.includes("duplicate") || res.status === 403) return { ok: false, reason: "duplicate" };
+      if (txt.includes("words_one_per_device_per_day") || txt.includes("duplicate")) return { ok: false, reason: "duplicate" };
+      // 403 from RLS WITH CHECK. Format and length are already validated
+      // client-side, so the remaining reason is the profanity backstop.
+      if (res.status === 403) return { ok: false, reason: "profanity" };
       return { ok: false, reason: "error", detail: txt };
     }
     const row = { word, submitted_at: new Date().toISOString(), utc_date: todayUTC() };
@@ -2924,6 +2931,21 @@
       submitEl.classList.add("fade-in");
       setTimeout(() => submitEl.classList.remove("fade-in"), 500);
       await refresh(word);
+      return;
+    }
+    if (!apiRes.ok && apiRes.reason === "profanity") {
+      // Server-side backstop caught a variant the client list missed.
+      // Re-render the input and surface the same message the client path uses.
+      submitEl.style.visibility = "";
+      renderSubmitInput();
+      const i = document.getElementById("word");
+      const rules = document.getElementById("rules");
+      if (i) { i.value = word; i.focus(); }
+      if (rules) {
+        rules.textContent = "Try a different word.";
+        rules.classList.add("error");
+      }
+      logAttempt("profanity", word);
       return;
     }
     if (!apiRes.ok) {
